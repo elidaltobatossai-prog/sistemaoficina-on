@@ -118,6 +118,9 @@
                 <a href="#" onclick="mudarModulo('financeiro')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
                     <i class="fa-solid fa-wallet w-5"></i><span>Caixa & Financeiro</span>
                 </a>
+                <a href="#" onclick="mudarModulo('metas')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
+                    <i class="fa-solid fa-bullseye w-5 text-emerald-400"></i><span>Metas & Desempenho</span>
+                </a>
                 <a href="#" onclick="mudarModulo('configuracoes')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
                     <i class="fa-solid fa-gear w-5"></i><span>Configurações</span>
                 </a>
@@ -150,10 +153,6 @@
                     <h1 id="pageTitle" class="text-lg font-bold text-white">Dashboard Geral</h1>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <div id="alertaAgendamentosTopo" class="hidden cursor-pointer bg-red-950/80 border border-red-800 text-red-300 text-xs px-3 py-1.5 rounded-full flex items-center space-x-2 animate-bounce" onclick="mudarModulo('agendamentos')">
-                        <i class="fa-solid fa-bell text-red-500"></i>
-                        <span id="txtAlertaTopo">Há agendamentos hoje!</span>
-                    </div>
                     <span class="text-xs bg-emerald-950 text-emerald-400 font-semibold px-3 py-1.5 rounded-full border border-emerald-800 flex items-center">
                         <i class="fa-solid fa-circle text-[8px] text-emerald-500 mr-1.5 animate-pulse"></i> Sincronizado
                     </span>
@@ -476,6 +475,67 @@
                             </thead>
                             <tbody id="tabelaCaixa" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- METAS & DESEMPENHO -->
+                <div id="mod-metas" class="hidden space-y-6">
+                    <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl max-w-3xl space-y-6">
+                        <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-white flex items-center"><i class="fa-solid fa-bullseye text-emerald-400 mr-2"></i> Controle de Metas de Faturamento</h3>
+                                <p class="text-xs text-zinc-400">Defina sua meta diária desejada e acompanhe o desempenho em tempo real.</p>
+                            </div>
+                        </div>
+
+                        <!-- Configuração da Meta Manual -->
+                        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col sm:flex-row items-end gap-4">
+                            <div class="flex-1 w-full">
+                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Definir Meta Diária (R$)</label>
+                                <input type="number" step="1.00" id="inputMetaDiaria" value="600" class="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 text-emerald-400 font-bold rounded-xl text-base focus:outline-none focus:border-red-600" placeholder="600.00">
+                            </div>
+                            <button type="button" onclick="salvarMetaDiaria()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">
+                                Salvar Nova Meta
+                            </button>
+                        </div>
+
+                        <!-- Resultados do Dia -->
+                        <div class="space-y-4">
+                            <h4 class="text-xs font-bold uppercase text-zinc-300">Desempenho do Dia (Hoje: <span id="metaDataHoje">--/--/----</span>)</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Faturamento de Hoje</p>
+                                    <h3 class="text-2xl font-bold text-white mt-1" id="metaFiltroFaturamentoDia">R$ 0,00</h3>
+                                </div>
+                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Meta Diária Estipulada</p>
+                                    <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="metaExibicaoDiaria">R$ 600,00</h3>
+                                </div>
+                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800" id="cardStatusDiaContainer">
+                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase" id="metaTituloStatusDia">Status do Dia</p>
+                                    <h3 class="text-2xl font-bold mt-1" id="metaResultadoDia">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Projeção Mensal -->
+                        <div class="space-y-4 pt-4 border-t border-zinc-800">
+                            <h4 class="text-xs font-bold uppercase text-zinc-300">Projeção da Meta Mensal</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Total Acumulado no Mês</p>
+                                    <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="metaAcumuladoMes">R$ 0,00</h3>
+                                </div>
+                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Meta Mensal Estimada (Dias Úteis x Diária)</p>
+                                    <h3 class="text-2xl font-bold text-white mt-1" id="metaEstimadaMes">R$ 0,00</h3>
+                                </div>
+                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Distância da Meta Mensal</p>
+                                    <h3 class="text-2xl font-bold mt-1" id="metaDistanciaMes">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -922,7 +982,8 @@
             os: [],
             caixa: [],
             agendamentos: [],
-            config: { nome: "EF Motos Centro Automotivo", logo: "" }
+            config: { nome: "EF Motos Centro Automotivo", logo: "" },
+            metaDiaria: 600
         };
 
         let osItensTemp = [];
@@ -1015,6 +1076,7 @@
                 mecanicos: 'Equipe & Usuários',
                 estoque: 'Estoque de Peças & Mais Vendidos',
                 financeiro: 'Caixa & Financeiro',
+                metas: 'Metas & Desempenho Fincanceiro',
                 configuracoes: 'Configurações'
             };
             document.getElementById('pageTitle').innerText = titulos[id] || 'Sistema';
@@ -1033,6 +1095,7 @@
             renderizarPDV();
             renderizarCaixa();
             renderizarUsuarios();
+            renderizarMetas();
             atualizarDashboard();
             atualizarDatalistProdutos();
         }
@@ -1043,6 +1106,81 @@
             document.getElementById('dashSaldoCaixa').innerText = `R$ ${((totalEntradas - totalSaidas)).toFixed(2)}`;
             document.getElementById('dashOsAndamento').innerText = db.os.filter(o => o.status === 'Em andamento' || o.status === 'Aguardando peça').length;
             document.getElementById('dashClientes').innerText = db.clientes.length;
+        }
+
+        // --- MÓDULO DE METAS & DESEMPENHO ---
+        function salvarMetaDiaria() {
+            const val = parseFloat(document.getElementById('inputMetaDiaria').value) || 0;
+            db.metaDiaria = val;
+            salvarDB();
+            renderizarMetas();
+            alert('Meta diária atualizada com sucesso!');
+        }
+
+        function renderizarMetas() {
+            const inputMeta = document.getElementById('inputMetaDiaria');
+            if (!inputMeta) return;
+            
+            const metaDiaria = db.metaDiaria || 600;
+            inputMeta.value = metaDiaria;
+            document.getElementById('metaExibicaoDiaria').innerText = `R$ ${metaDiaria.toFixed(2)}`;
+
+            const hojeStr = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('metaDataHoje').innerText = hojeStr;
+
+            // Faturamento de hoje (Entradas do dia atual)
+            let faturamentoHoje = db.caixa
+                .filter(m => m.tipo === 'Entrada' && m.data === hojeStr)
+                .reduce((acc, m) => acc + m.valor, 0);
+
+            document.getElementById('metaFiltroFaturamentoDia').innerText = `R$ ${faturamentoHoje.toFixed(2)}`;
+
+            const diff = faturamentoHoje - metaDiaria;
+            const resEl = document.getElementById('metaResultadoDia');
+            const titEl = document.getElementById('metaTituloStatusDia');
+            const containerEl = document.getElementById('cardStatusDiaContainer');
+
+            if (faturamentoHoje >= metaDiaria) {
+                titEl.innerText = "Meta Atingida (No Verde!)";
+                resEl.innerText = `+ R$ ${diff.toFixed(2)} Acima`;
+                resEl.className = "text-2xl font-bold text-emerald-400 mt-1";
+                containerEl.className = "bg-emerald-950/40 p-4 rounded-xl border border-emerald-900/50";
+            } else {
+                titEl.innerText = "Falta para Meta (Vermelho)";
+                resEl.innerText = `- R$ ${Math.abs(diff).toFixed(2)} Faltando`;
+                resEl.className = "text-2xl font-bold text-red-500 mt-1";
+                containerEl.className = "bg-red-950/40 p-4 rounded-xl border border-red-900/50";
+            }
+
+            // Projeção Mensal
+            const mesAtualStr = new Date().toISOString().slice(0, 7); // YYYY-MM
+            let acumuladoMes = db.caixa
+                .filter(m => m.tipo === 'Entrada' && m.data && converterDataParaISO(m.data).startsWith(mesAtualStr))
+                .reduce((acc, m) => acc + m.valor, 0);
+
+            document.getElementById('metaAcumuladoMes').innerText = `R$ ${acumuladoMes.toFixed(2)}`;
+
+            // Estimativa de dias úteis no mês (aproximado 22 dias)
+            const metaEstimadaMes = metaDiaria * 22;
+            document.getElementById('metaEstimadaMes').innerText = `R$ ${metaEstimadaMes.toFixed(2)}`;
+
+            const diffMes = acumuladoMes - metaEstimadaMes;
+            const distEl = document.getElementById('metaDistanciaMes');
+            if (acumuladoMes >= metaEstimadaMes) {
+                distEl.innerText = `+ R$ ${diffMes.toFixed(2)} Superada`;
+                distEl.className = "text-2xl font-bold text-emerald-400 mt-1";
+            } else {
+                distEl.innerText = `- R$ ${Math.abs(diffMes).toFixed(2)} Faltando`;
+                distEl.className = "text-2xl font-bold text-amber-400 mt-1";
+            }
+        }
+
+        function converterDataParaISO(dataBR) {
+            const partes = dataBR.split('/');
+            if (partes.length === 3) {
+                return `${partes[2]}-${partes[1]}-${partes[0]}`;
+            }
+            return '';
         }
 
         // --- CONFIGURAÇÕES ---
@@ -1089,7 +1227,7 @@
         }
         function removerCliente(id) { db.clientes = db.clientes.filter(c => c.id !== id); salvarDB(); renderizarClientes(); }
 
-        // --- VEÍCULOS / PRODUTOS / OS / ETC (Funções ajustadas para o campo input/datalist e desconto) ---
+        // --- OS & ORÇAMENTOS ---
         function abrirModalOS() {
             osItensTemp = [];
             document.getElementById('osClienteVeiculo').value = '';
@@ -1117,7 +1255,6 @@
                 if (prodEncontrado) {
                     osItensTemp[index].valorUnit = prodEncontrado.preco;
                     osItensTemp[index].tipo = prodEncontrado.tipo || 'Peça';
-                    // Atualiza o valor unitário visualmente no input correspondente
                     const inputPreco = document.getElementById(`osItemValor_${index}`);
                     if(inputPreco) inputPreco.value = prodEncontrado.preco;
                 }
@@ -1256,7 +1393,7 @@
         }
         function fecharModalOrcamento() { document.getElementById('modalVisualizarOrcamento').classList.add('hidden'); }
 
-        // --- MÓDULOS DE SUPORTE (Produtos, Veículos, etc.) ---
+        // --- ESTOQUE E SUPORTE ---
         function abrirModalProduto() { document.getElementById('modalProduto').classList.remove('hidden'); }
         function fecharModalProduto() { document.getElementById('modalProduto').classList.add('hidden'); }
         function salvarProduto(e) {
