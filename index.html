@@ -976,9 +976,14 @@
         </div>
     </div>
 
-    <script>
-        // Configuração correta do Firebase fornecida por você
-        const firebaseConfig = {
+    <!-- SCRIPT DE SINCRONIZAÇÃO EM TEMPO REAL COM FIREBASE REALTIME DATABASE -->
+    <script type="module">
+        // Importa as funções necessárias do Firebase SDK v10+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Configurações do Realtime Database fornecidas
+        const firebaseConfigRT = {
             apiKey: "AIzaSyDzoFpVcdffbfh8Ujo_PS2n5sfXV5JynwY",
             authDomain: "sistema-oficina-on.firebaseapp.com",
             databaseURL: "https://sistema-oficina-on-default-rtdb.firebaseio.com",
@@ -989,7 +994,57 @@
             measurementId: "G-B3NDGSFGG7"
         };
 
-        // Inicializar Firebase
+        // Inicializar o Realtime Database do Firebase
+        const appRT = initializeApp(firebaseConfigRT, "RealtimeApp");
+        const dbRT = getDatabase(appRT);
+        const dbRefRT = ref(dbRT, 'oficina/estadoAtual');
+
+        // Escuta em tempo real as alterações no banco de dados e atualiza o estado/telas de forma transparente
+        onValue(dbRefRT, (snapshot) => {
+            const dados = snapshot.val();
+            if (dados && dados.textoSistema) {
+                try {
+                    const dadosRemotos = JSON.parse(dados.textoSistema);
+                    if (dadosRemotos && typeof dadosRemotos === 'object') {
+                        db = { ...db, ...dadosRemotos };
+                        const appTela = document.getElementById('appScreen');
+                        if (appTela && !appTela.classList.contains('hidden')) {
+                            renderizarTudo();
+                        }
+                    }
+                } catch (e) {
+                    console.error("Erro ao processar dados em tempo real:", e);
+                }
+            }
+        });
+
+        // Função global para salvar o estado atualizado no Realtime Database
+        window.salvarDBRealtime = function() {
+            set(dbRefRT, {
+                textoSistema: JSON.stringify(db),
+                atualizadoEm: new Date().toISOString()
+            })
+            .then(() => {
+                console.log("Dados sincronizados com o Realtime Database com sucesso!");
+            })
+            .catch((error) => {
+                console.error("Erro ao sincronizar com o Realtime Database: ", error);
+            });
+        };
+    </script>
+
+    <script>
+        // Configuração do Firebase para o Firestore (compat)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDzopFvcdffbfh8Ujo_PS2n5sfXV5JynwY",
+            authDomain: "sistema-oficina-on.firebaseapp.com",
+            projectId: "sistema-oficina-on",
+            storageBucket: "sistema-oficina-on.firebasestorage.app",
+            messagingSenderId: "967732351574",
+            appId: "1:967732351574:web:ae6d21dd26a82f7704a1f7"
+        };
+
+        // Inicializar Firebase Firestore
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -1014,15 +1069,21 @@
         let pagamentoContexto = null;
         let splitLinhasTemp = [];
 
-        // Função universal de salvamento na nuvem (Firestore)
+        // Função unificada de salvamento que integra o Firestore e o Realtime Database sem alterar seu layout
         function salvarDB() {
+            // Salva no Firestore
             firestore.collection("ef_motos").doc("dados_gerais").set(db)
                 .then(() => {
-                    console.log("Dados salvos e sincronizados na nuvem!");
+                    console.log("Dados salvos no Firestore!");
                 })
                 .catch((error) => {
-                    console.error("Erro ao salvar no Firebase:", error);
+                    console.error("Erro ao salvar no Firestore:", error);
                 });
+
+            // Sincroniza também no Realtime Database via função global exposta pelo módulo
+            if (typeof window.salvarDBRealtime === 'function') {
+                window.salvarDBRealtime();
+            }
         }
 
         // Carregamento inicial assíncrono da nuvem
@@ -1043,7 +1104,7 @@
                 });
         }
 
-        // Sincronização silenciosa a cada 10 segundos
+        // Sincronização silenciosa a cada 10 segundos (Atualiza dados e telas sem deslogar ou mandar para a senha)
         function sincronizarAutomatico() {
             firestore.collection("ef_motos").doc("dados_gerais").get()
                 .then((doc) => {
@@ -1051,6 +1112,7 @@
                         const dadosRemotos = doc.data();
                         db = { ...db, ...dadosRemotos };
                         
+                        // Atualiza as telas em tempo real apenas se o usuário já estiver logado no sistema
                         const appTela = document.getElementById('appScreen');
                         if (appTela && !appTela.classList.contains('hidden')) {
                             renderizarTudo();
@@ -1062,6 +1124,7 @@
                 });
         }
 
+        // Dispara a sincronização a cada 10 segundos
         setInterval(sincronizarAutomatico, 10000);
 
         function aplicarConfiguracoesVisuais() {
