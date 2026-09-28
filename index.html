@@ -129,7 +129,7 @@
                     <i class="fa-solid fa-user-gear w-5"></i><span>Equipe & Usuários</span>
                 </a>
                 <a href="#" onclick="mudarModulo('estoque')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
-                    <i class="fa-solid fa-boxes-stacked w-5"></i><span>Estoque & Mais Vendidos</span>
+                    <i class="fa-solid fa-boxes-stacked w-5"></i><span>Estoque & Produtos</span>
                 </a>
                 <a href="#" onclick="mudarModulo('financeiro')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
                     <i class="fa-solid fa-wallet w-5"></i><span>Caixa & Financeiro</span>
@@ -253,23 +253,29 @@
                     </div>
                 </div>
 
-                <!-- VENDA DE PRODUTOS (PDV) -->
+                <!-- VENDA DE PRODUTOS (PDV) ATUALIZADO -->
                 <div id="mod-pdv" class="hidden space-y-6">
                     <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                             <div>
-                                <h3 class="text-base font-bold text-white"><i class="fa-solid fa-cash-register text-red-500 mr-2"></i> PDV - Venda de Produtos e Peças (Balcão)</h3>
-                                <p class="text-xs text-zinc-400">Realize vendas diretas de estoque com baixa automática e lançamento no caixa.</p>
+                                <h3 class="text-base font-bold text-white"><i class="fa-solid fa-cash-register text-red-500 mr-2"></i> PDV - Venda de Produtos e Peças</h3>
+                                <p class="text-xs text-zinc-400">Realize vendas diretas de estoque com baixa automática, escolha da forma de pagamento e lançamento no caixa.</p>
                             </div>
-                            <button onclick="abrirModalPagamentoPDV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
-                                <i class="fa-solid fa-check"></i><span>Ir para Pagamento</span>
+                            <button onclick="finalizarVendaPDV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
+                                <i class="fa-solid fa-check"></i><span>Finalizar Venda</span>
                             </button>
                         </div>
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <div class="lg:col-span-2 space-y-4">
                                 <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
                                     <h4 class="text-xs font-bold uppercase text-zinc-300">Adicionar Item à Venda</h4>
-                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    
+                                    <div class="flex border-b border-zinc-800 pb-2 space-x-4">
+                                        <button type="button" onclick="alternarTipoItemPDV('estoque')" id="btnTabPdvEstoque" class="text-xs font-bold text-red-500 border-b-2 border-red-500 pb-1">Do Estoque</button>
+                                        <button type="button" onclick="alternarTipoItemPDV('livre')" id="btnTabPdvLivre" class="text-xs font-bold text-zinc-400 pb-1">Item Livre</button>
+                                    </div>
+
+                                    <div id="secaoPdvEstoque" class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                                         <div class="sm:col-span-2">
                                             <select id="pdvProdutoSelect" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
                                                 <option value="">Selecione a peça/produto...</option>
@@ -278,8 +284,23 @@
                                         <div>
                                             <div class="flex space-x-2">
                                                 <input type="number" id="pdvQtdInput" min="1" value="1" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
-                                                <button type="button" onclick="adicionarItemPDV()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-plus"></i></button>
+                                                <button type="button" onclick="adicionarItemPDVEstoque()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-plus"></i></button>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="secaoPdvLivre" class="hidden space-y-3 pt-2">
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                            <div class="sm:col-span-2">
+                                                <input type="text" id="pdvDescLivre" placeholder="Descrição do item..." class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
+                                            </div>
+                                            <div>
+                                                <input type="number" id="pdvQtdLivre" min="1" value="1" placeholder="Qtd" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
+                                            </div>
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <input type="number" step="0.01" id="pdvPrecoLivre" placeholder="Valor Unitário R$" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
+                                            <button type="button" onclick="adicionarItemPDVLivre()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow transition whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> Adicionar</button>
                                         </div>
                                     </div>
                                 </div>
@@ -287,7 +308,7 @@
                                     <table class="w-full text-left text-xs">
                                         <thead class="bg-zinc-900/50 text-zinc-400 uppercase border-b border-zinc-800">
                                             <tr>
-                                                <th class="p-3">Produto</th>
+                                                <th class="p-3">Produto / Descrição</th>
                                                 <th class="p-3 text-center">Qtd</th>
                                                 <th class="p-3 text-right">V. Unit.</th>
                                                 <th class="p-3 text-right">Subtotal</th>
@@ -306,8 +327,37 @@
                                     <div>
                                         <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente</label>
                                         <select id="pdvClienteId" class="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
-                                            <option value="">Cliente Balcão / Geral</option>
+                                            <option value="generico">Cliente</option>
                                         </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Forma de Pagamento</label>
+                                        <select id="pdvFormaPagamento" onchange="atualizarResumoPDV()" class="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
+                                            <option value="Dinheiro">Dinheiro</option>
+                                            <option value="Pix">Pix</option>
+                                            <option value="Cartao_Debito">Cartão de Débito (InfinitePay)</option>
+                                            <option value="Cartao_Credito">Cartão de Crédito (InfinitePay)</option>
+                                        </select>
+                                    </div>
+                                    <div id="pdvContainerParcelas" class="hidden">
+                                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Quantidade de Parcelas</label>
+                                        <select id="pdvParcelas" onchange="atualizarResumoPDV()" class="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
+                                            <option value="1">1x (À vista)</option>
+                                            <option value="2">2x</option>
+                                            <option value="3">3x</option>
+                                            <option value="4">4x</option>
+                                            <option value="5">5x</option>
+                                            <option value="6">6x</option>
+                                            <option value="7">7x</option>
+                                            <option value="8">8x</option>
+                                            <option value="9">9x</option>
+                                            <option value="10">10x</option>
+                                            <option value="11">11x</option>
+                                            <option value="12">12x</option>
+                                        </select>
+                                    </div>
+                                    <div id="pdvInfoTaxas" class="hidden text-[11px] text-amber-400 bg-amber-950/40 p-2 rounded-lg border border-amber-900/50">
+                                        Taxa InfinitePay aplicada. Valor líquido no caixa.
                                     </div>
                                 </div>
                                 <div class="pt-4 border-t border-zinc-800 space-y-3">
@@ -315,8 +365,8 @@
                                         <span class="text-xs uppercase font-semibold text-zinc-400">Total a Pagar</span>
                                         <span class="text-2xl font-black text-emerald-400" id="pdvTotalDisplay">R$ 0,00</span>
                                     </div>
-                                    <button onclick="abrirModalPagamentoPDV()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl shadow transition text-sm">
-                                        Prosseguir para Pagamento
+                                    <button onclick="finalizarVendaPDV()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl shadow transition text-sm">
+                                        Finalizar Venda
                                     </button>
                                 </div>
                             </div>
@@ -347,7 +397,7 @@
                     </div>
                 </div>
 
-                <!-- VEÍCULOS / MOTOS (CORRIGIDO COM MARCA, MODELO, PLACA, KM, COR) -->
+                <!-- VEÍCULOS / MOTOS -->
                 <div id="mod-veiculos" class="hidden space-y-6">
                     <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
                         <span class="text-sm font-semibold text-zinc-300">Motos / Veículos Cadastrados</span>
@@ -372,7 +422,7 @@
                     </div>
                 </div>
 
-                <!-- EQUIPE / MECÂNICOS & USUÁRIOS (CORRIGIDO PARA ADICIONAR E EDITAR USUÁRIOS) -->
+                <!-- EQUIPE / MECÂNICOS & USUÁRIOS ATUALIZADO -->
                 <div id="mod-mecanicos" class="hidden space-y-6">
                     <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
                         <div>
@@ -399,13 +449,13 @@
                     </div>
                 </div>
 
-                <!-- ESTOQUE & MAIS VENDIDOS -->
+                <!-- ESTOQUE & PRODUTOS -->
                 <div id="mod-estoque" class="hidden space-y-6">
-                    <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
-                        <div>
-                            <span class="text-sm font-semibold text-zinc-300">Estoque de Peças & Produtos</span>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
+                        <div class="w-full sm:w-72">
+                            <input type="text" id="filtroBuscaProduto" oninput="renderizarEstoque()" placeholder="Buscar produto por nome ou tipo..." class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:outline-none focus:border-red-600">
                         </div>
-                        <button onclick="abrirModalProduto()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
+                        <button onclick="abrirModalProduto()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2 flex-shrink-0">
                             <i class="fa-solid fa-plus"></i><span>Novo Produto / Peça</span>
                         </button>
                     </div>
@@ -528,47 +578,27 @@
                     </div>
                 </div>
 
-                <!-- METAS & DESEMPENHO -->
+                <!-- METAS & DESEMPENHO ATUALIZADO -->
                 <div id="mod-metas" class="hidden space-y-6">
                     <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl max-w-5xl space-y-6">
                         <h3 class="text-lg font-bold text-white flex items-center"><i class="fa-solid fa-bullseye text-emerald-400 mr-2"></i> Controle Inteligente de Metas de Faturamento</h3>
                         
-                        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col sm:flex-row items-end gap-4">
-                            <div class="flex-1 w-full">
-                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Definir Meta Diária (R$)</label>
+                        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Definir Meta Diaria (R$)</label>
                                 <input type="number" step="1.00" id="inputMetaDiaria" oninput="calcularMetasAutomaticas()" class="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 text-emerald-400 font-bold rounded-xl text-base focus:outline-none focus:border-red-600">
                             </div>
-                            <div class="flex-1 w-full">
-                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Meta Semanal (Calculada Automática)</label>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Meta Semanal (Automática)</label>
                                 <input type="number" step="1.00" id="inputMetaSemanal" readonly class="w-full px-4 py-2.5 bg-zinc-900/50 border border-zinc-800 text-amber-400 font-bold rounded-xl text-base focus:outline-none cursor-not-allowed">
                             </div>
-                            <button type="button" onclick="salvarMetas()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">Salvar Metas</button>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Meta Mensal (Automática)</label>
+                                <input type="number" step="1.00" id="inputMetaMensal" readonly class="w-full px-4 py-2.5 bg-zinc-900/50 border border-zinc-800 text-blue-400 font-bold rounded-xl text-base focus:outline-none cursor-not-allowed">
+                            </div>
                         </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                <p class="text-[11px] font-semibold text-zinc-400 uppercase">Faturamento de Hoje</p>
-                                <h3 class="text-xl font-bold text-white mt-1" id="metaFiltroFaturamentoDia">R$ 0,00</h3>
-                                <div class="mt-2 text-xs space-y-1">
-                                    <p class="text-zinc-500">Meta Diária: <span id="metaExibicaoDiaria" class="text-emerald-400 font-semibold">R$ 0,00</span></p>
-                                    <p class="text-zinc-400">Falta para Meta Diária: <span id="metaFaltaDiaria" class="text-amber-400 font-semibold">R$ 0,00</span></p>
-                                </div>
-                            </div>
-
-                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                <p class="text-[11px] font-semibold text-zinc-400 uppercase">Faturamento Semanal (7 dias)</p>
-                                <h3 class="text-xl font-bold text-amber-400 mt-1" id="metaFaturamentoSemana">R$ 0,00</h3>
-                                <div class="mt-2 text-xs space-y-1">
-                                    <p class="text-zinc-500">Meta Semanal: <span id="metaExibicaoSemanal" class="text-amber-300 font-semibold">R$ 0,00</span></p>
-                                    <p class="text-zinc-400">Falta para Meta Semanal: <span id="metaFaltaSemanal" class="text-red-400 font-semibold">R$ 0,00</span></p>
-                                </div>
-                            </div>
-
-                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                <p class="text-[11px] font-semibold text-zinc-400 uppercase">Meta Mensal (22 Dias Úteis)</p>
-                                <h3 class="text-xl font-bold text-blue-400 mt-1" id="metaExibicaoMensal">R$ 0,00</h3>
-                                <p class="text-xs text-zinc-500 mt-2">Calculada automaticamente (Meta Diária x 22 dias úteis).</p>
-                            </div>
+                        <div class="flex justify-end">
+                            <button type="button" onclick="salvarMetas()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">Salvar Metas</button>
                         </div>
                     </div>
                 </div>
@@ -596,8 +626,170 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAIS DO SISTEMA CORRIGIDOS -->
+    <!-- MODAIS DO SISTEMA -->
     <!-- ========================================== -->
+
+    <!-- MODAL DE ORDEM DE SERVIÇO / ORÇAMENTO ATUALIZADO -->
+    <div id="modalOS" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-2xl w-full p-6 my-8">
+            <h3 id="modalOSTitulo" class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clipboard-list text-red-500 mr-2"></i>Nova Ordem de Serviço / Orçamento</h3>
+            
+            <form onsubmit="salvarOS(event)" class="space-y-4">
+                <input type="hidden" id="osIdEdit">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente</label>
+                        <select id="osClienteId" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                            <option value="generico">Cliente</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Veículo / Moto</label>
+                        <input type="text" id="osMotoInfo" placeholder="Ex: Honda CG 150 - Placa ABC-1234" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Adicionar Itens à OS -->
+                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
+                    <h4 class="text-xs font-bold uppercase text-zinc-300">Adicionar Peças ou Mão de Obra</h4>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-[10px] uppercase text-zinc-400 mb-1">Tipo de Item</label>
+                            <select id="osItemTipo" onchange="alternarTipoItemOS()" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs">
+                                <option value="peca_estoque">1. Peça (Do Estoque)</option>
+                                <option value="peca_livre">1. Peça (Item Livre)</option>
+                                <option value="mao_de_obra">2. Mão de Obra</option>
+                            </select>
+                        </div>
+
+                        <div class="sm:col-span-2" id="divOsItemEstoqueContainer">
+                            <label class="block text-[10px] uppercase text-zinc-400 mb-1">Selecione a Peça do Estoque</label>
+                            <select id="osItemEstoqueId" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+
+                        <div class="sm:col-span-2 hidden" id="divOsItemLivreContainer">
+                            <label class="block text-[10px] uppercase text-zinc-400 mb-1">Descrição do Item / Mão de Obra</label>
+                            <input type="text" id="osItemDescricaoLivre" placeholder="Ex: Troca de embreagem / Reparo no motor" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+                        <div>
+                            <label class="block text-[10px] uppercase text-zinc-400 mb-1">Quantidade</label>
+                            <input type="number" id="osItemQtd" min="1" value="1" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase text-zinc-400 mb-1">Valor Unitário (R$)</label>
+                            <input type="number" step="0.01" id="osItemValor" placeholder="0.00" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs">
+                        </div>
+                        <div class="flex items-end">
+                            <button type="button" onclick="adicionarItemOS()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-xl text-xs shadow transition">Adicionar Item</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Itens Adicionados -->
+                <div class="bg-zinc-950 rounded-xl border border-zinc-800 overflow-hidden">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-zinc-900/50 text-zinc-400 uppercase border-b border-zinc-800">
+                            <tr>
+                                <th class="p-3">Legenda</th>
+                                <th class="p-3">Item / Serviço</th>
+                                <th class="p-3 text-center">Qtd</th>
+                                <th class="p-3 text-right">Unitário</th>
+                                <th class="p-3 text-right">Subtotal</th>
+                                <th class="p-3 text-right">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaOsItens" class="divide-y divide-zinc-800 text-zinc-300">
+                            <tr><td colspan="6" class="p-4 text-center text-zinc-500">Nenhum item adicionado à OS.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Status da Ordem de Serviço</label>
+                            <select id="osStatus" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                                <option value="Orçamento aguardando peça">Orçamento aguardando peça</option>
+                                <option value="Em andamento">Em andamento</option>
+                                <option value="Faturada">Faturada (Vai para o Caixa)</option>
+                                <option value="Concluída">Concluída</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Forma de Pagamento (Se Faturada)</label>
+                            <select id="osFormaPagamento" onchange="atualizarResumoOSModal()" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                                <option value="Dinheiro">Dinheiro</option>
+                                <option value="Pix">Pix</option>
+                                <option value="Cartao_Debito">Cartão de Débito (InfinitePay)</option>
+                                <option value="Cartao_Credito">Cartão de Crédito (InfinitePay)</option>
+                            </select>
+                        </div>
+                        <div id="osContainerParcelas" class="hidden">
+                            <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Qtd Parcelas (Crédito)</label>
+                            <select id="osParcelas" onchange="atualizarResumoOSModal()" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                                <option value="1">1x (À vista)</option>
+                                <option value="2">2x</option>
+                                <option value="3">3x</option>
+                                <option value="4">4x</option>
+                                <option value="5">5x</option>
+                                <option value="6">6x</option>
+                                <option value="7">7x</option>
+                                <option value="8">8x</option>
+                                <option value="9">9x</option>
+                                <option value="10">10x</option>
+                                <option value="11">11x</option>
+                                <option value="12">12x</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-end">
+                        <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 flex justify-between items-center">
+                            <span class="text-xs uppercase font-semibold text-zinc-400">Total da OS:</span>
+                            <span class="text-xl font-black text-emerald-400" id="osTotalDisplay">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="fecharModalOS()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Ordem de Serviço</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CADASTRO / EDIÇÃO DE CLIENTE -->
+    <div id="modalCliente" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+            <h3 id="modalClienteTitulo" class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-user-plus text-red-500 mr-2"></i>Cadastrar / Editar Cliente</h3>
+            <form onsubmit="salvarCliente(event)" class="space-y-4">
+                <input type="hidden" id="clienteIdEdit">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome Completo</label>
+                    <input type="text" id="cNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Nome do cliente">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Telefone / WhatsApp</label>
+                    <input type="text" id="cTelefone" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="(00) 00000-0000">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">CPF ou CNPJ</label>
+                    <input type="text" id="cDoc" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="000.000.000-00">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="fecharModalCliente()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- MODAL DE CADASTRO DE VEÍCULO / MOTO -->
     <div id="modalVeiculo" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -618,16 +810,12 @@
                         <option value="Yamaha">Yamaha</option>
                         <option value="Suzuki">Suzuki</option>
                         <option value="Kawasaki">Kawasaki</option>
-                        <option value="Dafra">Dafra</option>
-                        <option value="Shineray">Shineray</option>
-                        <option value="BMW">BMW</option>
-                        <option value="Triumph">Triumph</option>
                         <option value="Outros">Outros</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Modelo da Moto</label>
-                    <input type="text" id="vModelo" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: CG 150 Titan / Fazer 250">
+                    <input type="text" id="vModelo" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: CG 150 Titan">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -636,12 +824,12 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cor</label>
-                        <input type="text" id="vCor" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Vermelha">
+                        <input type="text" id="vCor" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Vermelha">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Quilometragem (KM)</label>
-                    <input type="number" id="vKm" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: 25000">
+                    <input type="number" id="vKm" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="25000">
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" onclick="fecharModalVeiculo()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
@@ -659,7 +847,7 @@
                 <input type="hidden" id="usuarioIdEdit">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome / Apelido de Acesso</label>
-                    <input type="text" id="uNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Elizeu ou João">
+                    <input type="text" id="uNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Elizeu">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">E-mail</label>
@@ -667,10 +855,10 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Senha</label>
-                    <input type="text" id="uSenha" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Senha de acesso">
+                    <input type="text" id="uSenha" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Senha">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cargo / Função</label>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cargo</label>
                     <select id="uCargo" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                         <option value="Administrador">Administrador</option>
                         <option value="Mecânico / Técnico">Mecânico / Técnico</option>
@@ -680,6 +868,38 @@
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" onclick="fecharModalUsuario()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
                     <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Usuário</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CADASTRO / EDIÇÃO DE PRODUTO / PEÇA -->
+    <div id="modalProduto" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+            <h3 id="modalProdutoTitulo" class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-boxes-stacked text-red-500 mr-2"></i>Cadastrar / Editar Produto</h3>
+            <form onsubmit="salvarProduto(event)" class="space-y-4">
+                <input type="hidden" id="produtoIdEdit">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome da Peça / Produto</label>
+                    <input type="text" id="pNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Óleo 20W50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Categoria / Tipo</label>
+                    <input type="text" id="pTipo" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Lubrificante">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Qtd em Estoque</label>
+                        <input type="number" id="pQtd" min="0" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Preço de Venda (R$)</label>
+                        <input type="number" step="0.01" min="0" id="pPreco" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="fecharModalProduto()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Produto</button>
                 </div>
             </form>
         </div>
@@ -720,12 +940,34 @@
         </div>
     </div>
 
+    <!-- MODAL DE AGENDAMENTO -->
     <div id="modalAgendamento" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-white mb-4">Agendamento</h3>
+            <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-calendar-check text-red-500 mr-2"></i>Novo Agendamento</h3>
             <form onsubmit="salvarAgendamento(event)" class="space-y-4">
-                <div><label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Serviço</label><input type="text" id="agServico" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm"></div>
-                <div class="flex justify-end space-x-3 pt-2"><button type="button" onclick="fecharModalAgendamento()" class="px-4 py-2 text-sm text-zinc-400">Cancelar</button><button type="submit" class="px-5 py-2 bg-red-600 text-white rounded-xl text-sm">Salvar</button></div>
+                <input type="hidden" id="agendamentoIdEdit">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Data e Hora</label>
+                    <input type="datetime-local" id="agDataHora" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente</label>
+                    <select id="agClienteId" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                        <option value="generico">Cliente</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Moto / Veículo</label>
+                    <input type="text" id="agMoto" required placeholder="Ex: Honda CG 150 - Placa ABC-1234" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Serviço Agendado</label>
+                    <input type="text" id="agServico" required placeholder="Ex: Revisão geral e troca de óleo" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="fecharModalAgendamento()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Agendamento</button>
+                </div>
             </form>
         </div>
     </div>
@@ -797,10 +1039,44 @@
             agendamentos: [],
             config: { nome: "EF Motos Centro Automotivo", logo: "" },
             metaDiaria: 600,
-            metaSemanal: 3000
+            metaSemanal: 3000,
+            metaMensal: 13200
         };
 
         let usuarioLogadoAtual = null;
+
+        let itensTempOS = [];
+        let itensTempPDV = [];
+        let tipoItemPdvAtual = 'estoque';
+
+        // Tabela de Taxas InfinitePay (Aproximação padrão de mercado/maquininha)
+        // Débito ~1.38% | Crédito à vista e parcelado (taxas médias decrescentes/progressivas)
+        function calcularTaxaInfinitePay(valorBruto, forma, parcelas) {
+            if (forma === 'Dinheiro' || forma === 'Pix') {
+                return { valorLiquido: valorBruto, taxaPercentual: 0, valorTaxa: 0 };
+            }
+            let taxaPct = 1.38; // Débito padrão
+            if (forma === 'Cartao_Credito') {
+                const taxasCredito = {
+                    1: 3.31,
+                    2: 5.50,
+                    3: 6.20,
+                    4: 6.90,
+                    5: 7.60,
+                    6: 8.30,
+                    7: 9.80,
+                    8: 10.50,
+                    9: 11.20,
+                    10: 11.90,
+                    11: 12.60,
+                    12: 13.30
+                };
+                taxaPct = taxasCredito[parcelas] || (3.31 + (parcelas * 0.8));
+            }
+            let valorTaxa = valorBruto * (taxaPct / 100);
+            let valorLiquido = valorBruto - valorTaxa;
+            return { valorLiquido, taxaPercentual: taxaPct, valorTaxa };
+        }
 
         function salvarDB() {
             firestore.collection("ef_motos").doc("dados_gerais").set(db).catch(err => console.error(err));
@@ -883,7 +1159,7 @@
                 clientes: 'Gestão de Clientes',
                 veiculos: 'Gestão de Veículos / Motos',
                 mecanicos: 'Equipe & Usuários',
-                estoque: 'Estoque de Peças',
+                estoque: 'Estoque de Peças & Produtos',
                 financeiro: 'Caixa & Financeiro',
                 metas: 'Metas & Desempenho',
                 configuracoes: 'Configurações'
@@ -901,15 +1177,21 @@
             renderizarContasPagar();
             atualizarDashboard();
             renderizarMetas();
+            renderizarClientes();
             renderizarVeiculos();
             renderizarUsuarios();
+            renderizarEstoque();
+            renderizarOS();
+            renderizarAgendamentos();
+            atualizarSelectsClientesEProdutos();
         }
 
         function atualizarDashboard() {
             let totalEntradas = (db.caixa || []).filter(m => m.tipo === 'Entrada').reduce((a, c) => a + c.valor, 0);
             let totalSaidas = (db.caixa || []).filter(m => m.tipo === 'Saída').reduce((a, c) => a + c.valor, 0);
             document.getElementById('dashSaldoCaixa').innerText = `R$ ${(totalEntradas - totalSaidas).toFixed(2)}`;
-            document.getElementById('dashOsAndamento').innerText = (db.os || []).filter(o => o.status === 'Em andamento').length;
+            document.getElementById('dashOsAndamento').innerText = (db.os || []).filter(o => o.status === 'Em andamento' || o.status === 'Orçamento aguardando peça').length;
+            document.getElementById('dashAgendamentos').innerText = (db.agendamentos || []).length;
             document.getElementById('dashClientes').innerText = (db.clientes || []).length;
         }
 
@@ -923,172 +1205,654 @@
             else if (aba === 'pagar') document.getElementById('secPagar').classList.remove('hidden');
         }
 
-        // ==========================================
-        // MÓDULO DE VEÍCULOS / MOTOS CORRIGIDO
-        // ==========================================
-        function abrirModalVeiculo(id = null) {
-            document.getElementById('veiculoIdEdit').value = '';
-            document.getElementById('vModelo').value = '';
-            document.getElementById('vPlaca').value = '';
-            document.getElementById('vCor').value = '';
-            document.getElementById('vKm').value = '';
-            document.getElementById('modalVeiculoTitulo').innerHTML = `<i class="fa-solid fa-motorcycle text-red-500 mr-2"></i>Cadastrar Nova Moto`;
-
-            // Popular select de clientes
-            const selectCliente = document.getElementById('vClienteId');
-            selectCliente.innerHTML = '<option value="">Selecione o cliente...</option>' + 
+        function atualizarSelectsClientesEProdutos() {
+            const optionsClientes = '<option value="generico">Cliente</option>' + 
                 (db.clientes || []).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+            
+            if(document.getElementById('osClienteId')) document.getElementById('osClienteId').innerHTML = optionsClientes;
+            if(document.getElementById('pdvClienteId')) document.getElementById('pdvClienteId').innerHTML = optionsClientes;
+            if(document.getElementById('agClienteId')) document.getElementById('agClienteId').innerHTML = optionsClientes;
+            if(document.getElementById('vClienteId')) document.getElementById('vClienteId').innerHTML = '<option value="">Selecione o cliente...</option>' + (db.clientes || []).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+
+            const optionsProdutos = '<option value="">Selecione o produto do estoque...</option>' + 
+                (db.produtos || []).map(p => `<option value="${p.id}">${p.nome} (Estoque: ${p.qtd}) - R$ ${p.preco.toFixed(2)}</option>`).join('');
+
+            if(document.getElementById('osItemEstoqueId')) document.getElementById('osItemEstoqueId').innerHTML = optionsProdutos;
+            if(document.getElementById('pdvProdutoSelect')) document.getElementById('pdvProdutoSelect').innerHTML = optionsProdutos;
+        }
+
+        // ==========================================
+        // GESTÃO DE METAS AUTOMÁTICA CORRIGIDA
+        // ==========================================
+        function calcularMetasAutomaticas() {
+            const diária = parseFloat(document.getElementById('inputMetaDiaria').value) || 0;
+            const semanal = diária * 5;
+            const mensal = diária * 22;
+            document.getElementById('inputMetaSemanal').value = semanal.toFixed(2);
+            document.getElementById('inputMetaMensal').value = mensal.toFixed(2);
+        }
+
+        function salvarMetas() {
+            const diaria = parseFloat(document.getElementById('inputMetaDiaria').value) || 0;
+            const semanal = parseFloat(document.getElementById('inputMetaSemanal').value) || 0;
+            const mensal = parseFloat(document.getElementById('inputMetaMensal').value) || 0;
+
+            db.metaDiaria = diaria;
+            db.metaSemanal = semanal;
+            db.metaMensal = mensal;
+
+            salvarDB();
+            alert('Metas atualizadas e salvas com sucesso!');
+        }
+
+        function renderizarMetas() {
+            if (document.getElementById('inputMetaDiaria')) {
+                document.getElementById('inputMetaDiaria').value = db.metaDiaria || 600;
+                document.getElementById('inputMetaSemanal').value = db.metaSemanal || 3000;
+                document.getElementById('inputMetaMensal').value = db.metaMensal || 13200;
+            }
+        }
+
+        // ==========================================
+        // AGENDAMENTOS
+        // ==========================================
+        function abrirModalAgendamento(id = null) {
+            document.getElementById('agendamentoIdEdit').value = '';
+            document.getElementById('agDataHora').value = '';
+            document.getElementById('agMoto').value = '';
+            document.getElementById('agServico').value = '';
+            atualizarSelectsClientesEProdutos();
 
             if (id) {
-                const veiculo = (db.veiculos || []).find(v => v.id === id);
-                if (veiculo) {
-                    document.getElementById('veiculoIdEdit').value = veiculo.id;
-                    document.getElementById('vClienteId').value = veiculo.clienteId || '';
-                    document.getElementById('vMarca').value = veiculo.marca || 'Honda';
-                    document.getElementById('vModelo').value = veiculo.modelo || '';
-                    document.getElementById('vPlaca').value = veiculo.placa || '';
-                    document.getElementById('vCor').value = veiculo.cor || '';
-                    document.getElementById('vKm').value = veiculo.km || '';
-                    document.getElementById('modalVeiculoTitulo').innerHTML = `<i class="fa-solid fa-motorcycle text-red-500 mr-2"></i>Editar Moto`;
+                const ag = (db.agendamentos || []).find(a => a.id === id);
+                if (ag) {
+                    document.getElementById('agendamentoIdEdit').value = ag.id;
+                    document.getElementById('agDataHora').value = ag.dataHora || '';
+                    document.getElementById('agClienteId').value = ag.clienteId || 'generico';
+                    document.getElementById('agMoto').value = ag.moto || '';
+                    document.getElementById('agServico').value = ag.servico || '';
                 }
             }
-            document.getElementById('modalVeiculo').classList.remove('hidden');
+            document.getElementById('modalAgendamento').classList.remove('hidden');
         }
 
-        function fecharModalVeiculo() {
-            document.getElementById('modalVeiculo').classList.add('hidden');
+        function fecharModalAgendamento() {
+            document.getElementById('modalAgendamento').classList.add('hidden');
         }
 
-        function salvarVeiculo(e) {
+        function salvarAgendamento(e) {
             e.preventDefault();
-            const idEdit = document.getElementById('veiculoIdEdit').value;
-            const clienteId = parseInt(document.getElementById('vClienteId').value);
-            const marca = document.getElementById('vMarca').value;
-            const modelo = document.getElementById('vModelo').value.trim();
-            const placa = document.getElementById('vPlaca').value.trim().toUpperCase();
-            const cor = document.getElementById('vCor').value.trim();
-            const km = parseFloat(document.getElementById('vKm').value) || 0;
+            const idEdit = document.getElementById('agendamentoIdEdit').value;
+            const dataHora = document.getElementById('agDataHora').value;
+            const clienteId = document.getElementById('agClienteId').value;
+            const moto = document.getElementById('agMoto').value.trim();
+            const servico = document.getElementById('agServico').value.trim();
 
-            if (!db.veiculos) db.veiculos = [];
+            if (!db.agendamentos) db.agendamentos = [];
 
             if (idEdit) {
-                db.veiculos = db.veiculos.map(v => v.id == idEdit ? { ...v, clienteId, marca, modelo, placa, cor, km } : v);
+                db.agendamentos = db.agendamentos.map(a => a.id == idEdit ? { ...a, dataHora, clienteId, moto, servico } : a);
             } else {
-                db.veiculos.push({
-                    id: Date.now(),
-                    clienteId, marca, modelo, placa, cor, km
-                });
+                db.agendamentos.push({ id: Date.now(), dataHora, clienteId, moto, servico });
             }
 
             salvarDB();
-            fecharModalVeiculo();
-            renderizarVeiculos();
-            alert('Moto salva com sucesso!');
+            fecharModalAgendamento();
+            renderizarAgendamentos();
+            atualizarDashboard();
+            alert('Agendamento salvo com sucesso!');
         }
 
-        function renderizarVeiculos() {
-            const tbody = document.getElementById('tabelaVeiculos');
+        function excluirAgendamento(id) {
+            if (confirm('Deseja realmente excluir este agendamento?')) {
+                db.agendamentos = (db.agendamentos || []).filter(a => a.id !== id);
+                salvarDB();
+                renderizarAgendamentos();
+                atualizarDashboard();
+            }
+        }
+
+        function renderizarAgendamentos() {
+            const tbody = document.getElementById('tabelaAgendamentos');
             if (!tbody) return;
-            const lista = db.veiculos || [];
+            const lista = db.agendamentos || [];
+
             if (lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-zinc-500">Nenhuma moto cadastrada.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-zinc-500">Nenhum agendamento cadastrado.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = lista.map(v => {
-                const cliente = (db.clientes || []).find(c => c.id == v.clienteId);
-                const nomeCliente = cliente ? cliente.nome : 'Cliente não vinculado';
+            tbody.innerHTML = lista.map(a => {
+                const clienteNome = a.clienteId === 'generico' ? 'Cliente' : ((db.clientes || []).find(c => c.id == a.clienteId)?.nome || 'Cliente');
+                let dataFormatada = a.dataHora ? new Date(a.dataHora).toLocaleString('pt-BR') : '-';
                 return `
                     <tr class="hover:bg-zinc-950/50">
-                        <td class="p-4 font-bold text-white">${v.marca || 'Honda'} - ${v.modelo}</td>
-                        <td class="p-4 uppercase font-mono text-amber-400">${v.placa}</td>
-                        <td class="p-4">${v.cor}</td>
-                        <td class="p-4">${v.km} KM</td>
-                        <td class="p-4 text-zinc-300">${nomeCliente}</td>
+                        <td class="p-4 font-bold text-white">${dataFormatada}</td>
+                        <td class="p-4 text-zinc-300">${clienteNome}</td>
+                        <td class="p-4 text-zinc-300">${a.moto}</td>
+                        <td class="p-4 text-zinc-300">${a.servico}</td>
                         <td class="p-4 text-right space-x-2">
-                            <button onclick="abrirModalVeiculo(${v.id})" class="text-zinc-400 hover:text-white" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="removerVeiculo(${v.id})" class="text-zinc-500 hover:text-red-500" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="abrirModalAgendamento(${a.id})" class="text-blue-400 hover:text-blue-300"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="excluirAgendamento(${a.id})" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             }).join('');
         }
 
-        function removerVeiculo(id) {
-            if (confirm('Deseja realmente excluir esta moto?')) {
-                db.veiculos = (db.veiculos || []).filter(v => v.id !== id);
-                salvarDB();
-                renderizarVeiculos();
-            }
-        }
-
         // ==========================================
-        // MÓDULO DE USUÁRIOS & EQUIPE CORRIGIDO
+        // ORDENS DE SERVIÇO & ORÇAMENTOS
         // ==========================================
-        function abrirModalUsuario(id = null) {
-            document.getElementById('usuarioIdEdit').value = '';
-            document.getElementById('uNome').value = '';
-            document.getElementById('uEmail').value = '';
-            document.getElementById('uSenha').value = '';
-            document.getElementById('uCargo').value = 'Administrador';
-            document.getElementById('modalUsuarioTitulo').innerHTML = `<i class="fa-solid fa-user-gear text-red-500 mr-2"></i>Novo Usuário / Administrador`;
+        function abrirModalOS(id = null) {
+            document.getElementById('osIdEdit').value = '';
+            document.getElementById('osMotoInfo').value = '';
+            document.getElementById('osStatus').value = 'Orçamento aguardando peça';
+            document.getElementById('osFormaPagamento').value = 'Dinheiro';
+            document.getElementById('osContainerParcelas').classList.add('hidden');
+            itensTempOS = [];
+            atualizarTabelaItensOS();
+            document.getElementById('modalOSTitulo').innerHTML = `<i class="fa-solid fa-clipboard-list text-red-500 mr-2"></i>Nova Ordem de Serviço / Orçamento`;
 
             if (id) {
-                const user = (db.usuarios || []).find(u => u.id === id);
-                if (user) {
-                    document.getElementById('usuarioIdEdit').value = user.id;
-                    document.getElementById('uNome').value = user.nome || '';
-                    document.getElementById('uEmail').value = user.email || '';
-                    document.getElementById('uSenha').value = user.senha || '';
-                    document.getElementById('uCargo').value = user.cargo || 'Administrador';
-                    document.getElementById('modalUsuarioTitulo').innerHTML = `<i class="fa-solid fa-user-gear text-red-500 mr-2"></i>Editar Usuário`;
+                const os = (db.os || []).find(o => o.id === id);
+                if (os) {
+                    document.getElementById('osIdEdit').value = os.id;
+                    document.getElementById('osClienteId').value = os.clienteId || 'generico';
+                    document.getElementById('osMotoInfo').value = os.motoInfo || '';
+                    document.getElementById('osStatus').value = os.status || 'Em andamento';
+                    document.getElementById('osFormaPagamento').value = os.formaPagamento || 'Dinheiro';
+                    document.getElementById('osParcelas').value = os.parcelas || '1';
+                    if(os.formaPagamento === 'Cartao_Credito') {
+                        document.getElementById('osContainerParcelas').classList.remove('hidden');
+                    }
+                    itensTempOS = [...(os.itens || [])];
+                    atualizarTabelaItensOS();
                 }
             }
-            document.getElementById('modalUsuario').classList.remove('hidden');
+            atualizarSelectsClientesEProdutos();
+            document.getElementById('modalOS').classList.remove('hidden');
         }
 
-        function abrirPerfilLogado() {
-            if (usuarioLogadoAtual) {
-                abrirModalUsuario(usuarioLogadoAtual.id);
+        function fecharModalOS() {
+            document.getElementById('modalOS').classList.add('hidden');
+        }
+
+        function alternarTipoItemOS() {
+            const tipo = document.getElementById('osItemTipo').value;
+            const divEstoque = document.getElementById('divOsItemEstoqueContainer');
+            const divLivre = document.getElementById('divOsItemLivreContainer');
+            const inputValor = document.getElementById('osItemValor');
+
+            if (tipo === 'peca_estoque') {
+                divEstoque.classList.remove('hidden');
+                divLivre.classList.add('hidden');
+                inputValor.value = '';
             } else {
-                alert('Nenhum usuário logado identificado.');
+                divEstoque.classList.add('hidden');
+                divLivre.classList.remove('hidden');
+                inputValor.value = '';
             }
         }
 
-        function fecharModalUsuario() {
-            document.getElementById('modalUsuario').classList.add('hidden');
+        function adicionarItemOS() {
+            const tipo = document.getElementById('osItemTipo').value;
+            let nomeItem = '';
+            let valor = parseFloat(document.getElementById('osItemValor').value) || 0;
+            const qtd = parseInt(document.getElementById('osItemQtd').value) || 1;
+            let produtoId = null;
+
+            if (tipo === 'peca_estoque') {
+                const prodId = document.getElementById('osItemEstoqueId').value;
+                if (!prodId) { alert('Selecione uma peça do estoque.'); return; }
+                const produto = (db.produtos || []).find(p => p.id == prodId);
+                if (produto) { nomeItem = produto.nome; valor = produto.preco; produtoId = produto.id; }
+            } else if (tipo === 'peca_livre' || tipo === 'mao_de_obra') {
+                nomeItem = document.getElementById('osItemDescricaoLivre').value.trim();
+                if (!nomeItem) { alert('Digite a descrição.'); return; }
+                if (valor <= 0) { alert('Informe um valor válido.'); return; }
+            }
+
+            let categoriaItem = (tipo === 'mao_de_obra') ? 'mao_de_obra' : 'peca';
+            itensTempOS.push({ id: Date.now(), tipo: categoriaItem, nome: nomeItem, qtd, valor, produtoId });
+
+            document.getElementById('osItemDescricaoLivre').value = '';
+            document.getElementById('osItemQtd').value = '1';
+            document.getElementById('osItemValor').value = '';
+            atualizarTabelaItensOS();
         }
 
-        function salvarUsuario(e) {
+        function removerItemOS(id) {
+            itensTempOS = itensTempOS.filter(i => i.id !== id);
+            atualizarTabelaItensOS();
+        }
+
+        function atualizarTabelaItensOS() {
+            const tbody = document.getElementById('tabelaOsItens');
+            if (!tbody) return;
+
+            if (itensTempOS.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-zinc-500">Nenhum item adicionado à OS.</td></tr>`;
+                document.getElementById('osTotalDisplay').innerText = `R$ 0,00`;
+                return;
+            }
+
+            let totalGeral = 0;
+            tbody.innerHTML = itensTempOS.map(i => {
+                const subtotal = i.qtd * i.valor;
+                totalGeral += subtotal;
+                let bolinhaHtml = i.tipo === 'peca' ? `<span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span> Peça` : `<span class="inline-block w-3 h-3 rounded-full bg-red-600 mr-2"></span> Mão de Obra`;
+                return `
+                    <tr class="hover:bg-zinc-950/50">
+                        <td class="p-3">${bolinhaHtml}</td>
+                        <td class="p-3 font-medium text-white">${i.nome}</td>
+                        <td class="p-3 text-center">${i.qtd}</td>
+                        <td class="p-3 text-right font-mono">R$ ${i.valor.toFixed(2)}</td>
+                        <td class="p-3 text-right font-mono text-emerald-400 font-bold">R$ ${subtotal.toFixed(2)}</td>
+                        <td class="p-3 text-right"><button type="button" onclick="removerItemOS(${i.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('osTotalDisplay').innerText = `R$ ${totalGeral.toFixed(2)}`;
+        }
+
+        function atualizarResumoOSModal() {
+            const forma = document.getElementById('osFormaPagamento').value;
+            const containerParcelas = document.getElementById('osContainerParcelas');
+            if (forma === 'Cartao_Credito') {
+                containerParcelas.classList.remove('hidden');
+            } else {
+                containerParcelas.classList.add('hidden');
+            }
+        }
+
+        function salvarOS(e) {
             e.preventDefault();
-            const idEdit = document.getElementById('usuarioIdEdit').value;
-            const nome = document.getElementById('uNome').value.trim();
-            const email = document.getElementById('uEmail').value.trim();
-            const senha = document.getElementById('uSenha').value.trim();
-            const cargo = document.getElementById('uCargo').value;
+            const idEdit = document.getElementById('osIdEdit').value;
+            const clienteId = document.getElementById('osClienteId').value;
+            const motoInfo = document.getElementById('osMotoInfo').value.trim();
+            const status = document.getElementById('osStatus').value;
+            const formaPagamento = document.getElementById('osFormaPagamento').value;
+            const parcelas = parseInt(document.getElementById('osParcelas').value) || 1;
 
-            if (!db.usuarios) db.usuarios = [];
+            if (itensTempOS.length === 0) {
+                alert('Adicione pelo menos um item ou serviço à Ordem de Serviço.');
+                return;
+            }
 
-            if (idEdit) {
-                db.usuarios = db.usuarios.map(u => u.id == idEdit ? { ...u, nome, email, senha, cargo } : u);
-                // Atualizar exibição se for o usuário logado atual editando a si mesmo
-                if (usuarioLogadoAtual && usuarioLogadoAtual.id == idEdit) {
-                    usuarioLogadoAtual = db.usuarios.find(u => u.id == idEdit);
-                    document.getElementById('userNameDisplay').innerText = usuarioLogadoAtual.nome;
-                    document.getElementById('userRoleDisplay').innerText = usuarioLogadoAtual.cargo;
-                    document.getElementById('userAvatar').innerText = usuarioLogadoAtual.nome.charAt(0).toUpperCase();
-                }
-            } else {
-                db.usuarios.push({
+            let totalOSBruto = itensTempOS.reduce((acc, item) => acc + (item.qtd * item.valor), 0);
+            const calculoTaxa = calcularTaxaInfinitePay(totalOSBruto, formaPagamento, parcelas);
+            let nomeClienteStr = clienteId === 'generico' ? 'Cliente' : ((db.clientes || []).find(c => c.id == clienteId)?.nome || 'Cliente');
+
+            if (!db.os) db.os = [];
+
+            if (status === 'Faturada') {
+                itensTempOS.forEach(item => {
+                    if (item.produtoId) {
+                        const prod = (db.produtos || []).find(p => p.id == item.produtoId);
+                        if (prod) prod.qtd = Math.max(0, prod.qtd - item.qtd);
+                    }
+                });
+                if (!db.caixa) db.caixa = [];
+                let descPagamento = `OS #${idEdit || Date.now()} - ${nomeClienteStr} (${formaPagamento}${formaPagamento === 'Cartao_Credito' ? ' em ' + parcelas + 'x' : ''})`;
+                db.caixa.push({
                     id: Date.now(),
-                    nome, email, senha, cargo
+                    tipo: 'Entrada',
+                    descricao: descPagamento,
+                    valor: calculoTaxa.valorLiquido,
+                    data: new Date().toLocaleDateString('pt-BR')
                 });
             }
 
+            const dadosOS = {
+                id: idEdit ? Number(idEdit) : Date.now(),
+                clienteId,
+                motoInfo,
+                status,
+                formaPagamento,
+                parcelas,
+                itens: itensTempOS,
+                total: totalOSBruto,
+                valorLiquido: calculoTaxa.valorLiquido,
+                data: new Date().toLocaleDateString('pt-BR')
+            };
+
+            if (idEdit) {
+                db.os = db.os.map(o => o.id == idEdit ? dadosOS : o);
+            } else {
+                db.os.push(dadosOS);
+            }
+
             salvarDB();
-            fecharModalUsuario();
-            renderizarUsuarios();
-            alert('Usuário salvo com sucesso!');
+            fecharModalOS();
+            renderizarOS();
+            atualizarDashboard();
+            renderizarEstoque();
+            renderizarCaixa();
+            alert('Ordem de Serviço salva com sucesso!');
+        }
+
+        function renderizarOS() {
+            const tbody = document.getElementById('tabelaOS');
+            if (!tbody) return;
+            const filtro = (document.getElementById('filtroBuscaOS')?.value || '').toLowerCase();
+            const lista = (db.os || []).filter(o => 
+                String(o.id).includes(filtro) ||
+                (o.motoInfo && o.motoInfo.toLowerCase().includes(filtro)) ||
+                (o.status && o.status.toLowerCase().includes(filtro))
+            );
+
+            if (lista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-zinc-500">Nenhuma Ordem de Serviço cadastrada.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = lista.map(o => {
+                const cliente = o.clienteId === 'generico' ? 'Cliente' : ((db.clientes || []).find(c => c.id == o.clienteId)?.nome || 'Cliente');
+                let badgeStatus = '';
+                if (o.status === 'Orçamento aguardando peça') {
+                    badgeStatus = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-950 text-amber-400 border border-amber-800">Orçamento</span>`;
+                } else if (o.status === 'Faturada') {
+                    badgeStatus = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800">Faturada</span>`;
+                } else if (o.status === 'Em andamento') {
+                    badgeStatus = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-950 text-blue-400 border border-blue-800">Em andamento</span>`;
+                } else {
+                    badgeStatus = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-300">${o.status}</span>`;
+                }
+
+                return `
+                    <tr class="hover:bg-zinc-950/50">
+                        <td class="p-4 font-bold text-white">#${o.id}</td>
+                        <td class="p-4 text-zinc-300">${cliente}<br><span class="text-xs text-zinc-500">${o.motoInfo}</span></td>
+                        <td class="p-4">${badgeStatus}</td>
+                        <td class="p-4 font-mono font-bold text-emerald-400">R$ ${(o.total || 0).toFixed(2)}</td>
+                        <td class="p-4 text-right space-x-2">
+                            <button onclick="abrirModalOS(${o.id})" class="text-blue-400 hover:text-blue-300"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="excluirOS(${o.id})" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function excluirOS(id) {
+            if (confirm('Deseja excluir esta Ordem de Serviço?')) {
+                db.os = (db.os || []).filter(o => o.id !== id);
+                salvarDB();
+                renderizarOS();
+                atualizarDashboard();
+            }
+        }
+
+        // ==========================================
+        // PDV / VENDA DE BALCÃO ATUALIZADO (INFINITEPAY & CAIXA)
+        // ==========================================
+        function alternarTipoItemPDV(tipo) {
+            tipoItemPdvAtual = tipo;
+            const btnEstoque = document.getElementById('btnTabPdvEstoque');
+            const btnLivre = document.getElementById('btnTabPdvLivre');
+            const secEstoque = document.getElementById('secaoPdvEstoque');
+            const secLivre = document.getElementById('secaoPdvLivre');
+
+            if (tipo === 'estoque') {
+                btnEstoque.className = "text-xs font-bold text-red-500 border-b-2 border-red-500 pb-1";
+                btnLivre.className = "text-xs font-bold text-zinc-400 pb-1";
+                secEstoque.classList.remove('hidden');
+                secLivre.classList.add('hidden');
+            } else {
+                btnLivre.className = "text-xs font-bold text-red-500 border-b-2 border-red-500 pb-1";
+                btnEstoque.className = "text-xs font-bold text-zinc-400 pb-1";
+                secLivre.classList.remove('hidden');
+                secEstoque.classList.add('hidden');
+            }
+        }
+
+        function adicionarItemPDVEstoque() {
+            const prodId = document.getElementById('pdvProdutoSelect').value;
+            const qtd = parseInt(document.getElementById('pdvQtdInput').value) || 1;
+
+            if (!prodId) { alert('Selecione um produto do estoque.'); return; }
+            const produto = (db.produtos || []).find(p => p.id == prodId);
+            if (!produto) return;
+            if (qtd <= 0) { alert('Informe uma quantidade válida.'); return; }
+
+            const existente = itensTempPDV.find(i => i.produtoId == produto.id && i.tipo === 'estoque');
+            if (existente) {
+                existente.qtd += qtd;
+            } else {
+                itensTempPDV.push({ id: Date.now(), tipo: 'estoque', produtoId: produto.id, nome: produto.nome, qtd: qtd, valor: produto.preco });
+            }
+
+            document.getElementById('pdvQtdInput').value = '1';
+            document.getElementById('pdvProdutoSelect').value = '';
+            atualizarTabelaPDV();
+        }
+
+        function adicionarItemPDVLivre() {
+            const desc = document.getElementById('pdvDescLivre').value.trim();
+            const qtd = parseInt(document.getElementById('pdvQtdLivre').value) || 1;
+            const preco = parseFloat(document.getElementById('pdvPrecoLivre').value) || 0;
+
+            if (!desc) { alert('Digite a descrição.'); return; }
+            if (preco <= 0) { alert('Informe um valor válido.'); return; }
+            if (qtd <= 0) { alert('Informe uma quantidade.'); return; }
+
+            itensTempPDV.push({ id: Date.now(), tipo: 'livre', produtoId: null, nome: desc, qtd: qtd, valor: preco });
+            document.getElementById('pdvDescLivre').value = '';
+            document.getElementById('pdvQtdLivre').value = '1';
+            document.getElementById('pdvPrecoLivre').value = '';
+            atualizarTabelaPDV();
+        }
+
+        function removerItemPDV(id) {
+            itensTempPDV = itensTempPDV.filter(i => i.id !== id);
+            atualizarTabelaPDV();
+        }
+
+        function atualizarResumoPDV() {
+            const forma = document.getElementById('pdvFormaPagamento').value;
+            const containerParcelas = document.getElementById('pdvContainerParcelas');
+            const infoTaxas = document.getElementById('pdvInfoTaxas');
+
+            if (forma === 'Cartao_Credito') {
+                containerParcelas.classList.remove('hidden');
+            } else {
+                containerParcelas.classList.add('hidden');
+            }
+
+            if (forma === 'Cartao_Credito' || forma === 'Cartao_Debito') {
+                infoTaxas.classList.remove('hidden');
+            } else {
+                infoTaxas.classList.add('hidden');
+            }
+            atualizarTabelaPDV();
+        }
+
+        function atualizarTabelaPDV() {
+            const tbody = document.getElementById('tabelaPdvCarrinho');
+            if (!tbody) return;
+
+            if (itensTempPDV.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-zinc-500">Carrinho vazio.</td></tr>`;
+                document.getElementById('pdvTotalDisplay').innerText = `R$ 0,00`;
+                return;
+            }
+
+            let totalGeral = 0;
+            tbody.innerHTML = itensTempPDV.map(i => {
+                const subtotal = i.qtd * i.valor;
+                totalGeral += subtotal;
+                return `
+                    <tr class="hover:bg-zinc-950/50">
+                        <td class="p-3 font-medium text-white">${i.nome}</td>
+                        <td class="p-3 text-center">${i.qtd}</td>
+                        <td class="p-3 text-right font-mono">R$ ${i.valor.toFixed(2)}</td>
+                        <td class="p-3 text-right font-mono text-emerald-400 font-bold">R$ ${subtotal.toFixed(2)}</td>
+                        <td class="p-3 text-right"><button type="button" onclick="removerItemPDV(${i.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `;
+            }).join('');
+
+            const forma = document.getElementById('pdvFormaPagamento')?.value || 'Dinheiro';
+            const parcelas = parseInt(document.getElementById('pdvParcelas')?.value) || 1;
+            const calculo = calcularTaxaInfinitePay(totalGeral, forma, parcelas);
+
+            document.getElementById('pdvTotalDisplay').innerText = `R$ ${totalGeral.toFixed(2)}`;
+        }
+
+        function finalizarVendaPDV() {
+            if (itensTempPDV.length === 0) {
+                alert('O carrinho de vendas está vazio.');
+                return;
+            }
+
+            const clienteId = document.getElementById('pdvClienteId').value;
+            const formaPagamento = document.getElementById('pdvFormaPagamento').value;
+            const parcelas = parseInt(document.getElementById('pdvParcelas').value) || 1;
+            const totalVendaBruto = itensTempPDV.reduce((acc, item) => acc + (item.qtd * item.valor), 0);
+            const calculo = calcularTaxaInfinitePay(totalVendaBruto, formaPagamento, parcelas);
+
+            let nomeCliente = clienteId === 'generico' ? 'Cliente Balcão' : ((db.clientes || []).find(c => c.id == clienteId)?.nome || 'Cliente');
+
+            itensTempPDV.forEach(item => {
+                if (item.tipo === 'estoque' && item.produtoId) {
+                    const prod = (db.produtos || []).find(p => p.id == item.produtoId);
+                    if (prod) prod.qtd = Math.max(0, prod.qtd - item.qtd);
+                }
+            });
+
+            if (!db.caixa) db.caixa = [];
+            db.caixa.push({
+                id: Date.now(),
+                tipo: 'Entrada',
+                descricao: `Venda PDV - ${nomeCliente} (${formaPagamento}${formaPagamento === 'Cartao_Credito' ? ' ' + parcelas + 'x' : ''})`,
+                valor: calculo.valorLiquido,
+                data: new Date().toLocaleDateString('pt-BR')
+            });
+
+            salvarDB();
+            itensTempPDV = [];
+            atualizarTabelaPDV();
+            renderizarEstoque();
+            renderizarCaixa();
+            atualizarDashboard();
+            alert(`Venda finalizada com sucesso!\nValor Bruto: R$ ${totalVendaBruto.toFixed(2)}\nLíquido no Caixa (Inf. Pay): R$ ${calculo.valorLiquido.toFixed(2)}`);
+        }
+
+        // ==========================================
+        // GESTÃO DE CLIENTES, VEÍCULOS, ESTOQUE, CAIXA E USUÁRIOS
+        // ==========================================
+        function renderizarClientes() {
+            const tbody = document.getElementById('tabelaClientes');
+            if (!tbody) return;
+            const filtro = (document.getElementById('filtroBuscaCliente')?.value || '').toLowerCase();
+            const lista = (db.clientes || []).filter(c => c.nome.toLowerCase().includes(filtro) || c.telefone.includes(filtro));
+            tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-zinc-500">Nenhum cliente cadastrado.</td></tr>` :
+                lista.map(c => `
+                    <tr class="hover:bg-zinc-950/50">
+                        <td class="p-4 font-bold text-white">${c.nome}</td>
+                        <td class="p-4 text-zinc-300">${c.telefone}</td>
+                        <td class="p-4 text-zinc-300">${c.doc || '-'}</td>
+                        <td class="p-4 text-right space-x-2">
+                            <button onclick="abrirModalCliente(${c.id})" class="text-blue-400"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="excluirCliente(${c.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+        }
+
+        function abrirModalCliente(id = null) {
+            document.getElementById('clienteIdEdit').value = '';
+            document.getElementById('cNome').value = '';
+            document.getElementById('cTelefone').value = '';
+            document.getElementById('cDoc').value = '';
+            if (id) {
+                const c = (db.clientes || []).find(x => x.id === id);
+                if (c) {
+                    document.getElementById('clienteIdEdit').value = c.id;
+                    document.getElementById('cNome').value = c.nome;
+                    document.getElementById('cTelefone').value = c.telefone;
+                    document.getElementById('cDoc').value = c.doc || '';
+                }
+            }
+            document.getElementById('modalCliente').classList.remove('hidden');
+        }
+        function fecharModalCliente() { document.getElementById('modalCliente').classList.add('hidden'); }
+        function salvarCliente(e) {
+            e.preventDefault();
+            const idEdit = document.getElementById('clienteIdEdit').value;
+            const nome = document.getElementById('cNome').value.trim();
+            const telefone = document.getElementById('cTelefone').value.trim();
+            const doc = document.getElementById('cDoc').value.trim();
+            if (!db.clientes) db.clientes = [];
+            if (idEdit) {
+                db.clientes = db.clientes.map(c => c.id == idEdit ? { ...c, nome, telefone, doc } : c);
+            } else {
+                db.clientes.push({ id: Date.now(), nome, telefone, doc });
+            }
+            salvarDB();
+            fecharModalCliente();
+            renderizarClientes();
+            atualizarSelectsClientesEProdutos();
+            atualizarDashboard();
+        }
+        function excluirCliente(id) {
+            if (confirm('Excluir cliente?')) {
+                db.clientes = db.clientes.filter(c => c.id !== id);
+                salvarDB();
+                renderizarClientes();
+                atualizarSelectsClientesEProdutos();
+                atualizarDashboard();
+            }
+        }
+
+        function renderizarVeiculos() {
+            const tbody = document.getElementById('tabelaVeiculos');
+            if (!tbody) return;
+            const lista = db.veiculos || [];
+            tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="6" class="p-4 text-center text-zinc-500">Nenhum veículo cadastrado.</td></tr>` :
+                lista.map(v => {
+                    const cli = (db.clientes || []).find(c => c.id == v.clienteId)?.nome || 'Cliente';
+                    return `
+                        <tr class="hover:bg-zinc-950/50">
+                            <td class="p-4 font-bold text-white">${v.marca} ${v.modelo}</td>
+                            <td class="p-4 text-amber-400 font-mono">${v.placa}</td>
+                            <td class="p-4 text-zinc-300">${v.cor}</td>
+                            <td class="p-4 text-zinc-300">${v.km} KM</td>
+                            <td class="p-4 text-zinc-300">${cli}</td>
+                            <td class="p-4 text-right"><button onclick="excluirVeiculo(${v.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                        </tr>
+                    `;
+                }).join('');
+        }
+        function abrirModalVeiculo() {
+            document.getElementById('veiculoIdEdit').value = '';
+            document.getElementById('vModelo').value = '';
+            document.getElementById('vPlaca').value = '';
+            document.getElementById('vCor').value = '';
+            document.getElementById('vKm').value = '';
+            atualizarSelectsClientesEProdutos();
+            document.getElementById('modalVeiculo').classList.remove('hidden');
+        }
+        function fecharModalVeiculo() { document.getElementById('modalVeiculo').classList.add('hidden'); }
+        function salvarVeiculo(e) {
+            e.preventDefault();
+            const clienteId = document.getElementById('vClienteId').value;
+            const marca = document.getElementById('vMarca').value;
+            const modelo = document.getElementById('vModelo').value.trim();
+            const placa = document.getElementById('vPlaca').value.trim().toUpperCase();
+            const cor = document.getElementById('vCor').value.trim();
+            const km = parseInt(document.getElementById('vKm').value) || 0;
+            if (!db.veiculos) db.veiculos = [];
+            db.veiculos.push({ id: Date.now(), clienteId, marca, modelo, placa, cor, km });
+            salvarDB();
+            fecharModalVeiculo();
+            renderizarVeiculos();
+        }
+        function excluirVeiculo(id) {
+            db.veiculos = db.veiculos.filter(v => v.id !== id);
+            salvarDB();
+            renderizarVeiculos();
         }
 
         function renderizarUsuarios() {
@@ -1097,56 +1861,126 @@
             const lista = db.usuarios || [];
             tbody.innerHTML = lista.map(u => `
                 <tr class="hover:bg-zinc-950/50">
-                    <td class="p-4 font-bold text-white flex items-center space-x-2"><i class="fa-solid fa-user text-red-500 text-xs"></i><span>${u.nome}</span></td>
-                    <td class="p-4 text-zinc-400">${u.email || '-'}</td>
-                    <td class="p-4 font-mono text-zinc-300">${u.senha}</td>
-                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${u.cargo === 'Administrador' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-zinc-800 text-zinc-300'}">${u.cargo}</span></td>
-                    <td class="p-4 text-right space-x-2">
-                        <button onclick="abrirModalUsuario(${u.id})" class="text-zinc-400 hover:text-white" title="Editar Usuário"><i class="fa-solid fa-pen"></i></button>
-                        ${lista.length > 1 ? `<button onclick="removerUsuario(${u.id})" class="text-zinc-500 hover:text-red-500" title="Excluir"><i class="fa-solid fa-trash"></i></button>` : ''}
-                    </td>
+                    <td class="p-4 font-bold text-white">${u.nome}</td>
+                    <td class="p-4 text-zinc-300">${u.email}</td>
+                    <td class="p-4 text-zinc-500 font-mono">******</td>
+                    <td class="p-4 text-zinc-300">${u.cargo}</td>
+                    <td class="p-4 text-right"><button onclick="excluirUsuario(${u.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
-
-        function removerUsuario(id) {
-            if (db.usuarios.length <= 1) {
-                alert('Você não pode excluir o último usuário restante do sistema.');
-                return;
-            }
-            if (confirm('Deseja realmente excluir este usuário?')) {
-                db.usuarios = db.usuarios.filter(u => u.id !== id);
-                salvarDB();
-                renderizarUsuarios();
-            }
-        }
-
-        // Funções adicionais e de apoio
-        function calcularMetasAutomaticas() {
-            const diaria = parseFloat(document.getElementById('inputMetaDiaria').value) || 0;
-            const semanal = diaria * 5;
-            document.getElementById('inputMetaSemanal').value = semanal.toFixed(2);
-        }
-
-        function salvarMetas() {
-            const valorDiaria = parseFloat(document.getElementById('inputMetaDiaria').value) || 600;
-            db.metaDiaria = valorDiaria;
-            db.metaSemanal = valorDiaria * 5;
+        function abrirModalUsuario() { document.getElementById('modalUsuario').classList.remove('hidden'); }
+        function fecharModalUsuario() { document.getElementById('modalUsuario').classList.add('hidden'); }
+        function salvarUsuario(e) {
+            e.preventDefault();
+            const nome = document.getElementById('uNome').value.trim();
+            const email = document.getElementById('uEmail').value.trim();
+            const senha = document.getElementById('uSenha').value.trim();
+            const cargo = document.getElementById('uCargo').value;
+            if (!db.usuarios) db.usuarios = [];
+            db.usuarios.push({ id: Date.now(), nome, email, senha, cargo });
             salvarDB();
-            renderizarMetas();
-            alert('Metas atualizadas com sucesso!');
+            fecharModalUsuario();
+            renderizarUsuarios();
+        }
+        function excluirUsuario(id) {
+            if (db.usuarios.length <= 1) { alert('Mantenha ao menos um usuário.'); return; }
+            db.usuarios = db.usuarios.filter(u => u.id !== id);
+            salvarDB();
+            renderizarUsuarios();
         }
 
-        function renderizarMetas() {
-            const metaDiaria = db.metaDiaria || 600;
-            const metaSemanal = db.metaSemanal || (metaDiaria * 5);
-            if (document.getElementById('inputMetaDiaria')) document.getElementById('inputMetaDiaria').value = metaDiaria;
-            if (document.getElementById('inputMetaSemanal')) document.getElementById('inputMetaSemanal').value = metaSemanal.toFixed(2);
+        function renderizarEstoque() {
+            const tbody = document.getElementById('tabelaEstoque');
+            if (!tbody) return;
+            const filtro = (document.getElementById('filtroBuscaProduto')?.value || '').toLowerCase();
+            const lista = (db.produtos || []).filter(p => p.nome.toLowerCase().includes(filtro) || p.tipo.toLowerCase().includes(filtro));
+            tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="5" class="p-4 text-center text-zinc-500">Nenhum produto cadastrado.</td></tr>` :
+                lista.map(p => `
+                    <tr class="hover:bg-zinc-950/50">
+                        <td class="p-4 font-bold text-white">${p.nome}</td>
+                        <td class="p-4 text-zinc-300">${p.tipo}</td>
+                        <td class="p-4 text-zinc-300 font-bold ${p.qtd <= 2 ? 'text-red-500' : 'text-emerald-400'}">${p.qtd} un</td>
+                        <td class="p-4 font-mono text-emerald-400">R$ ${p.preco.toFixed(2)}</td>
+                        <td class="p-4 text-right space-x-2">
+                            <button onclick="abrirModalProduto(${p.id})" class="text-blue-400"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="excluirProduto(${p.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+        }
+        function abrirModalProduto(id = null) {
+            document.getElementById('produtoIdEdit').value = '';
+            document.getElementById('pNome').value = '';
+            document.getElementById('pTipo').value = '';
+            document.getElementById('pQtd').value = '';
+            document.getElementById('pPreco').value = '';
+            if (id) {
+                const prod = (db.produtos || []).find(p => p.id === id);
+                if (prod) {
+                    document.getElementById('produtoIdEdit').value = prod.id;
+                    document.getElementById('pNome').value = prod.nome;
+                    document.getElementById('pTipo').value = prod.tipo;
+                    document.getElementById('pQtd').value = prod.qtd;
+                    document.getElementById('pPreco').value = prod.preco;
+                }
+            }
+            document.getElementById('modalProduto').classList.remove('hidden');
+        }
+        function fecharModalProduto() { document.getElementById('modalProduto').classList.add('hidden'); }
+        function salvarProduto(e) {
+            e.preventDefault();
+            const idEdit = document.getElementById('produtoIdEdit').value;
+            const nome = document.getElementById('pNome').value.trim();
+            const tipo = document.getElementById('pTipo').value.trim();
+            const qtd = parseInt(document.getElementById('pQtd').value) || 0;
+            const preco = parseFloat(document.getElementById('pPreco').value) || 0;
+            if (!db.produtos) db.produtos = [];
+            if (idEdit) {
+                db.produtos = db.produtos.map(p => p.id == idEdit ? { ...p, nome, tipo, qtd, preco } : p);
+            } else {
+                db.produtos.push({ id: Date.now(), nome, tipo, qtd, preco });
+            }
+            salvarDB();
+            fecharModalProduto();
+            renderizarEstoque();
+            atualizarSelectsClientesEProdutos();
+        }
+        function excluirProduto(id) {
+            db.produtos = db.produtos.filter(p => p.id !== id);
+            salvarDB();
+            renderizarEstoque();
+            atualizarSelectsClientesEProdutos();
+        }
+
+        function renderizarCaixa() {
+            const tbody = document.getElementById('tabelaCaixa');
+            if (!tbody) return;
+            const lista = db.caixa || [];
+            let totalEntradas = lista.filter(m => m.tipo === 'Entrada').reduce((acc, c) => acc + c.valor, 0);
+            let totalSaidas = lista.filter(m => m.tipo === 'Saída').reduce((acc, c) => acc + c.valor, 0);
+
+            document.getElementById('finTotalEntradas').innerText = `R$ ${totalEntradas.toFixed(2)}`;
+            document.getElementById('finTotalSaidas').innerText = `R$ ${totalSaidas.toFixed(2)}`;
+            document.getElementById('finSaldoLiquido').innerText = `R$ ${(totalEntradas - totalSaidas).toFixed(2)}`;
+
+            tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="5" class="p-4 text-center text-zinc-500">Nenhuma movimentação de caixa registrada.</td></tr>` :
+                lista.map(m => `
+                    <tr class="hover:bg-zinc-950/50">
+                        <td class="p-4 text-zinc-400">${m.data}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${m.tipo === 'Entrada' ? 'bg-emerald-950 text-emerald-400' : 'bg-red-950 text-red-400'}">${m.tipo}</span></td>
+                        <td class="p-4 text-white">${m.descricao}</td>
+                        <td class="p-4 font-mono font-bold ${m.tipo === 'Entrada' ? 'text-emerald-400' : 'text-red-500'}">R$ ${m.valor.toFixed(2)}</td>
+                        <td class="p-4 text-right"><button onclick="excluirMovimentacaoCaixa(${m.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
         }
 
         function abrirModalCaixa(tipo) {
             document.getElementById('cxTipo').value = tipo;
-            document.getElementById('modalCaixaTitulo').innerText = tipo === 'Entrada' ? 'Nova Entrada no Caixa' : 'Nova Saída do Caixa';
+            document.getElementById('modalCaixaTitulo').innerText = `Nova ${tipo} no Caixa`;
+            document.getElementById('cxDescricao').value = '';
+            document.getElementById('cxValor').value = '';
             document.getElementById('modalCaixa').classList.remove('hidden');
         }
         function fecharModalCaixa() { document.getElementById('modalCaixa').classList.add('hidden'); }
@@ -1155,64 +1989,101 @@
             const tipo = document.getElementById('cxTipo').value;
             const descricao = document.getElementById('cxDescricao').value.trim();
             const valor = parseFloat(document.getElementById('cxValor').value) || 0;
-            if(!db.caixa) db.caixa = [];
+            if (!db.caixa) db.caixa = [];
             db.caixa.push({ id: Date.now(), tipo, descricao, valor, data: new Date().toLocaleDateString('pt-BR') });
             salvarDB();
             fecharModalCaixa();
-            renderizarTudo();
-            alert('Movimentação registrada!');
+            renderizarCaixa();
+            atualizarDashboard();
         }
-
-        function renderizarCaixa() {
-            const tbody = document.getElementById('tabelaCaixa');
-            if(!tbody) return;
-            const lista = db.caixa || [];
-            if(lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-zinc-500">Nenhuma movimentação registrada.</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = lista.map(m => `
-                <tr class="hover:bg-zinc-950/50">
-                    <td class="p-4 font-mono">${m.data}</td>
-                    <td class="p-4"><span class="px-2 py-1 rounded text-xs font-semibold ${m.tipo === 'Entrada' ? 'bg-emerald-950 text-emerald-400' : 'bg-red-950 text-red-400'}">${m.tipo}</span></td>
-                    <td class="p-4">${m.descricao}</td>
-                    <td class="p-4 font-bold ${m.tipo === 'Entrada' ? 'text-emerald-400' : 'text-red-500'}">R$ ${m.valor.toFixed(2)}</td>
-                    <td class="p-4 text-right"><button onclick="removerCaixa(${m.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
-            `).join('');
-            let tEntradas = lista.filter(m => m.tipo === 'Entrada').reduce((a,c) => a + c.valor, 0);
-            let tSaidas = lista.filter(m => m.tipo === 'Saída').reduce((a,c) => a + c.valor, 0);
-            document.getElementById('finTotalEntradas').innerText = `R$ ${tEntradas.toFixed(2)}`;
-            document.getElementById('finTotalSaidas').innerText = `R$ ${tSaidas.toFixed(2)}`;
-            document.getElementById('finSaldoLiquido').innerText = `R$ ${(tEntradas - tSaidas).toFixed(2)}`;
-        }
-
-        function removerCaixa(id) {
+        function excluirMovimentacaoCaixa(id) {
             db.caixa = db.caixa.filter(m => m.id !== id);
             salvarDB();
-            renderizarTudo();
+            renderizarCaixa();
+            atualizarDashboard();
         }
 
+        function renderizarContasReceber() {
+            const tbody = document.getElementById('tabelaContasReceber');
+            if (!tbody) return;
+            const lista = db.contasReceber || [];
+            let total = lista.filter(c => c.status === 'Pendente').reduce((acc, c) => acc + c.valor, 0);
+            document.getElementById('finTotalReceberPendente').innerText = `R$ ${total.toFixed(2)}`;
+            tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="6" class="p-4 text-center text-zinc-500">Nenhuma conta a receber.</td></tr>` :
+                lista.map(c => `
+                    <tr class="hover:bg-zinc-950/50">
+                        <td class="p-4 font-bold text-white">${c.descricao}</td>
+                        <td class="p-4 text-zinc-300">-</td>
+                        <td class="p-4 font-mono text-emerald-400">R$ ${c.valor.toFixed(2)}</td>
+                        <td class="p-4 text-zinc-400">${c.vencimento || '-'}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded text-xs bg-blue-950 text-blue-400">${c.status || 'Pendente'}</span></td>
+                        <td class="p-4 text-right"><button onclick="excluirContaReceber(${c.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+        }
         function abrirModalContaReceber() { document.getElementById('modalContaReceber').classList.remove('hidden'); }
         function fecharModalContaReceber() { document.getElementById('modalContaReceber').classList.add('hidden'); }
-        function salvarContaReceber(e) { e.preventDefault(); fecharModalContaReceber(); }
-        function renderizarContasReceber() {}
+        function salvarContaReceber(e) {
+            e.preventDefault();
+            const descricao = document.getElementById('crDescricao').value.trim();
+            const valor = parseFloat(document.getElementById('crValor').value) || 0;
+            if (!db.contasReceber) db.contasReceber = [];
+            db.contasReceber.push({ id: Date.now(), descricao, valor, status: 'Pendente', vencimento: new Date().toLocaleDateString('pt-BR') });
+            salvarDB();
+            fecharModalContaReceber();
+            renderizarContasReceber();
+        }
+        function excluirContaReceber(id) {
+            db.contasReceber = db.contasReceber.filter(c => c.id !== id);
+            salvarDB();
+            renderizarContasReceber();
+        }
+
+        function renderizarContasPagar() {
+            const tbody = document.getElementById('tabelaContasPagar');
+            if (!tbody) return;
+            const lista = db.contasPagar || [];
+            let total = lista.filter(c => c.status === 'Pendente').reduce((acc, c) => acc + c.valor, 0);
+            document.getElementById('finTotalPagarPendente').innerText = `R$ ${total.toFixed(2)}`;
+            tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="7" class="p-4 text-center text-zinc-500">Nenhuma conta a pagar.</td></tr>` :
+                lista.map(c => `
+                    <tr class="hover:bg-zinc-950/50">
+                        <td class="p-4 font-mono text-zinc-400">#${c.id}</td>
+                        <td class="p-4 font-bold text-white">${c.descricao}</td>
+                        <td class="p-4 font-mono text-red-400">R$ ${c.valor.toFixed(2)}</td>
+                        <td class="p-4 text-zinc-400">-</td>
+                        <td class="p-4 text-zinc-400">${c.vencimento || '-'}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded text-xs bg-amber-950 text-amber-400">${c.status || 'Pendente'}</span></td>
+                        <td class="p-4 text-right"><button onclick="excluirContaPagar(${c.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+        }
         function abrirModalContaPagar() { document.getElementById('modalContaPagar').classList.remove('hidden'); }
         function fecharModalContaPagar() { document.getElementById('modalContaPagar').classList.add('hidden'); }
-        function salvarContaPagar(e) { e.preventDefault(); fecharModalContaPagar(); }
-        function renderizarContasPagar() {}
-        function limparFiltroMes() {}
-        function salvarConfiguracoes(e) { e.preventDefault(); alert('Configurações salvas!'); }
-        function abrirModalAgendamento() { document.getElementById('modalAgendamento').classList.remove('hidden'); }
-        function fecharModalAgendamento() { document.getElementById('modalAgendamento').classList.add('hidden'); }
-        function salvarAgendamento(e) { e.preventDefault(); fecharModalAgendamento(); alert('Agendamento salvo!'); }
-        function renderizarClientes() {}
-        function abrirModalCliente() { alert('Abra o módulo de clientes.'); }
-        function abrirModalProduto() { alert('Abra o módulo de estoque.'); }
-        function abrirModalOS() { alert('Abra o módulo de OS.'); }
-        function renderizarOS() {}
-        function abrirModalPagamentoPDV() { alert('Carrinho vazio.'); }
-        function adicionarItemPDV() {}
+        function salvarContaPagar(e) {
+            e.preventDefault();
+            const descricao = document.getElementById('cpDescricao').value.trim();
+            const valor = parseFloat(document.getElementById('cpValor').value) || 0;
+            if (!db.contasPagar) db.contasPagar = [];
+            db.contasPagar.push({ id: Date.now(), descricao, valor, status: 'Pendente', vencimento: new Date().toLocaleDateString('pt-BR') });
+            salvarDB();
+            fecharModalContaPagar();
+            renderizarContasPagar();
+        }
+        function excluirContaPagar(id) {
+            db.contasPagar = db.contasPagar.filter(c => c.id !== id);
+            salvarDB();
+            renderizarContasPagar();
+        }
+
+        function salvarConfiguracoes(e) {
+            e.preventDefault();
+            db.config.nome = document.getElementById('cfgNome').value.trim();
+            db.config.logo = document.getElementById('cfgLogo').value.trim();
+            salvarDB();
+            aplicarConfiguracoesVisuais();
+            alert('Configurações salvas com sucesso!');
+        }
     </script>
 </body>
 </html>
