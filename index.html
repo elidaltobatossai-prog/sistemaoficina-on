@@ -1013,7 +1013,7 @@ HTML
         let pagamentoContexto = null;
         let splitLinhasTemp = [];
 
-        // Salvamento assíncrono no Firebase Firestore (substituindo localStorage)
+        // Substituição do armazenamento local pela nuvem do Firebase Firestore
         function salvarDB() {
             firestore.collection("ef_motos").doc("dados_gerais").set(db)
                 .then(() => {
@@ -1024,7 +1024,7 @@ HTML
                 });
         }
 
-        // Carregamento inicial do Firebase Firestore
+        // Carregamento assíncrono dos dados salvos no Firebase
         function carregarDadosFirebase(callback) {
             firestore.collection("ef_motos").doc("dados_gerais").get()
                 .then((doc) => {
@@ -1482,4 +1482,4 @@ HTML
         function renderizarUsuarios() {}
     </script>
 </body>
-</html>
+</html
