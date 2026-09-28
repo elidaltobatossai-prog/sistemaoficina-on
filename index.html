@@ -1,4 +1,3 @@
-HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1013,25 +1012,26 @@ HTML
         let pagamentoContexto = null;
         let splitLinhasTemp = [];
 
-        // Substituição do armazenamento local pela nuvem do Firebase Firestore
+        // Função universal de salvamento na nuvem (Firestore)
         function salvarDB() {
             firestore.collection("ef_motos").doc("dados_gerais").set(db)
                 .then(() => {
-                    console.log("Dados salvos na nuvem com sucesso!");
+                    console.log("Dados salvos e sincronizados na nuvem com sucesso!");
                 })
                 .catch((error) => {
                     console.error("Erro ao salvar no Firebase:", error);
                 });
         }
 
-        // Carregamento assíncrono dos dados salvos no Firebase
+        // Carregamento inicial assíncrono da nuvem
         function carregarDadosFirebase(callback) {
             firestore.collection("ef_motos").doc("dados_gerais").get()
                 .then((doc) => {
                     if (doc.exists) {
-                        db = doc.data();
+                        const dadosRemotos = doc.data();
+                        db = { ...db, ...dadosRemotos };
                     } else {
-                        salvarDB(); // Cria o documento inicial padrão se vazio
+                        salvarDB(); 
                     }
                     if (callback) callback();
                 })
@@ -1040,6 +1040,30 @@ HTML
                     if (callback) callback();
                 });
         }
+
+        // Sincronização em segundo plano a cada 10 segundos (Atualiza dados sem deslogar nem sair para o login)
+        function sincronizarAutomatico() {
+            firestore.collection("ef_motos").doc("dados_gerais").get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const dadosRemotos = doc.data();
+                        // Atualiza os dados locais de forma silenciosa
+                        db = { ...db, ...dadosRemotos };
+                        
+                        // Se o usuário estiver logado (app visível), apenas atualiza as telas em tempo real
+                        const appTela = document.getElementById('appScreen');
+                        if (appTela && !appTela.classList.contains('hidden')) {
+                            renderizarTudo();
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erro na sincronização automática:", error);
+                });
+        }
+
+        // Intervalo de 10 em 10 segundos chamando a sincronização silenciosa
+        setInterval(sincronizarAutomatico, 10000);
 
         function aplicarConfiguracoesVisuais() {
             const nomeOficina = db.config.nome || "EF Motos";
@@ -1169,14 +1193,13 @@ HTML
             const inputMeta = document.getElementById('inputMetaDiaria');
             if (!inputMeta) return;
             
-            const metaDiaria = db.metaDiaria || 600;
+            const metaDiaria = db.metaDiaria !== undefined ? db.metaDiaria : 600;
             inputMeta.value = metaDiaria;
             document.getElementById('metaExibicaoDiaria').innerText = `R$ ${metaDiaria.toFixed(2)}`;
 
             const hojeStr = new Date().toLocaleDateString('pt-BR');
             document.getElementById('metaDataHoje').innerText = hojeStr;
 
-            // Faturamento de hoje (Entradas do dia atual)
             let faturamentoHoje = db.caixa
                 .filter(m => m.tipo === 'Entrada' && m.data === hojeStr)
                 .reduce((acc, m) => acc + m.valor, 0);
@@ -1200,15 +1223,13 @@ HTML
                 containerEl.className = "bg-red-950/40 p-4 rounded-xl border border-red-900/50";
             }
 
-            // Projeção Mensal
-            const mesAtualStr = new Date().toISOString().slice(0, 7); // YYYY-MM
+            const mesAtualStr = new Date().toISOString().slice(0, 7); 
             let acumuladoMes = db.caixa
                 .filter(m => m.tipo === 'Entrada' && m.data && converterDataParaISO(m.data).startsWith(mesAtualStr))
                 .reduce((acc, m) => acc + m.valor, 0);
 
             document.getElementById('metaAcumuladoMes').innerText = `R$ ${acumuladoMes.toFixed(2)}`;
 
-            // Estimativa de dias úteis no mês (aproximado 22 dias)
             const metaEstimadaMes = metaDiaria * 22;
             document.getElementById('metaEstimadaMes').innerText = `R$ ${metaEstimadaMes.toFixed(2)}`;
 
@@ -1482,4 +1503,4 @@ HTML
         function renderizarUsuarios() {}
     </script>
 </body>
-</html
+</html>
