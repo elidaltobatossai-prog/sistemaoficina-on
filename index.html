@@ -1,1437 +1,1452 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageHeaderTitle">EF Motos - Sistema de Gestão</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome para Ícones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
-        @media print {
-            body * { visibility: hidden; }
-            #modalImprimirOrcamento, #modalImprimirOrcamento * { visibility: visible; }
-            #modalImprimirOrcamento { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 20px; background: white !important; color: black !important; }
-        }
-    </style>
-</head>
-<body class="bg-zinc-950 text-zinc-100 font-sans antialiased">
-
-    <!-- ========================================== -->
-    <!-- TELA DE LOGIN -->
-    <!-- ========================================== -->
-    <div id="loginScreen" class="fixed inset-0 bg-zinc-950 flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden">
-            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-600 to-rose-600"></div>
-            <div class="text-center mb-8">
-                <div id="loginLogoContainer" class="inline-flex items-center justify-center w-16 h-16 bg-red-950/50 text-red-500 border border-red-900/50 rounded-2xl text-2xl font-bold mb-4 shadow-inner overflow-hidden">
-                    <i class="fa-solid fa-motorcycle" id="loginIconDefault"></i>
-                    <img id="loginLogoImg" src="" class="w-full h-full object-cover hidden" alt="Logo">
-                </div>
-                <h1 class="text-2xl font-bold text-white" id="loginOficinaNome">EF Motos</h1>
-                <p class="text-sm text-zinc-400 font-medium">Centro Automotivo</p>
+<!-- ========================================== -->
+<!-- TELA DE LOGIN -->
+<!-- ========================================== -->
+<div id="loginScreen" class="fixed inset-0 bg-zinc-950 flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-600 to-rose-600"></div>
+        <div class="text-center mb-8">
+            <div id="loginLogoContainer" class="inline-flex items-center justify-center w-16 h-16 bg-red-950/50 text-red-500 border border-red-900/50 rounded-2xl text-2xl font-bold mb-4 shadow-inner overflow-hidden">
+                <i class="fa-solid fa-motorcycle" id="loginIconDefault"></i>
+                <img id="loginLogoImg" src="" class="w-full h-full object-cover hidden" alt="Logo">
             </div>
-
-            <div id="loginErrorMsg" class="hidden mb-4 p-3 bg-red-900/40 border border-red-700/50 text-red-300 text-xs rounded-xl text-center">
-                E-mail ou senha incorretos! Verifique os dados.
-            </div>
-
-            <form onsubmit="realizarLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">E-mail de Acesso</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500"><i class="fa-solid fa-envelope"></i></span>
-                        <input type="email" id="loginEmail" required class="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-red-600 transition" value="admin@efmotos.com">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Senha</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" id="loginSenha" required class="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-red-600 transition" value="123456">
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-red-600/30 transition duration-200">
-                        Entrar no Sistema
-                    </button>
-                </div>
-            </form>
+            <h1 class="text-2xl font-bold text-white" id="loginOficinaNome">EF Motos</h1>
+            <p class="text-sm text-zinc-400 font-medium">Centro Automotivo</p>
         </div>
+
+        <div id="loginErrorMsg" class="hidden mb-4 p-3 bg-red-900/40 border border-red-700/50 text-red-300 text-xs rounded-xl text-center">
+            E-mail ou senha incorretos! Verifique os dados.
+        </div>
+
+        <form onsubmit="realizarLogin(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">E-mail de Acesso</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500"><i class="fa-solid fa-envelope"></i></span>
+                    <input type="email" id="loginEmail" required class="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-red-600 transition" value="admin@efmotos.com">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Senha</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" id="loginSenha" required class="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-red-600 transition" value="123456">
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-red-600/30 transition duration-200">
+                    Entrar no Sistema
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <!-- ========================================== -->
-    <!-- APLICATIVO PRINCIPAL -->
-    <!-- ========================================== -->
-    <div id="appScreen" class="hidden flex h-screen overflow-hidden">
+<!-- ========================================== -->
+<!-- APLICATIVO PRINCIPAL -->
+<!-- ========================================== -->
+<div id="appScreen" class="hidden flex h-screen overflow-hidden">
+    
+    <!-- MENU LATERAL -->
+    <aside id="sidebar" class="bg-zinc-900 border-r border-zinc-800 text-zinc-300 w-64 flex-shrink-0 flex flex-col transition-all duration-300 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0 shadow-xl">
+        <div class="p-5 flex items-center justify-between border-b border-zinc-800">
+            <div class="flex items-center space-x-3">
+                <div id="sidebarLogoContainer" class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white font-bold text-lg shadow overflow-hidden">
+                    <i class="fa-solid fa-wrench" id="sidebarIconDefault"></i>
+                    <img id="sidebarLogoImg" src="" class="w-full h-full object-cover hidden" alt="Logo">
+                </div>
+                <div>
+                    <h2 class="text-white font-bold text-sm leading-tight" id="sidebarOficinaNome">EF Motos</h2>
+                    <p class="text-xs text-zinc-400">Centro Automotivo</p>
+                </div>
+            </div>
+            <button onclick="toggleSidebar()" class="lg:hidden text-zinc-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Navegação -->
+        <nav class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-1">
+            <a href="#" onclick="mudarModulo('dashboard')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white transition shadow-sm">
+                <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard</span>
+            </a>
+            <a href="#" onclick="mudarModulo('agendamentos')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition relative">
+                <i class="fa-solid fa-calendar-check w-5"></i><span>Agendamentos</span>
+                <span id="badgeAgendamentos" class="hidden absolute right-3 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+            </a>
+            <a href="#" onclick="mudarModulo('os')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
+                <i class="fa-solid fa-clipboard-list w-5"></i><span>Ordens de Serviço</span>
+            </a>
+            <a href="#" onclick="mudarModulo('pdv')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
+                <i class="fa-solid fa-cash-register w-5"></i><span>Venda de Produtos (PDV)</span>
+            </a>
+            <a href="#" onclick="mudarModulo('clientes')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
+                <i class="fa-solid fa-users w-5"></i><span>Clientes</span>
+            </a>
+            <a href="#" onclick="mudarModulo('veiculos')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
+                <i class="fa-solid fa-motorcycle w-5"></i><span>Veículos / Motos</span>
+            </a>
+            <a href="#" onclick="mudarModulo('mecanicos')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
+                <i class="fa-solid fa-user-gear w-5"></i><span>Equipe & Usuários</span>
+            </a>
+            <a href="#" onclick="mudarModulo('estoque')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
+                <i class="fa-solid fa-boxes-stacked w-5"></i><span>Estoque & Mais Vendidos</span>
+            </a>
+            <a href="#" onclick="mudarModulo('financeiro')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
+                <i class="fa-solid fa-wallet w-5"></i><span>Caixa & Financeiro</span>
+            </a>
+            <a href="#" onclick="mudarModulo('metas')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
+                <i class="fa-solid fa-bullseye w-5 text-emerald-400"></i><span>Metas & Desempenho</span>
+            </a>
+            <a href="#" onclick="mudarModulo('configuracoes')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
+                <i class="fa-solid fa-gear w-5"></i><span>Configurações</span>
+            </a>
+        </nav>
+
+        <!-- Rodapé Perfil -->
+        <div class="p-4 border-t border-zinc-800 bg-zinc-950 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-full bg-zinc-800 flex items-center text-red-500 justify-center font-bold" id="userAvatar">A</div>
+                <div>
+                    <p class="text-xs font-bold text-white truncate w-32" id="userNameDisplay">Admin</p>
+                    <p class="text-[10px] text-red-500 uppercase font-semibold" id="userRoleDisplay">Administrador</p>
+                </div>
+            </div>
+            <button onclick="realizarLogout()" title="Sair" class="text-zinc-400 hover:text-red-400 p-2 transition">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden bg-zinc-950">
         
-        <!-- MENU LATERAL -->
-        <aside id="sidebar" class="bg-zinc-900 border-r border-zinc-800 text-zinc-300 w-64 flex-shrink-0 flex flex-col transition-all duration-300 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0 shadow-xl">
-            <div class="p-5 flex items-center justify-between border-b border-zinc-800">
-                <div class="flex items-center space-x-3">
-                    <div id="sidebarLogoContainer" class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white font-bold text-lg shadow overflow-hidden">
-                        <i class="fa-solid fa-wrench" id="sidebarIconDefault"></i>
-                        <img id="sidebarLogoImg" src="" class="w-full h-full object-cover hidden" alt="Logo">
-                    </div>
-                    <div>
-                        <h2 class="text-white font-bold text-sm leading-tight" id="sidebarOficinaNome">EF Motos</h2>
-                        <p class="text-xs text-zinc-400">Centro Automotivo</p>
-                    </div>
-                </div>
-                <button onclick="toggleSidebar()" class="lg:hidden text-zinc-400 hover:text-white">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+        <!-- Topbar -->
+        <header class="bg-zinc-900 border-b border-zinc-800 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleSidebar()" class="text-zinc-400 hover:text-white lg:hidden text-lg">
+                    <i class="fa-solid fa-bars"></i>
                 </button>
+                <h1 id="pageTitle" class="text-lg font-bold text-white">Dashboard Geral</h1>
             </div>
-
-            <!-- Navegação -->
-            <nav class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-1">
-                <a href="#" onclick="mudarModulo('dashboard')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white transition shadow-sm">
-                    <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard</span>
-                </a>
-                <a href="#" onclick="mudarModulo('agendamentos')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition relative">
-                    <i class="fa-solid fa-calendar-check w-5"></i><span>Agendamentos</span>
-                    <span id="badgeAgendamentos" class="hidden absolute right-3 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
-                </a>
-                <a href="#" onclick="mudarModulo('os')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
-                    <i class="fa-solid fa-clipboard-list w-5"></i><span>Ordens de Serviço</span>
-                </a>
-                <a href="#" onclick="mudarModulo('pdv')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
-                    <i class="fa-solid fa-cash-register w-5"></i><span>Venda de Produtos (PDV)</span>
-                </a>
-                <a href="#" onclick="mudarModulo('clientes')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
-                    <i class="fa-solid fa-users w-5"></i><span>Clientes</span>
-                </a>
-                <a href="#" onclick="mudarModulo('veiculos')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
-                    <i class="fa-solid fa-motorcycle w-5"></i><span>Veículos / Motos</span>
-                </a>
-                <a href="#" onclick="mudarModulo('mecanicos')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
-                    <i class="fa-solid fa-user-gear w-5"></i><span>Equipe & Usuários</span>
-                </a>
-                <a href="#" onclick="mudarModulo('estoque')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
-                    <i class="fa-solid fa-boxes-stacked w-5"></i><span>Estoque & Mais Vendidos</span>
-                </a>
-                <a href="#" onclick="mudarModulo('financeiro')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
-                    <i class="fa-solid fa-wallet w-5"></i><span>Caixa & Financeiro</span>
-                </a>
-                <a href="#" onclick="mudarModulo('metas')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
-                    <i class="fa-solid fa-bullseye w-5 text-emerald-400"></i><span>Metas & Desempenho</span>
-                </a>
-                <a href="#" onclick="mudarModulo('configuracoes')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
-                    <i class="fa-solid fa-gear w-5"></i><span>Configurações</span>
-                </a>
-            </nav>
-
-            <!-- Rodapé Perfil -->
-            <div class="p-4 border-t border-zinc-800 bg-zinc-950 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-full bg-zinc-800 flex items-center text-red-500 justify-center font-bold" id="userAvatar">A</div>
-                    <div>
-                        <p class="text-xs font-bold text-white truncate w-32" id="userNameDisplay">Admin</p>
-                        <p class="text-[10px] text-red-500 uppercase font-semibold" id="userRoleDisplay">Administrador</p>
-                    </div>
-                </div>
-                <button onclick="realizarLogout()" title="Sair" class="text-zinc-400 hover:text-red-400 p-2 transition">
-                    <i class="fa-solid fa-power-off"></i>
-                </button>
+            <div class="flex items-center space-x-3">
+                <span class="text-xs bg-emerald-950 text-emerald-400 font-semibold px-3 py-1.5 rounded-full border border-emerald-800 flex items-center">
+                    <i class="fa-solid fa-circle text-[8px] text-emerald-500 mr-1.5 animate-pulse"></i> Sincronizado
+                </span>
             </div>
-        </aside>
+        </header>
 
-        <!-- CONTEÚDO PRINCIPAL -->
-        <div class="flex-1 flex flex-col h-screen overflow-hidden bg-zinc-950">
+        <!-- Área Dinâmica -->
+        <main class="flex-1 overflow-y-auto p-6 custom-scrollbar bg-zinc-950">
             
-            <!-- Topbar -->
-            <header class="bg-zinc-900 border-b border-zinc-800 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
-                <div class="flex items-center space-x-4">
-                    <button onclick="toggleSidebar()" class="text-zinc-400 hover:text-white lg:hidden text-lg">
-                        <i class="fa-solid fa-bars"></i>
+            <!-- DASHBOARD -->
+            <div id="mod-dashboard" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-sm">
+                        <p class="text-xs font-semibold text-zinc-400 uppercase">Saldo em Caixa</p>
+                        <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="dashSaldoCaixa">R$ 0,00</h3>
+                    </div>
+                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-sm">
+                        <p class="text-xs font-semibold text-zinc-400 uppercase">OS em Andamento</p>
+                        <h3 class="text-2xl font-bold text-amber-500 mt-1" id="dashOsAndamento">0</h3>
+                    </div>
+                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-sm">
+                        <p class="text-xs font-semibold text-zinc-400 uppercase">Agendamentos Pendentes</p>
+                        <h3 class="text-2xl font-bold text-blue-400 mt-1" id="dashAgendamentos">0</h3>
+                    </div>
+                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-sm">
+                        <p class="text-xs font-semibold text-zinc-400 uppercase">Total de Clientes</p>
+                        <h3 class="text-2xl font-bold text-red-500 mt-1" id="dashClientes">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AGENDAMENTOS DE VEÍCULOS -->
+            <div id="mod-agendamentos" class="hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
+                    <div>
+                        <span class="text-sm font-semibold text-zinc-300">Agenda de Veículos e Revisões</span>
+                        <p class="text-xs text-zinc-400">Controle de horários e alertas automáticos.</p>
+                    </div>
+                    <button onclick="abrirModalAgendamento()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
+                        <i class="fa-solid fa-calendar-plus"></i><span>Novo Agendamento</span>
                     </button>
-                    <h1 id="pageTitle" class="text-lg font-bold text-white">Dashboard Geral</h1>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <span class="text-xs bg-emerald-950 text-emerald-400 font-semibold px-3 py-1.5 rounded-full border border-emerald-800 flex items-center">
-                        <i class="fa-solid fa-circle text-[8px] text-emerald-500 mr-1.5 animate-pulse"></i> Sincronizado
-                    </span>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
+                                <th class="p-4">Data e Hora</th>
+                                <th class="p-4">Cliente</th>
+                                <th class="p-4">Moto</th>
+                                <th class="p-4">Serviço Agendado</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaAgendamentos" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
+                    </table>
                 </div>
-            </header>
+            </div>
 
-            <!-- Área Dinâmica -->
-            <main class="flex-1 overflow-y-auto p-6 custom-scrollbar bg-zinc-950">
-                
-                <!-- DASHBOARD -->
-                <div id="mod-dashboard" class="space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-sm">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">Saldo em Caixa</p>
-                            <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="dashSaldoCaixa">R$ 0,00</h3>
-                        </div>
-                        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-sm">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">OS em Andamento</p>
-                            <h3 class="text-2xl font-bold text-amber-500 mt-1" id="dashOsAndamento">0</h3>
-                        </div>
-                        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-sm">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">Agendamentos Pendentes</p>
-                            <h3 class="text-2xl font-bold text-blue-400 mt-1" id="dashAgendamentos">0</h3>
-                        </div>
-                        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-sm">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">Total de Clientes</p>
-                            <h3 class="text-2xl font-bold text-red-500 mt-1" id="dashClientes">0</h3>
-                        </div>
+            <!-- OS & ORÇAMENTOS -->
+            <div id="mod-os" class="hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
+                    <div class="w-full sm:w-72">
+                        <input type="text" id="filtroBuscaOS" oninput="renderizarOS()" placeholder="Buscar OS por nº, cliente ou moto..." class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:outline-none focus:border-red-600">
                     </div>
+                    <button onclick="abrirModalOS()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2 flex-shrink-0">
+                        <i class="fa-solid fa-plus"></i><span>Nova Ordem de Serviço</span>
+                    </button>
                 </div>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
+                                <th class="p-4">Nº OS</th>
+                                <th class="p-4">Cliente</th>
+                                <th class="p-4">Moto</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4">Total</th>
+                                <th class="p-4 text-right">Ações / Pagamento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaOS" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
+                    </table>
+                </div>
+            </div>
 
-                <!-- AGENDAMENTOS DE VEÍCULOS -->
-                <div id="mod-agendamentos" class="hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
+            <!-- VENDA DE PRODUTOS (PDV / BALCÃO) -->
+            <div id="mod-pdv" class="hidden space-y-6">
+                <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                         <div>
-                            <span class="text-sm font-semibold text-zinc-300">Agenda de Veículos e Revisões</span>
-                            <p class="text-xs text-zinc-400">Controle de horários e alertas automáticos.</p>
+                            <h3 class="text-base font-bold text-white"><i class="fa-solid fa-cash-register text-red-500 mr-2"></i> PDV - Venda de Produtos e Peças (Balcão)</h3>
+                            <p class="text-xs text-zinc-400">Realize vendas diretas de estoque com baixa automática e lançamento no caixa.</p>
                         </div>
-                        <button onclick="abrirModalAgendamento()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
-                            <i class="fa-solid fa-calendar-plus"></i><span>Novo Agendamento</span>
+                        <button onclick="abrirModalPagamentoPDV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
+                            <i class="fa-solid fa-check"></i><span>Ir para Pagamento (Motor InfinitePay)</span>
                         </button>
                     </div>
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
-                                    <th class="p-4">Data e Hora</th>
-                                    <th class="p-4">Cliente</th>
-                                    <th class="p-4">Moto</th>
-                                    <th class="p-4">Serviço Agendado</th>
-                                    <th class="p-4">Status</th>
-                                    <th class="p-4 text-right">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaAgendamentos" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
-                        </table>
-                    </div>
-                </div>
 
-                <!-- OS & ORÇAMENTOS -->
-                <div id="mod-os" class="hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
-                        <div class="w-full sm:w-72">
-                            <input type="text" id="filtroBuscaOS" oninput="renderizarOS()" placeholder="Buscar OS por nº, cliente ou moto..." class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:outline-none focus:border-red-600">
-                        </div>
-                        <button onclick="abrirModalOS()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2 flex-shrink-0">
-                            <i class="fa-solid fa-plus"></i><span>Nova Ordem de Serviço</span>
-                        </button>
-                    </div>
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
-                                    <th class="p-4">Nº OS</th>
-                                    <th class="p-4">Cliente</th>
-                                    <th class="p-4">Moto</th>
-                                    <th class="p-4">Status</th>
-                                    <th class="p-4">Total</th>
-                                    <th class="p-4 text-right">Ações / Pagamento</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaOS" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- VENDA DE PRODUTOS (PDV / BALCÃO) -->
-                <div id="mod-pdv" class="hidden space-y-6">
-                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                            <div>
-                                <h3 class="text-base font-bold text-white"><i class="fa-solid fa-cash-register text-red-500 mr-2"></i> PDV - Venda de Produtos e Peças (Balcão)</h3>
-                                <p class="text-xs text-zinc-400">Realize vendas diretas de estoque com baixa automática e lançamento no caixa.</p>
-                            </div>
-                            <button onclick="abrirModalPagamentoPDV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
-                                <i class="fa-solid fa-check"></i><span>Ir para Pagamento (Motor InfinitePay)</span>
-                            </button>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <!-- Seleção de Produtos -->
-                            <div class="lg:col-span-2 space-y-4">
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
-                                    <h4 class="text-xs font-bold uppercase text-zinc-300">Adicionar Item à Venda</h4>
-                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                        <div class="sm:col-span-2">
-                                            <label class="block text-[10px] uppercase text-zinc-500 mb-1">Selecionar Produto do Estoque</label>
-                                            <select id="pdvProdutoSelect" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
-                                                <option value="">Selecione a peça/produto...</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-[10px] uppercase text-zinc-500 mb-1">Quantidade</label>
-                                            <div class="flex space-x-2">
-                                                <input type="number" id="pdvQtdInput" min="1" value="1" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
-                                                <button type="button" onclick="adicionarItemPDV()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-plus"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="bg-zinc-950 rounded-xl border border-zinc-800 overflow-hidden">
-                                    <div class="p-3 bg-zinc-900 border-b border-zinc-800 text-xs font-bold uppercase text-zinc-300">Carrinho da Venda</div>
-                                    <table class="w-full text-left text-xs">
-                                        <thead class="bg-zinc-900/50 text-zinc-400 uppercase border-b border-zinc-800">
-                                            <tr>
-                                                <th class="p-3">Produto</th>
-                                                <th class="p-3 text-center">Qtd</th>
-                                                <th class="p-3 text-right">V. Unit.</th>
-                                                <th class="p-3 text-right">Subtotal</th>
-                                                <th class="p-3 text-right">Ação</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tabelaPdvCarrinho" class="divide-y divide-zinc-800 text-zinc-300">
-                                            <tr><td colspan="5" class="p-4 text-center text-zinc-500">Carrinho vazio.</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Resumo e Pagamento -->
-                            <div class="bg-zinc-950 p-5 rounded-xl border border-zinc-800 flex flex-col justify-between space-y-4">
-                                <div class="space-y-4">
-                                    <h4 class="text-xs font-bold uppercase text-zinc-300 border-b border-zinc-800 pb-2">Resumo da Venda</h4>
-                                    <div>
-                                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente (Opcional)</label>
-                                        <select id="pdvClienteId" class="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
-                                            <option value="">Cliente Balcão / Geral</option>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Seleção de Produtos -->
+                        <div class="lg:col-span-2 space-y-4">
+                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
+                                <h4 class="text-xs font-bold uppercase text-zinc-300">Adicionar Item à Venda</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[10px] uppercase text-zinc-500 mb-1">Selecionar Produto do Estoque</label>
+                                        <select id="pdvProdutoSelect" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
+                                            <option value="">Selecione a peça/produto...</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="pt-4 border-t border-zinc-800 space-y-3">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-xs uppercase font-semibold text-zinc-400">Total a Pagar</span>
-                                        <span class="text-2xl font-black text-emerald-400" id="pdvTotalDisplay">R$ 0,00</span>
+                                    <div>
+                                        <label class="block text-[10px] uppercase text-zinc-500 mb-1">Quantidade</label>
+                                        <div class="flex space-x-2">
+                                            <input type="number" id="pdvQtdInput" min="1" value="1" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
+                                            <button type="button" onclick="adicionarItemPDV()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-plus"></i></button>
+                                        </div>
                                     </div>
-                                    <button onclick="abrirModalPagamentoPDV()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-red-600/30 transition text-sm">
-                                        Prosseguir para Pagamento
-                                    </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- CLIENTES -->
-                <div id="mod-clientes" class="hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
-                        <div class="w-full sm:w-72">
-                            <input type="text" id="filtroBuscaCliente" oninput="renderizarClientes()" placeholder="Buscar cliente por nome, tel ou doc..." class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:outline-none focus:border-red-600">
-                        </div>
-                        <button onclick="abrirModalCliente()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex-shrink-0">Novo Cliente</button>
-                    </div>
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
-                                    <th class="p-4">Nome</th>
-                                    <th class="p-4">Telefone</th>
-                                    <th class="p-4">CPF/CNPJ</th>
-                                    <th class="p-4 text-right">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaClientes" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- VEÍCULOS / MOTOS -->
-                <div id="mod-veiculos" class="hidden space-y-6">
-                    <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
-                        <span class="text-sm font-semibold text-zinc-300">Motos / Veículos Cadastrados</span>
-                        <button onclick="abrirModalVeiculo()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
-                            <i class="fa-solid fa-motorcycle"></i><span>Nova Moto</span>
-                        </button>
-                    </div>
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
-                                    <th class="p-4">Moto (Marca/Modelo)</th>
-                                    <th class="p-4">Placa</th>
-                                    <th class="p-4">Ano / Cor</th>
-                                    <th class="p-4">Proprietário</th>
-                                    <th class="p-4 text-right">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaVeiculos" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- EQUIPE / MECÂNICOS -->
-                <div id="mod-mecanicos" class="hidden space-y-6">
-                    <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
-                        <span class="text-sm font-semibold text-zinc-300">Gerenciar Equipe e Mecânicos</span>
-                        <button onclick="abrirModalUsuario()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
-                            <i class="fa-solid fa-user-plus"></i><span>Novo Mecânico / Usuário</span>
-                        </button>
-                    </div>
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
-                                    <th class="p-4">Nome</th>
-                                    <th class="p-4">E-mail</th>
-                                    <th class="p-4">Cargo</th>
-                                    <th class="p-4 text-right">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaUsuarios" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- ESTOQUE & MAIS VENDIDOS -->
-                <div id="mod-estoque" class="hidden space-y-6">
-                    <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
-                        <div>
-                            <span class="text-sm font-semibold text-zinc-300">Estoque de Peças & Produtos</span>
-                            <p class="text-xs text-zinc-400">Controle de inventário e itens mais vendidos.</p>
-                        </div>
-                        <button onclick="abrirModalProduto()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
-                            <i class="fa-solid fa-plus"></i><span>Novo Produto / Peça</span>
-                        </button>
-                    </div>
-
-                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl space-y-4">
-                        <h3 class="text-sm font-bold text-white flex items-center"><i class="fa-solid fa-fire text-red-500 mr-2"></i> Peças e Serviços Mais Vendidos</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="rankingMaisVendidos"></div>
-                    </div>
-
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
-                                    <th class="p-4">Item / Peça</th>
-                                    <th class="p-4">Tipo</th>
-                                    <th class="p-4">Quantidade em Estoque</th>
-                                    <th class="p-4">Preço Venda</th>
-                                    <th class="p-4 text-right">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaEstoque" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- FINANCEIRO & CAIXA -->
-                <div id="mod-financeiro" class="hidden space-y-6">
-                    <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-xs font-semibold text-zinc-400 uppercase"><i class="fa-solid fa-filter mr-1 text-red-500"></i> Filtrar Mês/Ano:</span>
-                            <input type="month" id="filtroMesAno" onchange="renderizarCaixa()" class="px-3 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:outline-none focus:border-red-600">
-                            <button onclick="limparFiltroMes()" class="text-xs text-zinc-400 hover:text-white underline">Ver Todos</button>
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="abrirModalCaixa('Abertura/Troco')" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-coins mr-1"></i> Fundo de Troco</button>
-                            <button onclick="abrirModalSangria()" class="bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> Sangria de Caixa</button>
-                            <button onclick="abrirModalCaixa('Entrada')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-plus mr-1"></i> Nova Entrada</button>
-                            <button onclick="abrirModalCaixa('Sangria')" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-minus mr-1"></i> Nova Saída</button>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">Entradas (Período)</p>
-                            <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="finTotalEntradas">R$ 0,00</h3>
-                        </div>
-                        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">Saídas / Sangrias (Período)</p>
-                            <h3 class="text-2xl font-bold text-red-500 mt-1" id="finTotalSaidas">R$ 0,00</h3>
-                        </div>
-                        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">Balanço do Período</p>
-                            <h3 class="text-2xl font-bold text-white mt-1" id="finSaldoLiquido">R$ 0,00</h3>
-                        </div>
-                        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl border-l-4 border-l-red-600">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">Dinheiro Físico em Gaveta</p>
-                            <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="finCaixaGeral">R$ 0,00</h3>
-                        </div>
-                    </div>
-
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                            <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-wallet text-red-500 mr-2"></i> Histórico de Caixa (Movimentos & Taxas InfinitePay)</h3>
-                        </div>
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
-                                    <th class="p-4">Data</th>
-                                    <th class="p-4">Tipo</th>
-                                    <th class="p-4">Forma Pagamento</th>
-                                    <th class="p-4">Descrição</th>
-                                    <th class="p-4">V. Bruto</th>
-                                    <th class="p-4">Taxa Inf.</th>
-                                    <th class="p-4">V. Líquido</th>
-                                    <th class="p-4 text-right">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaCaixa" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- METAS & DESEMPENHO -->
-                <div id="mod-metas" class="hidden space-y-6">
-                    <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl max-w-3xl space-y-6">
-                        <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
-                            <div>
-                                <h3 class="text-lg font-bold text-white flex items-center"><i class="fa-solid fa-bullseye text-emerald-400 mr-2"></i> Controle de Metas de Faturamento</h3>
-                                <p class="text-xs text-zinc-400">Defina sua meta diária desejada e acompanhe o desempenho em tempo real.</p>
+                            <div class="bg-zinc-950 rounded-xl border border-zinc-800 overflow-hidden">
+                                <div class="p-3 bg-zinc-900 border-b border-zinc-800 text-xs font-bold uppercase text-zinc-300">Carrinho da Venda</div>
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-zinc-900/50 text-zinc-400 uppercase border-b border-zinc-800">
+                                        <tr>
+                                            <th class="p-3">Produto</th>
+                                            <th class="p-3 text-center">Qtd</th>
+                                            <th class="p-3 text-right">V. Unit.</th>
+                                            <th class="p-3 text-right">Subtotal</th>
+                                            <th class="p-3 text-right">Ação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabelaPdvCarrinho" class="divide-y divide-zinc-800 text-zinc-300">
+                                        <tr><td colspan="5" class="p-4 text-center text-zinc-500">Carrinho vazio.</td></tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
-                        <!-- Configuração da Meta Manual -->
-                        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col sm:flex-row items-end gap-4">
-                            <div class="flex-1 w-full">
-                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Definir Meta Diária (R$)</label>
-                                <input type="number" step="1.00" id="inputMetaDiaria" value="600" class="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 text-emerald-400 font-bold rounded-xl text-base focus:outline-none focus:border-red-600" placeholder="600.00">
-                            </div>
-                            <button type="button" onclick="salvarMetaDiaria()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">
-                                Salvar Nova Meta
-                            </button>
-                        </div>
-
-                        <!-- Resultados do Dia -->
-                        <div class="space-y-4">
-                            <h4 class="text-xs font-bold uppercase text-zinc-300">Desempenho do Dia (Hoje: <span id="metaDataHoje">--/--/----</span>)</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Faturamento de Hoje</p>
-                                    <h3 class="text-2xl font-bold text-white mt-1" id="metaFiltroFaturamentoDia">R$ 0,00</h3>
-                                </div>
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Meta Diária Estipulada</p>
-                                    <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="metaExibicaoDiaria">R$ 600,00</h3>
-                                </div>
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800" id="cardStatusDiaContainer">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase" id="metaTituloStatusDia">Status do Dia</p>
-                                    <h3 class="text-2xl font-bold mt-1" id="metaResultadoDia">R$ 0,00</h3>
+                        <!-- Resumo e Pagamento -->
+                        <div class="bg-zinc-950 p-5 rounded-xl border border-zinc-800 flex flex-col justify-between space-y-4">
+                            <div class="space-y-4">
+                                <h4 class="text-xs font-bold uppercase text-zinc-300 border-b border-zinc-800 pb-2">Resumo da Venda</h4>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente (Opcional)</label>
+                                    <select id="pdvClienteId" class="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
+                                        <option value="">Cliente Balcão / Geral</option>
+                                    </select>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Projeção Mensal -->
-                        <div class="space-y-4 pt-4 border-t border-zinc-800">
-                            <h4 class="text-xs font-bold uppercase text-zinc-300">Projeção da Meta Mensal</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Total Acumulado no Mês</p>
-                                    <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="metaAcumuladoMes">R$ 0,00</h3>
+                            <div class="pt-4 border-t border-zinc-800 space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs uppercase font-semibold text-zinc-400">Total a Pagar</span>
+                                    <span class="text-2xl font-black text-emerald-400" id="pdvTotalDisplay">R$ 0,00</span>
                                 </div>
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Meta Mensal Estimada (Dias Úteis x Diária)</p>
-                                    <h3 class="text-2xl font-bold text-white mt-1" id="metaEstimadaMes">R$ 0,00</h3>
-                                </div>
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Distância da Meta Mensal</p>
-                                    <h3 class="text-2xl font-bold mt-1" id="metaDistanciaMes">R$ 0,00</h3>
-                                </div>
+                                <button onclick="abrirModalPagamentoPDV()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-red-600/30 transition text-sm">
+                                    Prosseguir para Pagamento
+                                </button>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- CONFIGURAÇÕES -->
-                <div id="mod-configuracoes" class="hidden space-y-6">
-                    <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl max-w-2xl">
-                        <h3 class="text-lg font-bold text-white mb-4">Configurações da Oficina</h3>
-                        <form onsubmit="salvarConfiguracoes(event)" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome da Oficina</label>
-                                <input type="text" id="cfgNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:outline-none focus:border-red-600">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">URL do Logotipo da Oficina (Link da Imagem)</label>
-                                <input type="url" id="cfgLogo" placeholder="https://exemplo.com/logo.png" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:outline-none focus:border-red-600">
-                                <p class="text-[11px] text-zinc-500 mt-1">Cole o link de uma imagem válida da sua logo para exibi-la no sistema.</p>
-                            </div>
-                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">Salvar Configurações</button>
-                        </form>
-                    </div>
-                </div>
-
-            </main>
-        </div>
-    </div>
-
-    <!-- MODAL AGENDAMENTO -->
-    <div id="modalAgendamento" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-white mb-4">Agendar Horário / Revisão</h3>
-            <form onsubmit="salvarAgendamento(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente</label>
-                    <select id="agClienteId" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
-                        <option value="">Selecione o cliente...</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Moto / Veículo</label>
-                    <input type="text" id="agMoto" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Honda CG 150 - Placa ABC-1234">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Data</label>
-                        <input type="date" id="agData" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Horário</label>
-                        <input type="time" id="agHora" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Serviço Desejado</label>
-                    <input type="text" id="agServico" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Troca de óleo e revisão geral">
-                </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="fecharModalAgendamento()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Agendamento</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL LANÇAMENTO DE CAIXA / TROCO -->
-    <div id="modalCaixa" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 id="modalCaixaTitulo" class="text-lg font-bold text-white mb-4">Nova Movimentação</h3>
-            <form onsubmit="salvarMovimentacaoCaixa(event)" class="space-y-4">
-                <input type="hidden" id="cxTipo">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Descrição / Histórico</label>
-                    <input type="text" id="cxDescricao" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Fundo de troco inicial">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Valor (R$)</label>
-                    <input type="number" step="0.01" id="cxValor" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
-                </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="fecharModalCaixa()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL SANGRIA DE CAIXA -->
-    <div id="modalSangria" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-hand-holding-dollar text-amber-500 mr-2"></i> Sangria de Caixa</h3>
-            <p class="text-xs text-zinc-400 mb-4">Retire dinheiro físico da gaveta (ex: depósito, pagamento de fornecedor) para manter o caixa perfeitamente batido.</p>
-            <form onsubmit="salvarSangria(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Motivo / Destino da Sangria</label>
-                    <input type="text" id="sangriaDescricao" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Pagamento fornecedor de peças / Depósito bancário">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Valor da Retirada (R$)</label>
-                    <input type="number" step="0.01" id="sangriaValor" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
-                </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="fecharModalSangria()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl shadow">Confirmar Sangria</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL MOTOR DE PAGAMENTO (SPLIT & INFINITEPAY) -->
-    <div id="modalPagamento" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
-                <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-cash-register text-emerald-400 mr-2"></i> Motor de Pagamento & InfinitePay</h3>
-                <span class="text-sm font-bold text-emerald-400" id="pagTotalGeralDisplay">Total: R$ 0,00</span>
-            </div>
-
-            <div class="space-y-4">
-                <!-- Divisão de Pagamento (Split) -->
-                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold uppercase text-zinc-300">Formas de Pagamento (Split de Valores)</span>
-                        <button type="button" onclick="adicionarLinhaSplit()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-2.5 py-1 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-plus mr-1"></i> Adicionar Forma</button>
-                    </div>
-                    <div id="listaLinhasSplit" class="space-y-3">
-                        <!-- Inserido via JS -->
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-zinc-800 text-xs">
-                        <span class="text-zinc-400">Restante a Pagar: <strong id="pagRestanteDisplay" class="text-amber-400">R$ 0,00</strong></span>
-                        <span class="text-zinc-400">Total Informado: <strong id="pagInformadoDisplay" class="text-emerald-400">R$ 0,00</strong></span>
-                    </div>
-                </div>
-
-                <!-- Simulação de Troco em Dinheiro -->
-                <div id="secaoTrocoDinheiro" class="hidden bg-emerald-950/30 p-4 rounded-xl border border-emerald-900/50 space-y-3">
-                    <h4 class="text-xs font-bold uppercase text-emerald-400"><i class="fa-solid fa-money-bill-wave mr-1"></i> Cálculo de Troco (Dinheiro Físico)</h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[10px] uppercase text-zinc-400 mb-1">Valor Entregue pelo Cliente (R$)</label>
-                            <input type="number" step="0.01" id="pagValorClienteDinheiro" oninput="calcularTrocoDinheiro()" class="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
-                        </div>
-                        <div class="flex flex-col justify-center items-end bg-zinc-950 px-3 py-2 rounded-xl border border-zinc-800">
-                            <span class="text-[10px] uppercase text-zinc-400">Troco Calculado</span>
-                            <span class="text-lg font-black text-emerald-400" id="pagTrocoCalculadoDisplay">R$ 0,00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Resumo de Taxas InfinitePay -->
-                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2 text-xs">
-                    <div class="flex justify-between text-zinc-400">
-                        <span>Valor Bruto Total:</span>
-                        <strong id="resumoBruto" class="text-white">R$ 0,00</strong>
-                    </div>
-                    <div class="flex justify-between text-zinc-400">
-                        <span>Taxa Maquininha (InfinitePay):</span>
-                        <strong id="resumoTaxa" class="text-red-400">- R$ 0,00</strong>
-                    </div>
-                    <div class="flex justify-between text-zinc-300 pt-2 border-t border-zinc-800 font-bold text-sm">
-                        <span>Valor Líquido Creditado:</span>
-                        <strong id="resumoLiquido" class="text-emerald-400">R$ 0,00</strong>
                     </div>
                 </div>
             </div>
 
-            <div class="flex justify-end space-x-3 pt-5 mt-4 border-t border-zinc-800">
-                <button type="button" onclick="fecharModalPagamento()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                <button type="button" onclick="concluirPagamentoDefinitivo()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow">Confirmar Pagamento & Finalizar</button>
+            <!-- CLIENTES -->
+            <div id="mod-clientes" class="hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
+                    <div class="w-full sm:w-72">
+                        <input type="text" id="filtroBuscaCliente" oninput="renderizarClientes()" placeholder="Buscar cliente por nome, tel ou doc..." class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:outline-none focus:border-red-600">
+                    </div>
+                    <button onclick="abrirModalCliente()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex-shrink-0">Novo Cliente</button>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
+                                <th class="p-4">Nome</th>
+                                <th class="p-4">Telefone</th>
+                                <th class="p-4">CPF/CNPJ</th>
+                                <th class="p-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaClientes" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- MODAL PRODUTO / PEÇA -->
-    <div id="modalProduto" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-white mb-4">Cadastrar Peça / Produto / Serviço</h3>
-            <form onsubmit="salvarProduto(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome da Peça / Serviço</label>
-                    <input type="text" id="prodNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Caixa de marcha / Pastilha de freio">
+            <!-- VEÍCULOS / MOTOS -->
+            <div id="mod-veiculos" class="hidden space-y-6">
+                <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
+                    <span class="text-sm font-semibold text-zinc-300">Motos / Veículos Cadastrados</span>
+                    <button onclick="abrirModalVeiculo()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
+                        <i class="fa-solid fa-motorcycle"></i><span>Nova Moto</span>
+                    </button>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Tipo</label>
-                    <select id="prodTipo" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
-                        <option value="Peça">Peça</option>
-                        <option value="Serviço">Serviço (Mão de Obra)</option>
-                    </select>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
+                                <th class="p-4">Moto (Marca/Modelo)</th>
+                                <th class="p-4">Placa</th>
+                                <th class="p-4">Ano / Cor</th>
+                                <th class="p-4">Proprietário</th>
+                                <th class="p-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaVeiculos" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
+                    </table>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+            </div>
+
+            <!-- EQUIPE / MECÂNICOS -->
+            <div id="mod-mecanicos" class="hidden space-y-6">
+                <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
+                    <span class="text-sm font-semibold text-zinc-300">Gerenciar Equipe e Mecânicos</span>
+                    <button onclick="abrirModalUsuario()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
+                        <i class="fa-solid fa-user-plus"></i><span>Novo Mecânico / Usuário</span>
+                    </button>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
+                                <th class="p-4">Nome</th>
+                                <th class="p-4">E-mail</th>
+                                <th class="p-4">Cargo</th>
+                                <th class="p-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaUsuarios" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ESTOQUE & MAIS VENDIDOS -->
+            <div id="mod-estoque" class="hidden space-y-6">
+                <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Qtd em Estoque</label>
-                        <input type="number" id="prodQtd" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="10">
+                        <span class="text-sm font-semibold text-zinc-300">Estoque de Peças & Produtos</span>
+                        <p class="text-xs text-zinc-400">Controle de inventário e itens mais vendidos.</p>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Preço Venda (R$)</label>
-                        <input type="number" step="0.01" id="prodPreco" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
-                    </div>
-                </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="fecharModalProduto()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Produto</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL NOVO VEÍCULO / MOTO -->
-    <div id="modalVeiculo" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-white mb-4">Cadastrar Nova Moto</h3>
-            <form onsubmit="salvarVeiculo(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Proprietário (Cliente)</label>
-                    <select id="motoClienteId" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
-                        <option value="">Selecione o cliente...</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Marca e Modelo</label>
-                    <input type="text" id="motoModelo" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Yamaha Fazer 250">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Placa</label>
-                    <input type="text" id="motoPlaca" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm uppercase focus:border-red-600 focus:outline-none" placeholder="ABC-1234">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Ano</label>
-                        <input type="text" id="motoAno" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="2023">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cor</label>
-                        <input type="text" id="motoCor" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Vermelha">
-                    </div>
-                </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="fecharModalVeiculo()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Moto</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL ORDEM DE SERVIÇO ATUALIZADA -->
-    <div id="modalOS" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <h3 class="text-lg font-bold text-white mb-4">Nova Ordem de Serviço / Orçamento</h3>
-            <form onsubmit="salvarOS(event)" class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente / Veículo / Aparelho</label>
-                        <input type="text" id="osClienteVeiculo" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: João da Silva / Honda CG 150">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Status da OS</label>
-                        <select id="osStatus" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
-                            <option value="Orçamento">Orçamento</option>
-                            <option value="Em andamento">Em andamento</option>
-                            <option value="Aguardando peça">Aguardando peça</option>
-                            <option value="Faturado">Faturado</option>
-                        </select>
-                    </div>
+                    <button onclick="abrirModalProduto()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i><span>Novo Produto / Peça</span>
+                    </button>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Valor de Entrada (Sinal Antecipado)</label>
-                        <input type="number" step="0.01" id="osValorEntrada" value="0.00" oninput="calcularTotalOSModal()" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-emerald-400 font-bold rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Desconto Aplicado (R$)</label>
-                        <input type="number" step="0.01" id="osValorDesconto" value="0.00" oninput="calcularTotalOSModal()" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-amber-400 font-bold rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
-                    </div>
+                <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl space-y-4">
+                    <h3 class="text-sm font-bold text-white flex items-center"><i class="fa-solid fa-fire text-red-500 mr-2"></i> Peças e Serviços Mais Vendidos</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="rankingMaisVendidos"></div>
                 </div>
 
-                <!-- ITENS DA OS (Peças e Serviços) -->
-                <div class="space-y-3 pt-2">
-                    <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                        <div>
-                            <h4 class="text-xs font-bold uppercase text-zinc-300">Detalhamento Sequencial (Peças e Serviços)</h4>
-                            <p class="text-[11px] text-zinc-500">Adicione itens do estoque digitando o nome ou mão de obra diretamente.</p>
-                        </div>
-                        <button type="button" onclick="adicionarItemOS()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1 shadow">
-                            <i class="fa-solid fa-plus"></i><span>Adicionar Item</span>
-                        </button>
-                    </div>
-
-                    <div id="listaItensOSModal" class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-1"></div>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
+                                <th class="p-4">Item / Peça</th>
+                                <th class="p-4">Tipo</th>
+                                <th class="p-4">Quantidade em Estoque</th>
+                                <th class="p-4">Preço Venda</th>
+                                <th class="p-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaEstoque" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
+                    </table>
                 </div>
+            </div>
 
-                <!-- TOTALIZADOR -->
-                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col items-end space-y-1">
-                    <div class="text-xs text-zinc-400">Total Peças: <span id="osTotalPecasDisplay" class="text-white">R$ 0,00</span> | Total Serviços: <span id="osTotalServicosDisplay" class="text-white">R$ 0,00</span></div>
-                    <div class="text-xs text-zinc-400">Desconto Aplicado: <span id="osDescontoDisplay" class="text-amber-400">- R$ 0,00</span></div>
-                    <div class="text-xs text-zinc-400">Desconto Entrada (Sinal): <span id="osEntradaDisplay" class="text-amber-400">- R$ 0,00</span></div>
-                    <div class="text-sm font-bold uppercase text-zinc-300 pt-2 border-t border-zinc-800 w-full flex justify-between">
-                        <span>Valor Final a Pagar:</span>
-                        <span class="text-xl font-black text-emerald-400" id="osValorFinalDisplay">R$ 0,00</span>
-                    </div>
-                </div>
-
-                <div class="flex justify-end space-x-3 pt-3">
-                    <button type="button" onclick="fecharModalOS()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar OS</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- DATALIST GLOBAL PARA PRODUTOS -->
-    <datalist id="listaProdutosDatalist">
-        <!-- Preenchido dinamicamente via JS -->
-    </datalist>
-
-    <!-- MODAL IMPRESSÃO ORÇAMENTO -->
-    <div id="modalVisualizarOrcamento" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div id="modalImprimirOrcamento" class="bg-white text-zinc-900 p-8 rounded-xl shadow space-y-6">
-                <div class="flex justify-between items-start border-b pb-4">
+            <!-- FINANCEIRO & CAIXA -->
+            <div id="mod-financeiro" class="hidden space-y-6">
+                <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4">
                     <div class="flex items-center space-x-3">
-                        <div id="orcLogoPrintContainer" class="w-12 h-12 rounded-lg bg-red-600 flex items-center justify-center text-white font-bold overflow-hidden">
-                            <i class="fa-solid fa-wrench" id="orcIconDefault"></i>
-                            <img id="orcLogoImg" src="" class="w-full h-full object-cover hidden" alt="Logo">
+                        <span class="text-xs font-semibold text-zinc-400 uppercase"><i class="fa-solid fa-filter mr-1 text-red-500"></i> Filtrar Mês/Ano:</span>
+                        <input type="month" id="filtroMesAno" onchange="renderizarCaixa()" class="px-3 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:outline-none focus:border-red-600">
+                        <button onclick="limparFiltroMes()" class="text-xs text-zinc-400 hover:text-white underline">Ver Todos</button>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="abrirModalCaixa('Abertura/Troco')" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-coins mr-1"></i> Fundo de Troco</button>
+                        <button onclick="abrirModalSangria()" class="bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> Sangria de Caixa</button>
+                        <button onclick="abrirModalCaixa('Entrada')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-plus mr-1"></i> Nova Entrada</button>
+                        <button onclick="abrirModalCaixa('Sangria')" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-minus mr-1"></i> Nova Saída</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
+                        <p class="text-xs font-semibold text-zinc-400 uppercase">Entradas (Período)</p>
+                        <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="finTotalEntradas">R$ 0,00</h3>
+                    </div>
+                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
+                        <p class="text-xs font-semibold text-zinc-400 uppercase">Saídas / Sangrias (Período)</p>
+                        <h3 class="text-2xl font-bold text-red-500 mt-1" id="finTotalSaidas">R$ 0,00</h3>
+                    </div>
+                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
+                        <p class="text-xs font-semibold text-zinc-400 uppercase">Balanço do Período</p>
+                        <h3 class="text-2xl font-bold text-white mt-1" id="finSaldoLiquido">R$ 0,00</h3>
+                    </div>
+                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl border-l-4 border-l-red-600">
+                        <p class="text-xs font-semibold text-zinc-400 uppercase">Dinheiro Físico em Gaveta</p>
+                        <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="finCaixaGeral">R$ 0,00</h3>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                    <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-wallet text-red-500 mr-2"></i> Histórico de Caixa (Movimentos & Taxas InfinitePay)</h3>
+                    </div>
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
+                                <th class="p-4">Data</th>
+                                <th class="p-4">Tipo</th>
+                                <th class="p-4">Forma Pagamento</th>
+                                <th class="p-4">Descrição</th>
+                                <th class="p-4">V. Bruto</th>
+                                <th class="p-4">Taxa Inf.</th>
+                                <th class="p-4">V. Líquido</th>
+                                <th class="p-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaCaixa" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- METAS & DESEMPENHO -->
+            <div id="mod-metas" class="hidden space-y-6">
+                <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl max-w-3xl space-y-6">
+                    <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-white flex items-center"><i class="fa-solid fa-bullseye text-emerald-400 mr-2"></i> Controle de Metas de Faturamento</h3>
+                            <p class="text-xs text-zinc-400">Defina sua meta diária desejada e acompanhe o desempenho em tempo real.</p>
+                        </div>
+                    </div>
+
+                    <!-- Configuração da Meta Manual -->
+                    <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col sm:flex-row items-end gap-4">
+                        <div class="flex-1 w-full">
+                            <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Definir Meta Diária (R$)</label>
+                            <input type="number" step="1.00" id="inputMetaDiaria" value="600" class="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 text-emerald-400 font-bold rounded-xl text-base focus:outline-none focus:border-red-600" placeholder="600.00">
+                        </div>
+                        <button type="button" onclick="salvarMetaDiaria()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">
+                            Salvar Nova Meta
+                        </button>
+                    </div>
+
+                    <!-- Resultados do Dia -->
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-bold uppercase text-zinc-300">Desempenho do Dia (Hoje: <span id="metaDataHoje">--/--/----</span>)</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                <p class="text-[11px] font-semibold text-zinc-400 uppercase">Faturamento de Hoje</p>
+                                <h3 class="text-2xl font-bold text-white mt-1" id="metaFiltroFaturamentoDia">R$ 0,00</h3>
+                            </div>
+                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                <p class="text-[11px] font-semibold text-zinc-400 uppercase">Meta Diária Estipulada</p>
+                                <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="metaExibicaoDiaria">R$ 600,00</h3>
+                            </div>
+                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800" id="cardStatusDiaContainer">
+                                <p class="text-[11px] font-semibold text-zinc-400 uppercase" id="metaTituloStatusDia">Status do Dia</p>
+                                <h3 class="text-2xl font-bold mt-1" id="metaResultadoDia">R$ 0,00</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Projeção Mensal -->
+                    <div class="space-y-4 pt-4 border-t border-zinc-800">
+                        <h4 class="text-xs font-bold uppercase text-zinc-300">Projeção da Meta Mensal</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                <p class="text-[11px] font-semibold text-zinc-400 uppercase">Total Acumulado no Mês</p>
+                                <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="metaAcumuladoMes">R$ 0,00</h3>
+                            </div>
+                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                <p class="text-[11px] font-semibold text-zinc-400 uppercase">Meta Mensal Estimada (Dias Úteis x Diária)</p>
+                                <h3 class="text-2xl font-bold text-white mt-1" id="metaEstimadaMes">R$ 0,00</h3>
+                            </div>
+                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                <p class="text-[11px] font-semibold text-zinc-400 uppercase">Distância da Meta Mensal</p>
+                                <h3 class="text-2xl font-bold mt-1" id="metaDistanciaMes">R$ 0,00</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONFIGURAÇÕES -->
+            <div id="mod-configuracoes" class="hidden space-y-6">
+                <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl max-w-2xl">
+                    <h3 class="text-lg font-bold text-white mb-4">Configurações da Oficina</h3>
+                    <form onsubmit="salvarConfiguracoes(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome da Oficina</label>
+                            <input type="text" id="cfgNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:outline-none focus:border-red-600">
                         </div>
                         <div>
-                            <h2 class="text-2xl font-black text-red-600" id="orcOficinaNome">EF Motos</h2>
-                            <p class="text-xs text-zinc-500">Centro Automotivo Especializado</p>
+                            <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">URL do Logotipo da Oficina (Link da Imagem)</label>
+                            <input type="url" id="cfgLogo" placeholder="[https://exemplo.com/logo.png](https://exemplo.com/logo.png)" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:outline-none focus:border-red-600">
+                            <p class="text-[11px] text-zinc-500 mt-1">Cole o link de uma imagem válida da sua logo para exibi-la no sistema.</p>
                         </div>
-                    </div>
-                    <div class="text-right">
-                        <h3 class="text-lg font-bold text-zinc-800">ORDEM DE SERVIÇO #<span id="orcNumero"></span></h3>
-                        <p class="text-xs text-zinc-500" id="orcData"></p>
-                    </div>
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">Salvar Configurações</button>
+                    </form>
                 </div>
-                <div class="grid grid-cols-2 gap-4 text-sm bg-zinc-50 p-4 rounded-lg border">
-                    <div>
-                        <p class="text-xs font-semibold text-zinc-400 uppercase">Cliente / Veículo / Aparelho</p>
-                        <p class="font-bold text-zinc-800" id="orcCliente">-</p>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-zinc-400 uppercase">Status</p>
-                        <p class="font-bold text-red-600" id="orcStatus">-</p>
-                    </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- MODAL AGENDAMENTO -->
+<div id="modalAgendamento" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+        <h3 class="text-lg font-bold text-white mb-4">Agendar Horário / Revisão</h3>
+        <form onsubmit="salvarAgendamento(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente</label>
+                <select id="agClienteId" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <option value="">Selecione o cliente...</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Moto / Veículo</label>
+                <input type="text" id="agMoto" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Honda CG 150 - Placa ABC-1234">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Data</label>
+                    <input type="date" id="agData" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                 </div>
                 <div>
-                    <h4 class="text-xs font-semibold uppercase text-zinc-400 mb-2">Itens Detalhados da OS</h4>
-                    <div class="bg-zinc-50 rounded-lg border overflow-hidden">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-zinc-100 text-zinc-600 uppercase border-b">
-                                <tr>
-                                    <th class="p-2.5">Tipo</th>
-                                    <th class="p-2.5">Descrição</th>
-                                    <th class="p-2.5 text-center">Qtd</th>
-                                    <th class="p-2.5 text-right">V. Unit.</th>
-                                    <th class="p-2.5 text-right">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orcTabelaItens" class="divide-y text-zinc-800"></tbody>
-                        </table>
-                    </div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Horário</label>
+                    <input type="time" id="agHora" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                 </div>
-                <div class="flex justify-between items-center pt-4 border-t text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Serviço Desejado</label>
+                <input type="text" id="agServico" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Troca de óleo e revisão geral">
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button type="button" onclick="fecharModalAgendamento()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Agendamento</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL LANÇAMENTO DE CAIXA / TROCO -->
+<div id="modalCaixa" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+        <h3 id="modalCaixaTitulo" class="text-lg font-bold text-white mb-4">Nova Movimentação</h3>
+        <form onsubmit="salvarMovimentacaoCaixa(event)" class="space-y-4">
+            <input type="hidden" id="cxTipo">
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Descrição / Histórico</label>
+                <input type="text" id="cxDescricao" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Fundo de troco inicial">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Valor (R$)</label>
+                <input type="number" step="0.01" id="cxValor" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button type="button" onclick="fecharModalCaixa()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL SANGRIA DE CAIXA -->
+<div id="modalSangria" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+        <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-hand-holding-dollar text-amber-500 mr-2"></i> Sangria de Caixa</h3>
+        <p class="text-xs text-zinc-400 mb-4">Retire dinheiro físico da gaveta (ex: depósito, pagamento de fornecedor) para manter o caixa perfeitamente batido.</p>
+        <form onsubmit="salvarSangria(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Motivo / Destino da Sangria</label>
+                <input type="text" id="sangriaDescricao" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Pagamento fornecedor de peças / Depósito bancário">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Valor da Retirada (R$)</label>
+                <input type="number" step="0.01" id="sangriaValor" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button type="button" onclick="fecharModalSangria()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                <button type="submit" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl shadow">Confirmar Sangria</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL MOTOR DE PAGAMENTO (SPLIT & INFINITEPAY) -->
+<div id="modalPagamento" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+            <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-cash-register text-emerald-400 mr-2"></i> Motor de Pagamento & InfinitePay</h3>
+            <span class="text-sm font-bold text-emerald-400" id="pagTotalGeralDisplay">Total: R$ 0,00</span>
+        </div>
+
+        <div class="space-y-4">
+            <!-- Divisão de Pagamento (Split) -->
+            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold uppercase text-zinc-300">Formas de Pagamento (Split de Valores)</span>
+                    <button type="button" onclick="adicionarLinhaSplit()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-2.5 py-1 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-plus mr-1"></i> Adicionar Forma</button>
+                </div>
+                <div id="listaLinhasSplit" class="space-y-3">
+                    <!-- Inserido via JS -->
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t border-zinc-800 text-xs">
+                    <span class="text-zinc-400">Restante a Pagar: <strong id="pagRestanteDisplay" class="text-amber-400">R$ 0,00</strong></span>
+                    <span class="text-zinc-400">Total Informado: <strong id="pagInformadoDisplay" class="text-emerald-400">R$ 0,00</strong></span>
+                </div>
+            </div>
+
+            <!-- Simulação de Troco em Dinheiro -->
+            <div id="secaoTrocoDinheiro" class="hidden bg-emerald-950/30 p-4 rounded-xl border border-emerald-900/50 space-y-3">
+                <h4 class="text-xs font-bold uppercase text-emerald-400"><i class="fa-solid fa-money-bill-wave mr-1"></i> Cálculo de Troco (Dinheiro Físico)</h4>
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <p class="text-xs text-zinc-500">Desconto: <strong id="orcDesconto" class="text-zinc-800">R$ 0,00</strong></p>
-                        <p class="text-xs text-zinc-500">Valor Entrada (Sinal): <strong id="orcEntrada" class="text-zinc-800">R$ 0,00</strong></p>
+                        <label class="block text-[10px] uppercase text-zinc-400 mb-1">Valor Entregue pelo Cliente (R$)</label>
+                        <input type="number" step="0.01" id="pagValorClienteDinheiro" oninput="calcularTrocoDinheiro()" class="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
                     </div>
-                    <div class="text-right">
-                        <p class="text-xs font-semibold text-zinc-400 uppercase">Valor Final</p>
-                        <p class="text-2xl font-black text-red-600" id="orcValorFinal">R$ 0,00</p>
+                    <div class="flex flex-col justify-center items-end bg-zinc-950 px-3 py-2 rounded-xl border border-zinc-800">
+                        <span class="text-[10px] uppercase text-zinc-400">Troco Calculado</span>
+                        <span class="text-lg font-black text-emerald-400" id="pagTrocoCalculadoDisplay">R$ 0,00</span>
                     </div>
                 </div>
             </div>
-            <div class="flex justify-end space-x-3 pt-4">
-                <button type="button" onclick="fecharModalOrcamento()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Fechar</button>
-                <button type="button" onclick="window.print()" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow flex items-center space-x-2"><i class="fa-solid fa-print"></i><span>Imprimir / PDF</span></button>
+
+            <!-- Resumo de Taxas InfinitePay -->
+            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2 text-xs">
+                <div class="flex justify-between text-zinc-400">
+                    <span>Valor Bruto Total:</span>
+                    <strong id="resumoBruto" class="text-white">R$ 0,00</strong>
+                </div>
+                <div class="flex justify-between text-zinc-400">
+                    <span>Taxa Maquininha (InfinitePay):</span>
+                    <strong id="resumoTaxa" class="text-red-400">- R$ 0,00</strong>
+                </div>
+                <div class="flex justify-between text-zinc-300 pt-2 border-t border-zinc-800 font-bold text-sm">
+                    <span>Valor Líquido Creditado:</span>
+                    <strong id="resumoLiquido" class="text-emerald-400">R$ 0,00</strong>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- MODAL USUÁRIO -->
-    <div id="modalUsuario" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <h3 class="text-lg font-bold text-white mb-4">Novo Usuário / Mecânico</h3>
-            <form onsubmit="salvarUsuario(event)" class="space-y-3">
+        <div class="flex justify-end space-x-3 pt-5 mt-4 border-t border-zinc-800">
+            <button type="button" onclick="fecharModalPagamento()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+            <button type="button" onclick="concluirPagamentoDefinitivo()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow">Confirmar Pagamento & Finalizar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PRODUTO / PEÇA -->
+<div id="modalProduto" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+        <h3 class="text-lg font-bold text-white mb-4">Cadastrar Peça / Produto / Serviço</h3>
+        <form onsubmit="salvarProduto(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome da Peça / Serviço</label>
+                <input type="text" id="prodNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Caixa de marcha / Pastilha de freio">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Tipo</label>
+                <select id="prodTipo" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <option value="Peça">Peça</option>
+                    <option value="Serviço">Serviço (Mão de Obra)</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome Completo</label>
-                    <input type="text" id="usrNome" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Qtd em Estoque</label>
+                    <input type="number" id="prodQtd" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="10">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">E-mail</label>
-                    <input type="email" id="usrEmail1" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Preço Venda (R$)</label>
+                    <input type="number" step="0.01" id="prodPreco" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button type="button" onclick="fecharModalProduto()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Produto</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL NOVO VEÍCULO / MOTO -->
+<div id="modalVeiculo" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+        <h3 class="text-lg font-bold text-white mb-4">Cadastrar Nova Moto</h3>
+        <form onsubmit="salvarVeiculo(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Proprietário (Cliente)</label>
+                <select id="motoClienteId" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <option value="">Selecione o cliente...</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Marca e Modelo</label>
+                <input type="text" id="motoModelo" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Yamaha Fazer 250">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Placa</label>
+                <input type="text" id="motoPlaca" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm uppercase focus:border-red-600 focus:outline-none" placeholder="ABC-1234">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Ano</label>
+                    <input type="text" id="motoAno" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="2023">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Senha</label>
-                    <input type="password" id="usrSenha1" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cor</label>
+                    <input type="text" id="motoCor" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Vermelha">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button type="button" onclick="fecharModalVeiculo()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Moto</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL ORDEM DE SERVIÇO ATUALIZADA -->
+<div id="modalOS" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <h3 class="text-lg font-bold text-white mb-4">Nova Ordem de Serviço / Orçamento</h3>
+        <form onsubmit="salvarOS(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente / Veículo / Aparelho</label>
+                    <input type="text" id="osClienteVeiculo" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: João da Silva / Honda CG 150">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cargo</label>
-                    <select id="usrCargo" class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
-                        <option value="Administrador">Administrador</option>
-                        <option value="Atendente">Recepção / Atendente</option>
-                        <option value="Mecânico">Mecânico / Técnico</option>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Status da OS</label>
+                    <select id="osStatus" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                        <option value="Orçamento">Orçamento</option>
+                        <option value="Em andamento">Em andamento</option>
+                        <option value="Aguardando peça">Aguardando peça</option>
+                        <option value="Faturado">Faturado</option>
                     </select>
                 </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="fecharModalUsuario()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Valor de Entrada (Sinal Antecipado)</label>
+                    <input type="number" step="0.01" id="osValorEntrada" value="0.00" oninput="calcularTotalOSModal()" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-emerald-400 font-bold rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
                 </div>
-            </form>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Desconto Aplicado (R$)</label>
+                    <input type="number" step="0.01" id="osValorDesconto" value="0.00" oninput="calcularTotalOSModal()" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-amber-400 font-bold rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
+                </div>
+            </div>
+
+            <!-- ITENS DA OS (Peças e Serviços) -->
+            <div class="space-y-3 pt-2">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                    <div>
+                        <h4 class="text-xs font-bold uppercase text-zinc-300">Detalhamento Sequencial (Peças e Serviços)</h4>
+                        <p class="text-[11px] text-zinc-500">Adicione itens do estoque digitando o nome ou mão de obra diretamente.</p>
+                    </div>
+                    <button type="button" onclick="adicionarItemOS()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1 shadow">
+                        <i class="fa-solid fa-plus"></i><span>Adicionar Item</span>
+                    </button>
+                </div>
+
+                <div id="listaItensOSModal" class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-1"></div>
+            </div>
+
+            <!-- TOTALIZADOR -->
+            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col items-end space-y-1">
+                <div class="text-xs text-zinc-400">Total Peças: <span id="osTotalPecasDisplay" class="text-white">R$ 0,00</span> | Total Serviços: <span id="osTotalServicosDisplay" class="text-white">R$ 0,00</span></div>
+                <div class="text-xs text-zinc-400">Desconto Aplicado: <span id="osDescontoDisplay" class="text-amber-400">- R$ 0,00</span></div>
+                <div class="text-xs text-zinc-400">Desconto Entrada (Sinal): <span id="osEntradaDisplay" class="text-amber-400">- R$ 0,00</span></div>
+                <div class="text-sm font-bold uppercase text-zinc-300 pt-2 border-t border-zinc-800 w-full flex justify-between">
+                    <span>Valor Final a Pagar:</span>
+                    <span class="text-xl font-black text-emerald-400" id="osValorFinalDisplay">R$ 0,00</span>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-3">
+                <button type="button" onclick="fecharModalOS()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar OS</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- DATALIST GLOBAL PARA PRODUTOS -->
+<datalist id="listaProdutosDatalist">
+    <!-- Preenchido dinamicamente via JS -->
+</datalist>
+
+<!-- MODAL IMPRESSÃO ORÇAMENTO -->
+<div id="modalVisualizarOrcamento" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div id="modalImprimirOrcamento" class="bg-white text-zinc-900 p-8 rounded-xl shadow space-y-6">
+            <div class="flex justify-between items-start border-b pb-4">
+                <div class="flex items-center space-x-3">
+                    <div id="orcLogoPrintContainer" class="w-12 h-12 rounded-lg bg-red-600 flex items-center justify-center text-white font-bold overflow-hidden">
+                        <i class="fa-solid fa-wrench" id="orcIconDefault"></i>
+                        <img id="orcLogoImg" src="" class="w-full h-full object-cover hidden" alt="Logo">
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-red-600" id="orcOficinaNome">EF Motos</h2>
+                        <p class="text-xs text-zinc-500">Centro Automotivo Especializado</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <h3 class="text-lg font-bold text-zinc-800">ORDEM DE SERVIÇO #<span id="orcNumero"></span></h3>
+                    <p class="text-xs text-zinc-500" id="orcData"></p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-sm bg-zinc-50 p-4 rounded-lg border">
+                <div>
+                    <p class="text-xs font-semibold text-zinc-400 uppercase">Cliente / Veículo / Aparelho</p>
+                    <p class="font-bold text-zinc-800" id="orcCliente">-</p>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-zinc-400 uppercase">Status</p>
+                    <p class="font-bold text-red-600" id="orcStatus">-</p>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-xs font-semibold uppercase text-zinc-400 mb-2">Itens Detalhados da OS</h4>
+                <div class="bg-zinc-50 rounded-lg border overflow-hidden">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-zinc-100 text-zinc-600 uppercase border-b">
+                            <tr>
+                                <th class="p-2.5">Tipo</th>
+                                <th class="p-2.5">Descrição</th>
+                                <th class="p-2.5 text-center">Qtd</th>
+                                <th class="p-2.5 text-right">V. Unit.</th>
+                                <th class="p-2.5 text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orcTabelaItens" class="divide-y text-zinc-800"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="flex justify-between items-center pt-4 border-t text-sm">
+                <div>
+                    <p class="text-xs text-zinc-500">Desconto: <strong id="orcDesconto" class="text-zinc-800">R$ 0,00</strong></p>
+                    <p class="text-xs text-zinc-500">Valor Entrada (Sinal): <strong id="orcEntrada" class="text-zinc-800">R$ 0,00</strong></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs font-semibold text-zinc-400 uppercase">Valor Final</p>
+                    <p class="text-2xl font-black text-red-600" id="orcValorFinal">R$ 0,00</p>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" onclick="fecharModalOrcamento()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Fechar</button>
+            <button type="button" onclick="window.print()" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow flex items-center space-x-2"><i class="fa-solid fa-print"></i><span>Imprimir / PDF</span></button>
         </div>
     </div>
+</div>
 
-    <!-- MODAL CLIENTE -->
-    <div id="modalCliente" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-white mb-4">Novo Cliente</h3>
-            <form onsubmit="salvarCliente(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome</label>
-                    <input type="text" id="cliNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Telefone / WhatsApp</label>
-                    <input type="text" id="cliTel" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">CPF / CNPJ</label>
-                    <input type="text" id="cliDoc" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
-                </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="fecharModalCliente()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar</button>
-                </div>
-            </form>
-        </div>
+<!-- MODAL USUÁRIO -->
+<div id="modalUsuario" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <h3 class="text-lg font-bold text-white mb-4">Novo Usuário / Mecânico</h3>
+        <form onsubmit="salvarUsuario(event)" class="space-y-3">
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome Completo</label>
+                <input type="text" id="usrNome" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">E-mail</label>
+                <input type="email" id="usrEmail1" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Senha</label>
+                <input type="password" id="usrSenha1" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cargo</label>
+                <select id="usrCargo" class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <option value="Administrador">Administrador</option>
+                    <option value="Atendente">Recepção / Atendente</option>
+                    <option value="Mecânico">Mecânico / Técnico</option>
+                </select>
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button type="button" onclick="fecharModalUsuario()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <script>
-        let db = JSON.parse(localStorage.getItem('ef_motos_db_v10')) || {
-            usuarios: [
-                { id: 1, nome: 'Administrador Master', email: 'admin@efmotos.com', senha: '123456', cargo: 'Administrador' }
-            ],
-            clientes: [],
-            veiculos: [],
-            produtos: [],
-            os: [],
-            caixa: [],
-            agendamentos: [],
-            config: { nome: "EF Motos Centro Automotivo", logo: "" },
-            metaDiaria: 600
-        };
+<!-- MODAL CLIENTE -->
+<div id="modalCliente" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+        <h3 class="text-lg font-bold text-white mb-4">Novo Cliente</h3>
+        <form onsubmit="salvarCliente(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome</label>
+                <input type="text" id="cliNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Telefone / WhatsApp</label>
+                <input type="text" id="cliTel" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">CPF / CNPJ</label>
+                <input type="text" id="cliDoc" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button type="button" onclick="fecharModalCliente()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-        let osItensTemp = [];
-        let pdvCarrinhoTemp = [];
-        let pagamentoContexto = null;
-        let splitLinhasTemp = [];
+<script>
+    // Configuração do Firebase com as chaves do seu projeto "sistema-oficina-on"
+    const firebaseConfig = {
+        apiKey: "AIzaSyDzopFvcdffbfh8Ujo_PS2n5sfXV5JynwY",
+        authDomain: "sistema-oficina-on.firebaseapp.com",
+        projectId: "sistema-oficina-on",
+        storageBucket: "sistema-oficina-on.firebasestorage.app",
+        messagingSenderId: "967732351574",
+        appId: "1:967732351574:web:ae6d21dd26a82f7704a1f7"
+    };
 
-        function salvarDB() {
-            localStorage.setItem('ef_motos_db_v10', JSON.stringify(db));
-        }
+    // Inicializar Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const firestore = firebase.firestore();
 
-        function aplicarConfiguracoesVisuais() {
-            const nomeOficina = db.config.nome || "EF Motos";
-            const logoUrl = db.config.logo || "";
+    let db = {
+        usuarios: [
+            { id: 1, nome: 'Administrador Master', email: 'admin@efmotos.com', senha: '123456', cargo: 'Administrador' }
+        ],
+        clientes: [],
+        veiculos: [],
+        produtos: [],
+        os: [],
+        caixa: [],
+        agendamentos: [],
+        config: { nome: "EF Motos Centro Automotivo", logo: "" },
+        metaDiaria: 600
+    };
 
-            document.getElementById('loginOficinaNome').innerText = nomeOficina;
-            document.getElementById('sidebarOficinaNome').innerText = nomeOficina;
-            document.getElementById('pageHeaderTitle').innerText = `${nomeOficina} - Sistema de Gestão`;
-            document.getElementById('cfgNome').value = nomeOficina;
-            document.getElementById('cfgLogo').value = logoUrl;
+    let osItensTemp = [];
+    let pdvCarrinhoTemp = [];
+    let pagamentoContexto = null;
+    let splitLinhasTemp = [];
 
-            const loginImg = document.getElementById('loginLogoImg');
-            const loginIcon = document.getElementById('loginIconDefault');
-            if (logoUrl) { loginImg.src = logoUrl; loginImg.classList.remove('hidden'); loginIcon.classList.add('hidden'); }
-            else { loginImg.classList.add('hidden'); loginIcon.classList.remove('hidden'); }
+    // Substituição do localStorage por salvamento assíncrono no Firebase Firestore
+    function salvarDB() {
+        firestore.collection("ef_motos").doc("dados_gerais").set(db)
+            .then(() => {
+                console.log("Dados sincronizados com sucesso na nuvem!");
+            })
+            .catch((error) => {
+                console.error("Erro ao salvar dados no Firebase:", error);
+            });
+    }
 
-            const sidebarImg = document.getElementById('sidebarLogoImg');
-            const sidebarIcon = document.getElementById('sidebarIconDefault');
-            if (logoUrl) { sidebarImg.src = logoUrl; sidebarImg.classList.remove('hidden'); sidebarIcon.classList.add('hidden'); }
-            else { sidebarImg.classList.add('hidden'); sidebarIcon.classList.remove('hidden'); }
+    // Carregamento inicial dos dados do Firebase Firestore
+    function carregarDadosFirebase(callback) {
+        firestore.collection("ef_motos").doc("dados_gerais").get()
+            .then((doc) => {
+                if (doc.exists) {
+                    db = doc.data();
+                } else {
+                    salvarDB(); // Cria o documento inicial se não existir
+                }
+                if (callback) callback();
+            })
+            .catch((error) => {
+                console.error("Erro ao carregar do Firebase:", error);
+                if (callback) callback();
+            });
+    }
 
-            const orcImg = document.getElementById('orcLogoImg');
-            const orcIcon = document.getElementById('orcIconDefault');
-            if (logoUrl) { orcImg.src = logoUrl; orcImg.classList.remove('hidden'); orcIcon.classList.add('hidden'); }
-            else { orcImg.classList.add('hidden'); orcIcon.classList.remove('hidden'); }
-        }
+    function aplicarConfiguracoesVisuais() {
+        const nomeOficina = db.config.nome || "EF Motos";
+        const logoUrl = db.config.logo || "";
 
-        window.addEventListener('DOMContentLoaded', () => { 
+        document.getElementById('loginOficinaNome').innerText = nomeOficina;
+        document.getElementById('sidebarOficinaNome').innerText = nomeOficina;
+        document.getElementById('pageHeaderTitle').innerText = `${nomeOficina} - Sistema de Gestão`;
+        document.getElementById('cfgNome').value = nomeOficina;
+        document.getElementById('cfgLogo').value = logoUrl;
+
+        const loginImg = document.getElementById('loginLogoImg');
+        const loginIcon = document.getElementById('loginIconDefault');
+        if (logoUrl) { loginImg.src = logoUrl; loginImg.classList.remove('hidden'); loginIcon.classList.add('hidden'); }
+        else { loginImg.classList.add('hidden'); loginIcon.classList.remove('hidden'); }
+
+        const sidebarImg = document.getElementById('sidebarLogoImg');
+        const sidebarIcon = document.getElementById('sidebarIconDefault');
+        if (logoUrl) { sidebarImg.src = logoUrl; sidebarImg.classList.remove('hidden'); sidebarIcon.classList.add('hidden'); }
+        else { sidebarImg.classList.add('hidden'); sidebarIcon.classList.remove('hidden'); }
+
+        const orcImg = document.getElementById('orcLogoImg');
+        const orcIcon = document.getElementById('orcIconDefault');
+        if (logoUrl) { orcImg.src = logoUrl; orcImg.classList.remove('hidden'); orcIcon.classList.add('hidden'); }
+        else { orcImg.classList.add('hidden'); orcIcon.classList.remove('hidden'); }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => { 
+        carregarDadosFirebase(() => {
             aplicarConfiguracoesVisuais(); 
             atualizarDatalistProdutos();
         });
+    });
 
-        function atualizarDatalistProdutos() {
-            const datalist = document.getElementById('listaProdutosDatalist');
-            if(!datalist) return;
-            datalist.innerHTML = db.produtos.map(p => `<option value="${p.nome}"></option>`).join('');
-        }
+    function atualizarDatalistProdutos() {
+        const datalist = document.getElementById('listaProdutosDatalist');
+        if(!datalist) return;
+        datalist.innerHTML = db.produtos.map(p => `<option value="${p.nome}"></option>`).join('');
+    }
 
-        function realizarLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
-            const senha = document.getElementById('loginSenha').value.trim();
-            const erroBox = document.getElementById('loginErrorMsg');
+    function realizarLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const senha = document.getElementById('loginSenha').value.trim();
+        const erroBox = document.getElementById('loginErrorMsg');
 
-            const user = db.usuarios.find(u => u.email === email && u.senha === senha);
-            if (user) {
-                erroBox.classList.add('hidden');
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('appScreen').classList.remove('hidden');
-                
-                document.getElementById('userNameDisplay').innerText = user.nome;
-                document.getElementById('userRoleDisplay').innerText = user.cargo;
-                document.getElementById('userAvatar').innerText = user.nome.charAt(0).toUpperCase();
-
-                aplicarConfiguracoesVisuais();
-                renderizarTudo();
-            } else {
-                erroBox.classList.remove('hidden');
-            }
-        }
-
-        function realizarLogout() {
-            document.getElementById('appScreen').classList.add('hidden');
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('loginSenha').value = '';
-            document.getElementById('loginEmail').value = '';
-        }
-
-        function mudarModulo(id) {
-            document.querySelectorAll('[id^="mod-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`mod-${id}`).classList.remove('hidden');
+        const user = db.usuarios.find(u => u.email === email && u.senha === senha);
+        if (user) {
+            erroBox.classList.add('hidden');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
             
-            const titulos = {
-                dashboard: 'Dashboard Geral',
-                agendamentos: 'Agenda e Alertas de Veículos',
-                os: 'Ordens de Serviço e Orçamentos',
-                pdv: 'Venda de Produtos (PDV / Balcão)',
-                clientes: 'Gestão de Clientes',
-                veiculos: 'Gestão de Veículos / Motos',
-                mecanicos: 'Equipe & Usuários',
-                estoque: 'Estoque de Peças & Mais Vendidos',
-                financeiro: 'Caixa & Financeiro',
-                metas: 'Metas & Desempenho Fincanceiro',
-                configuracoes: 'Configurações'
-            };
-            document.getElementById('pageTitle').innerText = titulos[id] || 'Sistema';
-            if (window.innerWidth < 1024) document.getElementById('sidebar').classList.add('-translate-x-full');
-            renderizarTudo();
-        }
+            document.getElementById('userNameDisplay').innerText = user.nome;
+            document.getElementById('userRoleDisplay').innerText = user.cargo;
+            document.getElementById('userAvatar').innerText = user.nome.charAt(0).toUpperCase();
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
-
-        function renderizarTudo() {
-            renderizarClientes();
-            renderizarVeiculos();
-            renderizarEstoque();
-            renderizarAgendamentos();
-            renderizarOS();
-            renderizarPDV();
-            renderizarCaixa();
-            renderizarUsuarios();
-            renderizarMetas();
-            atualizarDashboard();
-            atualizarDatalistProdutos();
-        }
-
-        function atualizarDashboard() {
-            let totalEntradas = db.caixa.filter(m => m.tipo === 'Entrada').reduce((a, c) => a + c.valor, 0);
-            let totalSaidas = db.caixa.filter(m => m.tipo === 'Sangria' || m.tipo === 'Saída').reduce((a, c) => a + c.valor, 0);
-            document.getElementById('dashSaldoCaixa').innerText = `R$ ${((totalEntradas - totalSaidas)).toFixed(2)}`;
-            document.getElementById('dashOsAndamento').innerText = db.os.filter(o => o.status === 'Em andamento' || o.status === 'Aguardando peça').length;
-            document.getElementById('dashClientes').innerText = db.clientes.length;
-        }
-
-        // --- MÓDULO DE METAS & DESEMPENHO ---
-        function salvarMetaDiaria() {
-            const val = parseFloat(document.getElementById('inputMetaDiaria').value) || 0;
-            db.metaDiaria = val;
-            salvarDB();
-            renderizarMetas();
-            alert('Meta diária atualizada com sucesso!');
-        }
-
-        function renderizarMetas() {
-            const inputMeta = document.getElementById('inputMetaDiaria');
-            if (!inputMeta) return;
-            
-            const metaDiaria = db.metaDiaria || 600;
-            inputMeta.value = metaDiaria;
-            document.getElementById('metaExibicaoDiaria').innerText = `R$ ${metaDiaria.toFixed(2)}`;
-
-            const hojeStr = new Date().toLocaleDateString('pt-BR');
-            document.getElementById('metaDataHoje').innerText = hojeStr;
-
-            // Faturamento de hoje (Entradas do dia atual)
-            let faturamentoHoje = db.caixa
-                .filter(m => m.tipo === 'Entrada' && m.data === hojeStr)
-                .reduce((acc, m) => acc + m.valor, 0);
-
-            document.getElementById('metaFiltroFaturamentoDia').innerText = `R$ ${faturamentoHoje.toFixed(2)}`;
-
-            const diff = faturamentoHoje - metaDiaria;
-            const resEl = document.getElementById('metaResultadoDia');
-            const titEl = document.getElementById('metaTituloStatusDia');
-            const containerEl = document.getElementById('cardStatusDiaContainer');
-
-            if (faturamentoHoje >= metaDiaria) {
-                titEl.innerText = "Meta Atingida (No Verde!)";
-                resEl.innerText = `+ R$ ${diff.toFixed(2)} Acima`;
-                resEl.className = "text-2xl font-bold text-emerald-400 mt-1";
-                containerEl.className = "bg-emerald-950/40 p-4 rounded-xl border border-emerald-900/50";
-            } else {
-                titEl.innerText = "Falta para Meta (Vermelho)";
-                resEl.innerText = `- R$ ${Math.abs(diff).toFixed(2)} Faltando`;
-                resEl.className = "text-2xl font-bold text-red-500 mt-1";
-                containerEl.className = "bg-red-950/40 p-4 rounded-xl border border-red-900/50";
-            }
-
-            // Projeção Mensal
-            const mesAtualStr = new Date().toISOString().slice(0, 7); // YYYY-MM
-            let acumuladoMes = db.caixa
-                .filter(m => m.tipo === 'Entrada' && m.data && converterDataParaISO(m.data).startsWith(mesAtualStr))
-                .reduce((acc, m) => acc + m.valor, 0);
-
-            document.getElementById('metaAcumuladoMes').innerText = `R$ ${acumuladoMes.toFixed(2)}`;
-
-            // Estimativa de dias úteis no mês (aproximado 22 dias)
-            const metaEstimadaMes = metaDiaria * 22;
-            document.getElementById('metaEstimadaMes').innerText = `R$ ${metaEstimadaMes.toFixed(2)}`;
-
-            const diffMes = acumuladoMes - metaEstimadaMes;
-            const distEl = document.getElementById('metaDistanciaMes');
-            if (acumuladoMes >= metaEstimadaMes) {
-                distEl.innerText = `+ R$ ${diffMes.toFixed(2)} Superada`;
-                distEl.className = "text-2xl font-bold text-emerald-400 mt-1";
-            } else {
-                distEl.innerText = `- R$ ${Math.abs(diffMes).toFixed(2)} Faltando`;
-                distEl.className = "text-2xl font-bold text-amber-400 mt-1";
-            }
-        }
-
-        function converterDataParaISO(dataBR) {
-            const partes = dataBR.split('/');
-            if (partes.length === 3) {
-                return `${partes[2]}-${partes[1]}-${partes[0]}`;
-            }
-            return '';
-        }
-
-        // --- CONFIGURAÇÕES ---
-        function salvarConfiguracoes(e) {
-            e.preventDefault();
-            db.config.nome = document.getElementById('cfgNome').value.trim();
-            db.config.logo = document.getElementById('cfgLogo').value.trim();
-            salvarDB();
             aplicarConfiguracoesVisuais();
-            alert('Configurações salvas com sucesso!');
+            renderizarTudo();
+        } else {
+            erroBox.classList.remove('hidden');
+        }
+    }
+
+    function realizarLogout() {
+        document.getElementById('appScreen').classList.add('hidden');
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('loginSenha').value = '';
+        document.getElementById('loginEmail').value = '';
+    }
+
+    function mudarModulo(id) {
+        document.querySelectorAll('[id^="mod-"]').forEach(el => el.classList.add('hidden'));
+        document.getElementById(`mod-${id}`).classList.remove('hidden');
+        
+        const titulos = {
+            dashboard: 'Dashboard Geral',
+            agendamentos: 'Agenda e Alertas de Veículos',
+            os: 'Ordens de Serviço e Orçamentos',
+            pdv: 'Venda de Produtos (PDV / Balcão)',
+            clientes: 'Gestão de Clientes',
+            veiculos: 'Gestão de Veículos / Motos',
+            mecanicos: 'Equipe & Usuários',
+            estoque: 'Estoque de Peças & Mais Vendidos',
+            financeiro: 'Caixa & Financeiro',
+            metas: 'Metas & Desempenho Fincanceiro',
+            configuracoes: 'Configurações'
+        };
+        document.getElementById('pageTitle').innerText = titulos[id] || 'Sistema';
+        if (window.innerWidth < 1024) document.getElementById('sidebar').classList.add('-translate-x-full');
+        renderizarTudo();
+    }
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
+
+    function renderizarTudo() {
+        renderizarClientes();
+        renderizarVeiculos();
+        renderizarEstoque();
+        renderizarAgendamentos();
+        renderizarOS();
+        renderizarPDV();
+        renderizarCaixa();
+        renderizarUsuarios();
+        renderizarMetas();
+        atualizarDashboard();
+        atualizarDatalistProdutos();
+    }
+
+    function atualizarDashboard() {
+        let totalEntradas = db.caixa.filter(m => m.tipo === 'Entrada').reduce((a, c) => a + c.valor, 0);
+        let totalSaidas = db.caixa.filter(m => m.tipo === 'Sangria' || m.tipo === 'Saída').reduce((a, c) => a + c.valor, 0);
+        document.getElementById('dashSaldoCaixa').innerText = `R$ ${((totalEntradas - totalSaidas)).toFixed(2)}`;
+        document.getElementById('dashOsAndamento').innerText = db.os.filter(o => o.status === 'Em andamento' || o.status === 'Aguardando peça').length;
+        document.getElementById('dashClientes').innerText = db.clientes.length;
+    }
+
+    // --- MÓDULO DE METAS & DESEMPENHO ---
+    function salvarMetaDiaria() {
+        const val = parseFloat(document.getElementById('inputMetaDiaria').value) || 0;
+        db.metaDiaria = val;
+        salvarDB();
+        renderizarMetas();
+        alert('Meta diária atualizada com sucesso!');
+    }
+
+    function renderizarMetas() {
+        const inputMeta = document.getElementById('inputMetaDiaria');
+        if (!inputMeta) return;
+        
+        const metaDiaria = db.metaDiaria || 600;
+        inputMeta.value = metaDiaria;
+        document.getElementById('metaExibicaoDiaria').innerText = `R$ ${metaDiaria.toFixed(2)}`;
+
+        const hojeStr = new Date().toLocaleDateString('pt-BR');
+        document.getElementById('metaDataHoje').innerText = hojeStr;
+
+        let faturamentoHoje = db.caixa
+            .filter(m => m.tipo === 'Entrada' && m.data === hojeStr)
+            .reduce((acc, m) => acc + m.valor, 0);
+
+        document.getElementById('metaFiltroFaturamentoDia').innerText = `R$ ${faturamentoHoje.toFixed(2)}`;
+
+        const diff = faturamentoHoje - metaDiaria;
+        const resEl = document.getElementById('metaResultadoDia');
+        const titEl = document.getElementById('metaTituloStatusDia');
+        const containerEl = document.getElementById('cardStatusDiaContainer');
+
+        if (faturamentoHoje >= metaDiaria) {
+            titEl.innerText = "Meta Atingida (No Verde!)";
+            resEl.innerText = `+ R$ ${diff.toFixed(2)} Acima`;
+            resEl.className = "text-2xl font-bold text-emerald-400 mt-1";
+            containerEl.className = "bg-emerald-950/40 p-4 rounded-xl border border-emerald-900/50";
+        } else {
+            titEl.innerText = "Falta para Meta (Vermelho)";
+            resEl.innerText = `- R$ ${Math.abs(diff).toFixed(2)} Faltando`;
+            resEl.className = "text-2xl font-bold text-red-500 mt-1";
+            containerEl.className = "bg-red-950/40 p-4 rounded-xl border border-red-900/50";
         }
 
-        // --- CLIENTES ---
-        function abrirModalCliente() { document.getElementById('modalCliente').classList.remove('hidden'); }
-        function fecharModalCliente() { document.getElementById('modalCliente').classList.add('hidden'); }
-        function salvarCliente(e) {
-            e.preventDefault();
-            db.clientes.push({
-                id: Date.now(),
-                nome: document.getElementById('cliNome').value,
-                telefone: document.getElementById('cliTel').value,
-                doc: document.getElementById('cliDoc').value
-            });
-            salvarDB();
-            fecharModalCliente();
-            renderizarClientes();
-            e.target.reset();
-            alert('Cliente cadastrado com sucesso!');
-        }
-        function renderizarClientes() {
-            const tbody = document.getElementById('tabelaClientes');
-            if(!tbody) return;
-            const termo = (document.getElementById('filtroBuscaCliente')?.value || '').toLowerCase();
-            let lista = db.clientes.filter(c => c.nome.toLowerCase().includes(termo) || c.telefone.toLowerCase().includes(termo));
-            if (lista.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-zinc-500">Nenhum cliente encontrado.</td></tr>`; return; }
-            tbody.innerHTML = lista.map(c => `
-                <tr class="hover:bg-zinc-950/50 transition">
-                    <td class="p-4 font-medium text-white">${c.nome}</td>
-                    <td class="p-4">${c.telefone}</td>
-                    <td class="p-4">${c.doc}</td>
-                    <td class="p-4 text-right"><button onclick="removerCliente(${c.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
-            `).join('');
-        }
-        function removerCliente(id) { db.clientes = db.clientes.filter(c => c.id !== id); salvarDB(); renderizarClientes(); }
+        const mesAtualStr = new Date().toISOString().slice(0, 7);
+        let acumuladoMes = db.caixa
+            .filter(m => m.tipo === 'Entrada' && m.data && converterDataParaISO(m.data).startsWith(mesAtualStr))
+            .reduce((acc, m) => acc + m.valor, 0);
 
-        // --- OS & ORÇAMENTOS ---
-        function abrirModalOS() {
-            osItensTemp = [];
-            document.getElementById('osClienteVeiculo').value = '';
-            document.getElementById('osValorEntrada').value = '0.00';
-            document.getElementById('osValorDesconto').value = '0.00';
-            document.getElementById('modalOS').classList.remove('hidden');
-            renderizarItensOSModal();
-        }
-        function fecharModalOS() { document.getElementById('modalOS').classList.add('hidden'); }
+        document.getElementById('metaAcumuladoMes').innerText = `R$ ${acumuladoMes.toFixed(2)}`;
 
-        function adicionarItemOS() {
-            osItensTemp.push({ tipo: 'Peça', nome: '', qtd: 1, valorUnit: 0 });
-            renderizarItensOSModal();
-        }
+        const metaEstimadaMes = metaDiaria * 22;
+        document.getElementById('metaEstimadaMes').innerText = `R$ ${metaEstimadaMes.toFixed(2)}`;
 
-        function removerItemOS(index) {
-            osItensTemp.splice(index, 1);
-            renderizarItensOSModal();
+        const diffMes = acumuladoMes - metaEstimadaMes;
+        const distEl = document.getElementById('metaDistanciaMes');
+        if (acumuladoMes >= metaEstimadaMes) {
+            distEl.innerText = `+ R$ ${diffMes.toFixed(2)} Superada`;
+            distEl.className = "text-2xl font-bold text-emerald-400 mt-1";
+        } else {
+            distEl.innerText = `- R$ ${Math.abs(diffMes).toFixed(2)} Faltando`;
+            distEl.className = "text-2xl font-bold text-amber-400 mt-1";
         }
+    }
 
-        function atualizarItemOS(index, campo, valor) {
-            osItensTemp[index][campo] = valor;
-            if (campo === 'nome') {
-                const prodEncontrado = db.produtos.find(p => p.nome.toLowerCase() === valor.toLowerCase());
-                if (prodEncontrado) {
-                    osItensTemp[index].valorUnit = prodEncontrado.preco;
-                    osItensTemp[index].tipo = prodEncontrado.tipo || 'Peça';
-                    const inputPreco = document.getElementById(`osItemValor_${index}`);
-                    if(inputPreco) inputPreco.value = prodEncontrado.preco;
-                }
+    function converterDataParaISO(dataBR) {
+        const partes = dataBR.split('/');
+        if (partes.length === 3) {
+            return `${partes[2]}-${partes[1]}-${partes[0]}`;
+        }
+        return '';
+    }
+
+    // --- CONFIGURAÇÕES ---
+    function salvarConfiguracoes(e) {
+        e.preventDefault();
+        db.config.nome = document.getElementById('cfgNome').value.trim();
+        db.config.logo = document.getElementById('cfgLogo').value.trim();
+        salvarDB();
+        aplicarConfiguracoesVisuais();
+        alert('Configurações salvas com sucesso!');
+    }
+
+    // --- CLIENTES ---
+    function abrirModalCliente() { document.getElementById('modalCliente').classList.remove('hidden'); }
+    function fecharModalCliente() { document.getElementById('modalCliente').classList.add('hidden'); }
+    function salvarCliente(e) {
+        e.preventDefault();
+        db.clientes.push({
+            id: Date.now(),
+            nome: document.getElementById('cliNome').value,
+            telefone: document.getElementById('cliTel').value,
+            doc: document.getElementById('cliDoc').value
+        });
+        salvarDB();
+        fecharModalCliente();
+        renderizarClientes();
+        e.target.reset();
+        alert('Cliente cadastrado com sucesso!');
+    }
+    function renderizarClientes() {
+        const tbody = document.getElementById('tabelaClientes');
+        if(!tbody) return;
+        const termo = (document.getElementById('filtroBuscaCliente')?.value || '').toLowerCase();
+        let lista = db.clientes.filter(c => c.nome.toLowerCase().includes(termo) || c.telefone.toLowerCase().includes(termo));
+        if (lista.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-zinc-500">Nenhum cliente encontrado.</td></tr>`; return; }
+        tbody.innerHTML = lista.map(c => `
+            <tr class="hover:bg-zinc-950/50 transition">
+                <td class="p-4 font-medium text-white">${c.nome}</td>
+                <td class="p-4">${c.telefone}</td>
+                <td class="p-4">${c.doc}</td>
+                <td class="p-4 text-right"><button onclick="removerCliente(${c.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+            </tr>
+        `).join('');
+    }
+    function removerCliente(id) { db.clientes = db.clientes.filter(c => c.id !== id); salvarDB(); renderizarClientes(); }
+
+    // --- OS & ORÇAMENTOS ---
+    function abrirModalOS() {
+        osItensTemp = [];
+        document.getElementById('osClienteVeiculo').value = '';
+        document.getElementById('osValorEntrada').value = '0.00';
+        document.getElementById('osValorDesconto').value = '0.00';
+        document.getElementById('modalOS').classList.remove('hidden');
+        renderizarItensOSModal();
+    }
+    function fecharModalOS() { document.getElementById('modalOS').classList.add('hidden'); }
+
+    function adicionarItemOS() {
+        osItensTemp.push({ tipo: 'Peça', nome: '', qtd: 1, valorUnit: 0 });
+        renderizarItensOSModal();
+    }
+
+    function removerItemOS(index) {
+        osItensTemp.splice(index, 1);
+        renderizarItensOSModal();
+    }
+
+    function atualizarItemOS(index, campo, valor) {
+        osItensTemp[index][campo] = valor;
+        if (campo === 'nome') {
+            const prodEncontrado = db.produtos.find(p => p.nome.toLowerCase() === valor.toLowerCase());
+            if (prodEncontrado) {
+                osItensTemp[index].valorUnit = prodEncontrado.preco;
+                osItensTemp[index].tipo = prodEncontrado.tipo || 'Peça';
+                const inputPreco = document.getElementById(`osItemValor_${index}`);
+                if(inputPreco) inputPreco.value = prodEncontrado.preco;
             }
+        }
+        calcularTotalOSModal();
+    }
+
+    function renderizarItensOSModal() {
+        const container = document.getElementById('listaItensOSModal');
+        if(!container) return;
+        if (osItensTemp.length === 0) {
+            container.innerHTML = `<p class="text-xs text-zinc-500 text-center py-2">Nenhum item adicionado à OS.</p>`;
             calcularTotalOSModal();
+            return;
         }
-
-        function renderizarItensOSModal() {
-            const container = document.getElementById('listaItensOSModal');
-            if(!container) return;
-            if (osItensTemp.length === 0) {
-                container.innerHTML = `<p class="text-xs text-zinc-500 text-center py-2">Nenhum item adicionado à OS.</p>`;
-                calcularTotalOSModal();
-                return;
-            }
-            container.innerHTML = osItensTemp.map((item, idx) => `
-                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 bg-zinc-950 p-3 rounded-xl border border-zinc-800 items-center">
-                    <div class="sm:col-span-3">
-                        <select onchange="atualizarItemOS(${idx}, 'tipo', this.value)" class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs">
-                            <option value="Peça" ${item.tipo === 'Peça' ? 'selected' : ''}>Peça</option>
-                            <option value="Serviço" ${item.tipo === 'Serviço' ? 'selected' : ''}>Serviço</option>
-                        </select>
-                    </div>
-                    <div class="sm:col-span-4">
-                        <input type="text" list="listaProdutosDatalist" value="${item.nome}" oninput="atualizarItemOS(${idx}, 'nome', this.value)" placeholder="Digite ou selecione o item..." class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <input type="number" min="1" value="${item.qtd}" oninput="atualizarItemOS(${idx}, 'qtd', parseFloat(this.value) || 1)" class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs text-center">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <input type="number" step="0.01" id="osItemValor_${idx}" value="${item.valorUnit}" oninput="atualizarItemOS(${idx}, 'valorUnit', parseFloat(this.value) || 0)" class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs text-right">
-                    </div>
-                    <div class="sm:col-span-1 text-right">
-                        <button type="button" onclick="removerItemOS(${idx})" class="text-zinc-500 hover:text-red-500 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>
-                    </div>
+        container.innerHTML = osItensTemp.map((item, idx) => `
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 bg-zinc-950 p-3 rounded-xl border border-zinc-800 items-center">
+                <div class="sm:col-span-3">
+                    <select onchange="atualizarItemOS(${idx}, 'tipo', this.value)" class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs">
+                        <option value="Peça" ${item.tipo === 'Peça' ? 'selected' : ''}>Peça</option>
+                        <option value="Serviço" ${item.tipo === 'Serviço' ? 'selected' : ''}>Serviço</option>
+                    </select>
                 </div>
-            `).join('');
-            calcularTotalOSModal();
+                <div class="sm:col-span-4">
+                    <input type="text" list="listaProdutosDatalist" value="${item.nome}" oninput="atualizarItemOS(${idx}, 'nome', this.value)" placeholder="Digite ou selecione o item..." class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs">
+                </div>
+                <div class="sm:col-span-2">
+                    <input type="number" min="1" value="${item.qtd}" oninput="atualizarItemOS(${idx}, 'qtd', parseFloat(this.value) || 1)" class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs text-center">
+                </div>
+                <div class="sm:col-span-2">
+                    <input type="number" step="0.01" id="osItemValor_${idx}" value="${item.valorUnit}" oninput="atualizarItemOS(${idx}, 'valorUnit', parseFloat(this.value) || 0)" class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs text-right">
+                </div>
+                <div class="sm:col-span-1 text-right">
+                    <button type="button" onclick="removerItemOS(${idx})" class="text-zinc-500 hover:text-red-500 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+        calcularTotalOSModal();
+    }
+
+    function calcularTotalOSModal() {
+        let totalPecas = 0;
+        let totalServicos = 0;
+        osItensTemp.forEach(item => {
+            let sub = (item.qtd || 0) * (item.valorUnit || 0);
+            if (item.tipo === 'Serviço') totalServicos += sub;
+            else totalPecas += sub;
+        });
+        let valorEntrada = parseFloat(document.getElementById('osValorEntrada')?.value) || 0;
+        let valorDesconto = parseFloat(document.getElementById('osValorDesconto')?.value) || 0;
+        let totalGeral = totalPecas + totalServicos - valorEntrada - valorDesconto;
+        if (totalGeral < 0) totalGeral = 0;
+
+        document.getElementById('osTotalPecasDisplay').innerText = `R$ ${totalPecas.toFixed(2)}`;
+        document.getElementById('osTotalServicosDisplay').innerText = `R$ ${totalServicos.toFixed(2)}`;
+        document.getElementById('osDescontoDisplay').innerText = `- R$ ${valorDesconto.toFixed(2)}`;
+        document.getElementById('osEntradaDisplay').innerText = `- R$ ${valorEntrada.toFixed(2)}`;
+        document.getElementById('osValorFinalDisplay').innerText = `R$ ${totalGeral.toFixed(2)}`;
+    }
+
+    function salvarOS(e) {
+        e.preventDefault();
+        if (osItensTemp.length === 0) {
+            alert('Adicione pelo menos um item à Ordem de Serviço.');
+            return;
         }
+        let totalPecas = osItensTemp.filter(i => i.tipo === 'Peça').reduce((a, b) => a + (b.qtd * b.valorUnit), 0);
+        let totalServicos = osItensTemp.filter(i => i.tipo === 'Serviço').reduce((a, b) => a + (b.qtd * b.valorUnit), 0);
+        let entrada = parseFloat(document.getElementById('osValorEntrada').value) || 0;
+        let desconto = parseFloat(document.getElementById('osValorDesconto').value) || 0;
+        let totalFinal = totalPecas + totalServicos - entrada - desconto;
 
-        function calcularTotalOSModal() {
-            let totalPecas = 0;
-            let totalServicos = 0;
-            osItensTemp.forEach(item => {
-                let sub = (item.qtd || 0) * (item.valorUnit || 0);
-                if (item.tipo === 'Serviço') totalServicos += sub;
-                else totalPecas += sub;
-            });
-            let valorEntrada = parseFloat(document.getElementById('osValorEntrada')?.value) || 0;
-            let valorDesconto = parseFloat(document.getElementById('osValorDesconto')?.value) || 0;
-            let totalGeral = totalPecas + totalServicos - valorEntrada - valorDesconto;
-            if (totalGeral < 0) totalGeral = 0;
+        db.os.push({
+            id: Date.now(),
+            numero: Math.floor(1000 + Math.random() * 9000),
+            clienteVeiculo: document.getElementById('osClienteVeiculo').value,
+            status: document.getElementById('osStatus').value,
+            itens: [...osItensTemp],
+            entrada: entrada,
+            desconto: desconto,
+            total: totalFinal > 0 ? totalFinal : 0,
+            data: new Date().toLocaleDateString('pt-BR')
+        });
 
-            document.getElementById('osTotalPecasDisplay').innerText = `R$ ${totalPecas.toFixed(2)}`;
-            document.getElementById('osTotalServicosDisplay').innerText = `R$ ${totalServicos.toFixed(2)}`;
-            document.getElementById('osDescontoDisplay').innerText = `- R$ ${valorDesconto.toFixed(2)}`;
-            document.getElementById('osEntradaDisplay').innerText = `- R$ ${valorEntrada.toFixed(2)}`;
-            document.getElementById('osValorFinalDisplay').innerText = `R$ ${totalGeral.toFixed(2)}`;
-        }
+        salvarDB();
+        fecharModalOS();
+        renderizarOS();
+        alert('Ordem de Serviço salva com sucesso!');
+    }
 
-        function salvarOS(e) {
-            e.preventDefault();
-            if (osItensTemp.length === 0) {
-                alert('Adicione pelo menos um item à Ordem de Serviço.');
-                return;
-            }
-            let totalPecas = osItensTemp.filter(i => i.tipo === 'Peça').reduce((a, b) => a + (b.qtd * b.valorUnit), 0);
-            let totalServicos = osItensTemp.filter(i => i.tipo === 'Serviço').reduce((a, b) => a + (b.qtd * b.valorUnit), 0);
-            let entrada = parseFloat(document.getElementById('osValorEntrada').value) || 0;
-            let desconto = parseFloat(document.getElementById('osValorDesconto').value) || 0;
-            let totalFinal = totalPecas + totalServicos - entrada - desconto;
+    function renderizarOS() {
+        const tbody = document.getElementById('tabelaOS');
+        if(!tbody) return;
+        const termo = (document.getElementById('filtroBuscaOS')?.value || '').toLowerCase();
+        let lista = db.os.filter(o => o.clienteVeiculo.toLowerCase().includes(termo) || o.numero.toString().includes(termo));
+        if (lista.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-zinc-500">Nenhuma Ordem de Serviço encontrada.</td></tr>`; return; }
+        tbody.innerHTML = lista.map(o => `
+            <tr class="hover:bg-zinc-950/50 transition">
+                <td class="p-4 font-bold text-white">#${o.numero}</td>
+                <td class="p-4">${o.clienteVeiculo}</td>
+                <td class="p-4"><span class="px-2 py-1 bg-zinc-800 text-xs rounded-lg">${o.status}</span></td>
+                <td class="p-4 font-bold text-emerald-400">R$ ${(o.total || 0).toFixed(2)}</td>
+                <td class="p-4 text-right space-x-2">
+                    <button onclick="visualizarOrcamento(${o.id})" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-eye"></i></button>
+                    <button onclick="removerOS(${o.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
 
-            db.os.push({
-                id: Date.now(),
-                numero: Math.floor(1000 + Math.random() * 9000),
-                clienteVeiculo: document.getElementById('osClienteVeiculo').value,
-                status: document.getElementById('osStatus').value,
-                itens: [...osItensTemp],
-                entrada: entrada,
-                desconto: desconto,
-                total: totalFinal > 0 ? totalFinal : 0,
-                data: new Date().toLocaleDateString('pt-BR')
-            });
+    function removerOS(id) { db.os = db.os.filter(o => o.id !== id); salvarDB(); renderizarOS(); }
 
-            salvarDB();
-            fecharModalOS();
-            renderizarOS();
-            alert('Ordem de Serviço salva com sucesso!');
-        }
+    function visualizarOrcamento(id) {
+        const os = db.os.find(o => o.id === id);
+        if(!os) return;
+        document.getElementById('orcNumero').innerText = os.numero;
+        document.getElementById('orcData').innerText = os.data;
+        document.getElementById('orcCliente').innerText = os.clienteVeiculo;
+        document.getElementById('orcStatus').innerText = os.status;
+        document.getElementById('orcDesconto').innerText = `R$ ${(os.desconto || 0).toFixed(2)}`;
+        document.getElementById('orcEntrada').innerText = `R$ ${(os.entrada || 0).toFixed(2)}`;
+        document.getElementById('orcValorFinal').innerText = `R$ ${(os.total || 0).toFixed(2)}`;
 
-        function renderizarOS() {
-            const tbody = document.getElementById('tabelaOS');
-            if(!tbody) return;
-            const termo = (document.getElementById('filtroBuscaOS')?.value || '').toLowerCase();
-            let lista = db.os.filter(o => o.clienteVeiculo.toLowerCase().includes(termo) || o.numero.toString().includes(termo));
-            if (lista.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-zinc-500">Nenhuma Ordem de Serviço encontrada.</td></tr>`; return; }
-            tbody.innerHTML = lista.map(o => `
-                <tr class="hover:bg-zinc-950/50 transition">
-                    <td class="p-4 font-bold text-white">#${o.numero}</td>
-                    <td class="p-4">${o.clienteVeiculo}</td>
-                    <td class="p-4"><span class="px-2 py-1 bg-zinc-800 text-xs rounded-lg">${o.status}</span></td>
-                    <td class="p-4 font-bold text-emerald-400">R$ ${(o.total || 0).toFixed(2)}</td>
-                    <td class="p-4 text-right space-x-2">
-                        <button onclick="visualizarOrcamento(${o.id})" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-eye"></i></button>
-                        <button onclick="removerOS(${o.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+        const tbody = document.getElementById('orcTabelaItens');
+        tbody.innerHTML = (os.itens || []).map(i => `
+            <tr>
+                <td class="p-2.5">${i.tipo}</td>
+                <td class="p-2.5 font-medium">${i.nome}</td>
+                <td class="p-2.5 text-center">${i.qtd}</td>
+                <td class="p-2.5 text-right">R$ ${i.valorUnit.toFixed(2)}</td>
+                <td class="p-2.5 text-right font-bold">R$ ${(i.qtd * i.valorUnit).toFixed(2)}</td>
+            </tr>
+        `).join('');
 
-        function removerOS(id) { db.os = db.os.filter(o => o.id !== id); salvarDB(); renderizarOS(); }
+        document.getElementById('modalVisualizarOrcamento').classList.remove('hidden');
+    }
+    function fecharModalOrcamento() { document.getElementById('modalVisualizarOrcamento').classList.add('hidden'); }
 
-        function visualizarOrcamento(id) {
-            const os = db.os.find(o => o.id === id);
-            if(!os) return;
-            document.getElementById('orcNumero').innerText = os.numero;
-            document.getElementById('orcData').innerText = os.data;
-            document.getElementById('orcCliente').innerText = os.clienteVeiculo;
-            document.getElementById('orcStatus').innerText = os.status;
-            document.getElementById('orcDesconto').innerText = `R$ ${(os.desconto || 0).toFixed(2)}`;
-            document.getElementById('orcEntrada').innerText = `R$ ${(os.entrada || 0).toFixed(2)}`;
-            document.getElementById('orcValorFinal').innerText = `R$ ${(os.total || 0).toFixed(2)}`;
+    // --- ESTOQUE E SUPORTE ---
+    function abrirModalProduto() { document.getElementById('modalProduto').classList.remove('hidden'); }
+    function fecharModalProduto() { document.getElementById('modalProduto').classList.add('hidden'); }
+    function salvarProduto(e) {
+        e.preventDefault();
+        db.produtos.push({
+            id: Date.now(),
+            nome: document.getElementById('prodNome').value,
+            tipo: document.getElementById('prodTipo').value,
+            qtd: parseInt(document.getElementById('prodQtd').value) || 0,
+            preco: parseFloat(document.getElementById('prodPreco').value) || 0
+        });
+        salvarDB();
+        fecharModalProduto();
+        renderizarEstoque();
+        atualizarDatalistProdutos();
+        e.target.reset();
+        alert('Produto cadastrado com sucesso!');
+    }
+    function renderizarEstoque() {
+        const tbody = document.getElementById('tabelaEstoque');
+        if(!tbody) return;
+        tbody.innerHTML = db.produtos.map(p => `
+            <tr class="hover:bg-zinc-950/50 transition">
+                <td class="p-4 font-medium text-white">${p.nome}</td>
+                <td class="p-4">${p.tipo}</td>
+                <td class="p-4">${p.qtd}</td>
+                <td class="p-4 text-emerald-400 font-bold">R$ ${p.preco.toFixed(2)}</td>
+                <td class="p-4 text-right"><button onclick="removerProduto(${p.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+            </tr>
+        `).join('');
+    }
+    function removerProduto(id) { db.produtos = db.produtos.filter(p => p.id !== id); salvarDB(); renderizarEstoque(); atualizarDatalistProdutos(); }
 
-            const tbody = document.getElementById('orcTabelaItens');
-            tbody.innerHTML = (os.itens || []).map(i => `
-                <tr>
-                    <td class="p-2.5">${i.tipo}</td>
-                    <td class="p-2.5 font-medium">${i.nome}</td>
-                    <td class="p-2.5 text-center">${i.qtd}</td>
-                    <td class="p-2.5 text-right">R$ ${i.valorUnit.toFixed(2)}</td>
-                    <td class="p-2.5 text-right font-bold">R$ ${(i.qtd * i.valorUnit).toFixed(2)}</td>
-                </tr>
-            `).join('');
-
-            document.getElementById('modalVisualizarOrcamento').classList.remove('hidden');
-        }
-        function fecharModalOrcamento() { document.getElementById('modalVisualizarOrcamento').classList.add('hidden'); }
-
-        // --- ESTOQUE E SUPORTE ---
-        function abrirModalProduto() { document.getElementById('modalProduto').classList.remove('hidden'); }
-        function fecharModalProduto() { document.getElementById('modalProduto').classList.add('hidden'); }
-        function salvarProduto(e) {
-            e.preventDefault();
-            db.produtos.push({
-                id: Date.now(),
-                nome: document.getElementById('prodNome').value,
-                tipo: document.getElementById('prodTipo').value,
-                qtd: parseInt(document.getElementById('prodQtd').value) || 0,
-                preco: parseFloat(document.getElementById('prodPreco').value) || 0
-            });
-            salvarDB();
-            fecharModalProduto();
-            renderizarEstoque();
-            atualizarDatalistProdutos();
-            e.target.reset();
-            alert('Produto cadastrado com sucesso!');
-        }
-        function renderizarEstoque() {
-            const tbody = document.getElementById('tabelaEstoque');
-            if(!tbody) return;
-            tbody.innerHTML = db.produtos.map(p => `
-                <tr class="hover:bg-zinc-950/50 transition">
-                    <td class="p-4 font-medium text-white">${p.nome}</td>
-                    <td class="p-4">${p.tipo}</td>
-                    <td class="p-4">${p.qtd}</td>
-                    <td class="p-4 text-emerald-400 font-bold">R$ ${p.preco.toFixed(2)}</td>
-                    <td class="p-4 text-right"><button onclick="removerProduto(${p.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
-            `).join('');
-        }
-        function removerProduto(id) { db.produtos = db.produtos.filter(p => p.id !== id); salvarDB(); renderizarEstoque(); atualizarDatalistProdutos(); }
-
-        function renderizarVeiculos() {}
-        function renderizarAgendamentos() {}
-        function renderizarPDV() {}
-        function renderizarCaixa() {}
-        function renderizarUsuarios() {}
-    </script>
-</body>
-</html>
+    function renderizarVeiculos() {}
+    function renderizarAgendamentos() {}
+    function renderizarPDV() {}
+    function renderizarCaixa() {}
+    function renderizarUsuarios() {}
+</script>
