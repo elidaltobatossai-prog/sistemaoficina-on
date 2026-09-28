@@ -100,7 +100,6 @@
                 </a>
                 <a href="#" onclick="mudarModulo('agendamentos')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition relative">
                     <i class="fa-solid fa-calendar-check w-5"></i><span>Agendamentos</span>
-                    <span id="badgeAgendamentos" class="hidden absolute right-3 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
                 </a>
                 <a href="#" onclick="mudarModulo('os')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
                     <i class="fa-solid fa-clipboard-list w-5"></i><span>Ordens de Serviço</span>
@@ -189,7 +188,7 @@
                     </div>
                 </div>
 
-                <!-- AGENDAMENTOS DE VEÍCULOS -->
+                <!-- AGENDAMENTOS -->
                 <div id="mod-agendamentos" class="hidden space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
                         <div>
@@ -208,7 +207,6 @@
                                     <th class="p-4">Cliente</th>
                                     <th class="p-4">Moto</th>
                                     <th class="p-4">Serviço Agendado</th>
-                                    <th class="p-4">Status</th>
                                     <th class="p-4 text-right">Ações</th>
                                 </tr>
                             </thead>
@@ -233,10 +231,9 @@
                                 <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
                                     <th class="p-4">Nº OS</th>
                                     <th class="p-4">Cliente</th>
-                                    <th class="p-4">Moto</th>
                                     <th class="p-4">Status</th>
                                     <th class="p-4">Total</th>
-                                    <th class="p-4 text-right">Ações / Pagamento</th>
+                                    <th class="p-4 text-right">Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="tabelaOS" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
@@ -244,7 +241,7 @@
                     </div>
                 </div>
 
-                <!-- VENDA DE PRODUTOS (PDV / BALCÃO) -->
+                <!-- VENDA DE PRODUTOS (PDV) -->
                 <div id="mod-pdv" class="hidden space-y-6">
                     <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -253,24 +250,20 @@
                                 <p class="text-xs text-zinc-400">Realize vendas diretas de estoque com baixa automática e lançamento no caixa.</p>
                             </div>
                             <button onclick="abrirModalPagamentoPDV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
-                                <i class="fa-solid fa-check"></i><span>Ir para Pagamento (Motor InfinitePay)</span>
+                                <i class="fa-solid fa-check"></i><span>Ir para Pagamento</span>
                             </button>
                         </div>
-
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <!-- Seleção de Produtos -->
                             <div class="lg:col-span-2 space-y-4">
                                 <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
                                     <h4 class="text-xs font-bold uppercase text-zinc-300">Adicionar Item à Venda</h4>
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                         <div class="sm:col-span-2">
-                                            <label class="block text-[10px] uppercase text-zinc-500 mb-1">Selecionar Produto do Estoque</label>
                                             <select id="pdvProdutoSelect" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
                                                 <option value="">Selecione a peça/produto...</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-[10px] uppercase text-zinc-500 mb-1">Quantidade</label>
                                             <div class="flex space-x-2">
                                                 <input type="number" id="pdvQtdInput" min="1" value="1" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
                                                 <button type="button" onclick="adicionarItemPDV()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-plus"></i></button>
@@ -278,9 +271,7 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="bg-zinc-950 rounded-xl border border-zinc-800 overflow-hidden">
-                                    <div class="p-3 bg-zinc-900 border-b border-zinc-800 text-xs font-bold uppercase text-zinc-300">Carrinho da Venda</div>
                                     <table class="w-full text-left text-xs">
                                         <thead class="bg-zinc-900/50 text-zinc-400 uppercase border-b border-zinc-800">
                                             <tr>
@@ -297,13 +288,11 @@
                                     </table>
                                 </div>
                             </div>
-
-                            <!-- Resumo e Pagamento -->
                             <div class="bg-zinc-950 p-5 rounded-xl border border-zinc-800 flex flex-col justify-between space-y-4">
                                 <div class="space-y-4">
                                     <h4 class="text-xs font-bold uppercase text-zinc-300 border-b border-zinc-800 pb-2">Resumo da Venda</h4>
                                     <div>
-                                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente (Opcional)</label>
+                                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente</label>
                                         <select id="pdvClienteId" class="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs focus:border-red-600 focus:outline-none">
                                             <option value="">Cliente Balcão / Geral</option>
                                         </select>
@@ -314,7 +303,7 @@
                                         <span class="text-xs uppercase font-semibold text-zinc-400">Total a Pagar</span>
                                         <span class="text-2xl font-black text-emerald-400" id="pdvTotalDisplay">R$ 0,00</span>
                                     </div>
-                                    <button onclick="abrirModalPagamentoPDV()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-red-600/30 transition text-sm">
+                                    <button onclick="abrirModalPagamentoPDV()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl shadow transition text-sm">
                                         Prosseguir para Pagamento
                                     </button>
                                 </div>
@@ -346,7 +335,7 @@
                     </div>
                 </div>
 
-                <!-- VEÍCULOS / MOTOS -->
+                <!-- VEÍCULOS / MOTOS (CONFIGURADO COM PLACA, ANO, KM, COR, MONTADORA E DESCRIÇÃO) -->
                 <div id="mod-veiculos" class="hidden space-y-6">
                     <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
                         <span class="text-sm font-semibold text-zinc-300">Motos / Veículos Cadastrados</span>
@@ -358,9 +347,10 @@
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
-                                    <th class="p-4">Moto (Marca/Modelo)</th>
+                                    <th class="p-4">Montadora / Modelo</th>
                                     <th class="p-4">Placa</th>
                                     <th class="p-4">Ano / Cor</th>
+                                    <th class="p-4">KM</th>
                                     <th class="p-4">Proprietário</th>
                                     <th class="p-4 text-right">Ações</th>
                                 </tr>
@@ -370,12 +360,15 @@
                     </div>
                 </div>
 
-                <!-- EQUIPE / MECÂNICOS -->
+                <!-- EQUIPE / MECÂNICOS & USUÁRIOS (LOGIN, SENHA E EDITAR ADMIN PRINCIPAL) -->
                 <div id="mod-mecanicos" class="hidden space-y-6">
                     <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
-                        <span class="text-sm font-semibold text-zinc-300">Gerenciar Equipe e Mecânicos</span>
+                        <div>
+                            <span class="text-sm font-semibold text-zinc-300">Gerenciar Equipe, Administradores e Técnicos</span>
+                            <p class="text-xs text-zinc-400">Adicione ou edite o login principal, administradores e funcionários.</p>
+                        </div>
                         <button onclick="abrirModalUsuario()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
-                            <i class="fa-solid fa-user-plus"></i><span>Novo Mecânico / Usuário</span>
+                            <i class="fa-solid fa-user-plus"></i><span>Novo Usuário / Administrador</span>
                         </button>
                     </div>
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
@@ -383,7 +376,8 @@
                             <thead>
                                 <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
                                     <th class="p-4">Nome</th>
-                                    <th class="p-4">E-mail</th>
+                                    <th class="p-4">E-mail (Login)</th>
+                                    <th class="p-4">Senha</th>
                                     <th class="p-4">Cargo</th>
                                     <th class="p-4 text-right">Ações</th>
                                 </tr>
@@ -398,25 +392,18 @@
                     <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
                         <div>
                             <span class="text-sm font-semibold text-zinc-300">Estoque de Peças & Produtos</span>
-                            <p class="text-xs text-zinc-400">Controle de inventário e itens mais vendidos.</p>
                         </div>
                         <button onclick="abrirModalProduto()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
                             <i class="fa-solid fa-plus"></i><span>Novo Produto / Peça</span>
                         </button>
                     </div>
-
-                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl space-y-4">
-                        <h3 class="text-sm font-bold text-white flex items-center"><i class="fa-solid fa-fire text-red-500 mr-2"></i> Peças e Serviços Mais Vendidos</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="rankingMaisVendidos"></div>
-                    </div>
-
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
                                     <th class="p-4">Item / Peça</th>
                                     <th class="p-4">Tipo</th>
-                                    <th class="p-4">Quantidade em Estoque</th>
+                                    <th class="p-4">Qtd Estoque</th>
                                     <th class="p-4">Preço Venda</th>
                                     <th class="p-4 text-right">Ações</th>
                                 </tr>
@@ -435,46 +422,32 @@
                             <button onclick="limparFiltroMes()" class="text-xs text-zinc-400 hover:text-white underline">Ver Todos</button>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <button onclick="abrirModalCaixa('Abertura/Troco')" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-coins mr-1"></i> Fundo de Troco</button>
-                            <button onclick="abrirModalSangria()" class="bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> Sangria de Caixa</button>
                             <button onclick="abrirModalCaixa('Entrada')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-plus mr-1"></i> Nova Entrada</button>
-                            <button onclick="abrirModalCaixa('Sangria')" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-minus mr-1"></i> Nova Saída</button>
+                            <button onclick="abrirModalCaixa('Saída')" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition"><i class="fa-solid fa-minus mr-1"></i> Nova Saída</button>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
                             <p class="text-xs font-semibold text-zinc-400 uppercase">Entradas (Período)</p>
                             <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="finTotalEntradas">R$ 0,00</h3>
                         </div>
                         <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">Saídas / Sangrias (Período)</p>
+                            <p class="text-xs font-semibold text-zinc-400 uppercase">Saídas (Período)</p>
                             <h3 class="text-2xl font-bold text-red-500 mt-1" id="finTotalSaidas">R$ 0,00</h3>
                         </div>
                         <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">Balanço do Período</p>
+                            <p class="text-xs font-semibold text-zinc-400 uppercase">Balanço Líquido</p>
                             <h3 class="text-2xl font-bold text-white mt-1" id="finSaldoLiquido">R$ 0,00</h3>
                         </div>
-                        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl border-l-4 border-l-red-600">
-                            <p class="text-xs font-semibold text-zinc-400 uppercase">Dinheiro Físico em Gaveta</p>
-                            <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="finCaixaGeral">R$ 0,00</h3>
-                        </div>
                     </div>
-
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                            <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-wallet text-red-500 mr-2"></i> Histórico de Caixa (Movimentos & Taxas InfinitePay)</h3>
-                        </div>
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
                                     <th class="p-4">Data</th>
                                     <th class="p-4">Tipo</th>
-                                    <th class="p-4">Forma Pagamento</th>
                                     <th class="p-4">Descrição</th>
-                                    <th class="p-4">V. Bruto</th>
-                                    <th class="p-4">Taxa Inf.</th>
-                                    <th class="p-4">V. Líquido</th>
+                                    <th class="p-4">Valor</th>
                                     <th class="p-4 text-right">Ações</th>
                                 </tr>
                             </thead>
@@ -486,59 +459,22 @@
                 <!-- METAS & DESEMPENHO -->
                 <div id="mod-metas" class="hidden space-y-6">
                     <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl max-w-3xl space-y-6">
-                        <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
-                            <div>
-                                <h3 class="text-lg font-bold text-white flex items-center"><i class="fa-solid fa-bullseye text-emerald-400 mr-2"></i> Controle de Metas de Faturamento</h3>
-                                <p class="text-xs text-zinc-400">Defina sua meta diária desejada e acompanhe o desempenho em tempo real.</p>
-                            </div>
-                        </div>
-
-                        <!-- Configuração da Meta Manual -->
+                        <h3 class="text-lg font-bold text-white flex items-center"><i class="fa-solid fa-bullseye text-emerald-400 mr-2"></i> Controle de Metas de Faturamento</h3>
                         <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col sm:flex-row items-end gap-4">
                             <div class="flex-1 w-full">
                                 <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Definir Meta Diária (R$)</label>
-                                <input type="number" step="1.00" id="inputMetaDiaria" value="600" class="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 text-emerald-400 font-bold rounded-xl text-base focus:outline-none focus:border-red-600" placeholder="600.00">
+                                <input type="number" step="1.00" id="inputMetaDiaria" value="600" class="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 text-emerald-400 font-bold rounded-xl text-base focus:outline-none focus:border-red-600">
                             </div>
-                            <button type="button" onclick="salvarMetaDiaria()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">
-                                Salvar Nova Meta
-                            </button>
+                            <button type="button" onclick="salvarMetaDiaria()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">Salvar Meta</button>
                         </div>
-
-                        <!-- Resultados do Dia -->
-                        <div class="space-y-4">
-                            <h4 class="text-xs font-bold uppercase text-zinc-300">Desempenho do Dia (Hoje: <span id="metaDataHoje">--/--/----</span>)</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Faturamento de Hoje</p>
-                                    <h3 class="text-2xl font-bold text-white mt-1" id="metaFiltroFaturamentoDia">R$ 0,00</h3>
-                                </div>
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Meta Diária Estipulada</p>
-                                    <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="metaExibicaoDiaria">R$ 600,00</h3>
-                                </div>
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800" id="cardStatusDiaContainer">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase" id="metaTituloStatusDia">Status do Dia</p>
-                                    <h3 class="text-2xl font-bold mt-1" id="metaResultadoDia">R$ 0,00</h3>
-                                </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                <p class="text-[11px] font-semibold text-zinc-400 uppercase">Faturamento de Hoje</p>
+                                <h3 class="text-2xl font-bold text-white mt-1" id="metaFiltroFaturamentoDia">R$ 0,00</h3>
                             </div>
-                        </div>
-
-                        <!-- Projeção Mensal -->
-                        <div class="space-y-4 pt-4 border-t border-zinc-800">
-                            <h4 class="text-xs font-bold uppercase text-zinc-300">Projeção da Meta Mensal</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Total Acumulado no Mês</p>
-                                    <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="metaAcumuladoMes">R$ 0,00</h3>
-                                </div>
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Meta Mensal Estimada (Dias Úteis x Diária)</p>
-                                    <h3 class="text-2xl font-bold text-white mt-1" id="metaEstimadaMes">R$ 0,00</h3>
-                                </div>
-                                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                                    <p class="text-[11px] font-semibold text-zinc-400 uppercase">Distância da Meta Mensal</p>
-                                    <h3 class="text-2xl font-bold mt-1" id="metaDistanciaMes">R$ 0,00</h3>
-                                </div>
+                            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                                <p class="text-[11px] font-semibold text-zinc-400 uppercase">Meta Diária Estipulada</p>
+                                <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="metaExibicaoDiaria">R$ 600,00</h3>
                             </div>
                         </div>
                     </div>
@@ -554,9 +490,8 @@
                                 <input type="text" id="cfgNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:outline-none focus:border-red-600">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">URL do Logotipo da Oficina (Link da Imagem)</label>
+                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">URL do Logotipo da Oficina</label>
                                 <input type="url" id="cfgLogo" placeholder="https://exemplo.com/logo.png" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:outline-none focus:border-red-600">
-                                <p class="text-[11px] text-zinc-500 mt-1">Cole o link de uma imagem válida da sua logo para exibi-la no sistema.</p>
                             </div>
                             <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">Salvar Configurações</button>
                         </form>
@@ -580,7 +515,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Moto / Veículo</label>
-                    <input type="text" id="agMoto" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Honda CG 150 - Placa ABC-1234">
+                    <input type="text" id="agMoto" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Honda CG 150">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -594,25 +529,25 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Serviço Desejado</label>
-                    <input type="text" id="agServico" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Troca de óleo e revisão geral">
+                    <input type="text" id="agServico" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Troca de óleo">
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" onclick="fecharModalAgendamento()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Agendamento</button>
+                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL LANÇAMENTO DE CAIXA / TROCO -->
+    <!-- MODAL LANÇAMENTO DE CAIXA -->
     <div id="modalCaixa" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
             <h3 id="modalCaixaTitulo" class="text-lg font-bold text-white mb-4">Nova Movimentação</h3>
             <form onsubmit="salvarMovimentacaoCaixa(event)" class="space-y-4">
                 <input type="hidden" id="cxTipo">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Descrição / Histórico</label>
-                    <input type="text" id="cxDescricao" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Fundo de troco inicial">
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Descrição</label>
+                    <input type="text" id="cxDescricao" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Venda balcão / Conta de luz">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Valor (R$)</label>
@@ -626,99 +561,14 @@
         </div>
     </div>
 
-    <!-- MODAL SANGRIA DE CAIXA -->
-    <div id="modalSangria" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-hand-holding-dollar text-amber-500 mr-2"></i> Sangria de Caixa</h3>
-            <p class="text-xs text-zinc-400 mb-4">Retire dinheiro físico da gaveta (ex: depósito, pagamento de fornecedor) para manter o caixa perfeitamente batido.</p>
-            <form onsubmit="salvarSangria(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Motivo / Destino da Sangria</label>
-                    <input type="text" id="sangriaDescricao" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Pagamento fornecedor de peças / Depósito bancário">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Valor da Retirada (R$)</label>
-                    <input type="number" step="0.01" id="sangriaValor" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
-                </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="fecharModalSangria()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl shadow">Confirmar Sangria</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL MOTOR DE PAGAMENTO (SPLIT & INFINITEPAY) -->
-    <div id="modalPagamento" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
-                <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-cash-register text-emerald-400 mr-2"></i> Motor de Pagamento & InfinitePay</h3>
-                <span class="text-sm font-bold text-emerald-400" id="pagTotalGeralDisplay">Total: R$ 0,00</span>
-            </div>
-
-            <div class="space-y-4">
-                <!-- Divisão de Pagamento (Split) -->
-                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold uppercase text-zinc-300">Formas de Pagamento (Split de Valores)</span>
-                        <button type="button" onclick="adicionarLinhaSplit()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-2.5 py-1 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-plus mr-1"></i> Adicionar Forma</button>
-                    </div>
-                    <div id="listaLinhasSplit" class="space-y-3">
-                        <!-- Inserido via JS -->
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-zinc-800 text-xs">
-                        <span class="text-zinc-400">Restante a Pagar: <strong id="pagRestanteDisplay" class="text-amber-400">R$ 0,00</strong></span>
-                        <span class="text-zinc-400">Total Informado: <strong id="pagInformadoDisplay" class="text-emerald-400">R$ 0,00</strong></span>
-                    </div>
-                </div>
-
-                <!-- Simulação de Troco em Dinheiro -->
-                <div id="secaoTrocoDinheiro" class="hidden bg-emerald-950/30 p-4 rounded-xl border border-emerald-900/50 space-y-3">
-                    <h4 class="text-xs font-bold uppercase text-emerald-400"><i class="fa-solid fa-money-bill-wave mr-1"></i> Cálculo de Troco (Dinheiro Físico)</h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[10px] uppercase text-zinc-400 mb-1">Valor Entregue pelo Cliente (R$)</label>
-                            <input type="number" step="0.01" id="pagValorClienteDinheiro" oninput="calcularTrocoDinheiro()" class="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
-                        </div>
-                        <div class="flex flex-col justify-center items-end bg-zinc-950 px-3 py-2 rounded-xl border border-zinc-800">
-                            <span class="text-[10px] uppercase text-zinc-400">Troco Calculado</span>
-                            <span class="text-lg font-black text-emerald-400" id="pagTrocoCalculadoDisplay">R$ 0,00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Resumo de Taxas InfinitePay -->
-                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2 text-xs">
-                    <div class="flex justify-between text-zinc-400">
-                        <span>Valor Bruto Total:</span>
-                        <strong id="resumoBruto" class="text-white">R$ 0,00</strong>
-                    </div>
-                    <div class="flex justify-between text-zinc-400">
-                        <span>Taxa Maquininha (InfinitePay):</span>
-                        <strong id="resumoTaxa" class="text-red-400">- R$ 0,00</strong>
-                    </div>
-                    <div class="flex justify-between text-zinc-300 pt-2 border-t border-zinc-800 font-bold text-sm">
-                        <span>Valor Líquido Creditado:</span>
-                        <strong id="resumoLiquido" class="text-emerald-400">R$ 0,00</strong>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex justify-end space-x-3 pt-5 mt-4 border-t border-zinc-800">
-                <button type="button" onclick="fecharModalPagamento()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                <button type="button" onclick="concluirPagamentoDefinitivo()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow">Confirmar Pagamento & Finalizar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL PRODUTO / PEÇA -->
+    <!-- MODAL PRODUTO -->
     <div id="modalProduto" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
             <h3 class="text-lg font-bold text-white mb-4">Cadastrar Peça / Produto / Serviço</h3>
             <form onsubmit="salvarProduto(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome da Peça / Serviço</label>
-                    <input type="text" id="prodNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Caixa de marcha / Pastilha de freio">
+                    <input type="text" id="prodNome" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Tipo</label>
@@ -730,7 +580,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Qtd em Estoque</label>
-                        <input type="number" id="prodQtd" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="10">
+                        <input type="number" id="prodQtd" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" value="10">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Preço Venda (R$)</label>
@@ -739,40 +589,64 @@
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" onclick="fecharModalProduto()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Produto</button>
+                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL NOVO VEÍCULO / MOTO -->
+    <!-- MODAL NOVO VEÍCULO / MOTO (ATUALIZADO COM PLACA, ANO, KM, COR, MONTADORA E DESCRIÇÃO) -->
     <div id="modalVeiculo" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-white mb-4">Cadastrar Nova Moto</h3>
-            <form onsubmit="salvarVeiculo(event)" class="space-y-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <h3 class="text-lg font-bold text-white mb-4" id="tituloModalVeiculo">Cadastrar Nova Moto</h3>
+            <form onsubmit="salvarVeiculo(event)" class="space-y-3">
+                <input type="hidden" id="motoIdEdit">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Proprietário (Cliente)</label>
-                    <select id="motoClienteId" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <select id="motoClienteId" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                         <option value="">Selecione o cliente...</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Marca e Modelo</label>
-                    <input type="text" id="motoModelo" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Yamaha Fazer 250">
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Montadora</label>
+                    <select id="motoMontadora" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                        <option value="Honda">Honda</option>
+                        <option value="Yamaha">Yamaha</option>
+                        <option value="Suzuki">Suzuki</option>
+                        <option value="Kawasaki">Kawasaki</option>
+                        <option value="Dafra">Dafra</option>
+                        <option value="Haojue">Haojue</option>
+                        <option value="Shineray">Shineray</option>
+                        <option value="Outra">Outra</option>
+                    </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Placa</label>
-                    <input type="text" id="motoPlaca" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm uppercase focus:border-red-600 focus:outline-none" placeholder="ABC-1234">
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Modelo / Versão</label>
+                    <input type="text" id="motoModelo" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Fazer 250 / CG 150 Titan">
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Placa</label>
+                        <input type="text" id="motoPlaca" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm uppercase focus:border-red-600 focus:outline-none" placeholder="ABC-1234">
+                    </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Ano</label>
-                        <input type="text" id="motoAno" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="2023">
+                        <input type="text" id="motoAno" class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="2023">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Quilometragem (KM)</label>
+                        <input type="number" id="motoKm" class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="45000">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cor</label>
-                        <input type="text" id="motoCor" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Vermelha">
+                        <input type="text" id="motoCor" class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Vermelha">
                     </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Descrição / Observações</label>
+                    <textarea id="motoDescricao" rows="2" class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Acessórios instalados, detalhes do motor, etc..."></textarea>
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" onclick="fecharModalVeiculo()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
@@ -782,15 +656,15 @@
         </div>
     </div>
 
-    <!-- MODAL ORDEM DE SERVIÇO ATUALIZADA -->
+    <!-- MODAL ORDEM DE SERVIÇO -->
     <div id="modalOS" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <h3 class="text-lg font-bold text-white mb-4">Nova Ordem de Serviço / Orçamento</h3>
             <form onsubmit="salvarOS(event)" class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente / Veículo / Aparelho</label>
-                        <input type="text" id="osClienteVeiculo" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: João da Silva / Honda CG 150">
+                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente / Moto</label>
+                        <input type="text" id="osClienteVeiculo" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: João / Honda CG">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Status da OS</label>
@@ -802,44 +676,17 @@
                         </select>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Valor de Entrada (Sinal Antecipado)</label>
-                        <input type="number" step="0.01" id="osValorEntrada" value="0.00" oninput="calcularTotalOSModal()" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-emerald-400 font-bold rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Desconto Aplicado (R$)</label>
-                        <input type="number" step="0.01" id="osValorDesconto" value="0.00" oninput="calcularTotalOSModal()" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-amber-400 font-bold rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="0.00">
-                    </div>
-                </div>
-
-                <!-- ITENS DA OS (Peças e Serviços) -->
                 <div class="space-y-3 pt-2">
                     <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                        <div>
-                            <h4 class="text-xs font-bold uppercase text-zinc-300">Detalhamento Sequencial (Peças e Serviços)</h4>
-                            <p class="text-[11px] text-zinc-500">Adicione itens do estoque digitando o nome ou mão de obra diretamente.</p>
-                        </div>
-                        <button type="button" onclick="adicionarItemOS()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1 shadow">
-                            <i class="fa-solid fa-plus"></i><span>Adicionar Item</span>
-                        </button>
+                        <h4 class="text-xs font-bold uppercase text-zinc-300">Itens / Serviços</h4>
+                        <button type="button" onclick="adicionarItemOS()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-plus"></i> Adicionar Item</button>
                     </div>
-
-                    <div id="listaItensOSModal" class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-1"></div>
+                    <div id="listaItensOSModal" class="space-y-3 max-h-48 overflow-y-auto custom-scrollbar pr-1"></div>
                 </div>
-
-                <!-- TOTALIZADOR -->
-                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col items-end space-y-1">
-                    <div class="text-xs text-zinc-400">Total Peças: <span id="osTotalPecasDisplay" class="text-white">R$ 0,00</span> | Total Serviços: <span id="osTotalServicosDisplay" class="text-white">R$ 0,00</span></div>
-                    <div class="text-xs text-zinc-400">Desconto Aplicado: <span id="osDescontoDisplay" class="text-amber-400">- R$ 0,00</span></div>
-                    <div class="text-xs text-zinc-400">Desconto Entrada (Sinal): <span id="osEntradaDisplay" class="text-amber-400">- R$ 0,00</span></div>
-                    <div class="text-sm font-bold uppercase text-zinc-300 pt-2 border-t border-zinc-800 w-full flex justify-between">
-                        <span>Valor Final a Pagar:</span>
-                        <span class="text-xl font-black text-emerald-400" id="osValorFinalDisplay">R$ 0,00</span>
-                    </div>
+                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex justify-between items-center">
+                    <span class="text-sm font-bold uppercase text-zinc-300">Valor Final:</span>
+                    <span class="text-xl font-black text-emerald-400" id="osValorFinalDisplay">R$ 0,00</span>
                 </div>
-
                 <div class="flex justify-end space-x-3 pt-3">
                     <button type="button" onclick="fecharModalOS()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
                     <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar OS</button>
@@ -848,92 +695,23 @@
         </div>
     </div>
 
-    <!-- DATALIST GLOBAL PARA PRODUTOS -->
-    <datalist id="listaProdutosDatalist">
-        <!-- Preenchido dinamicamente via JS -->
-    </datalist>
-
-    <!-- MODAL IMPRESSÃO ORÇAMENTO -->
-    <div id="modalVisualizarOrcamento" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div id="modalImprimirOrcamento" class="bg-white text-zinc-900 p-8 rounded-xl shadow space-y-6">
-                <div class="flex justify-between items-start border-b pb-4">
-                    <div class="flex items-center space-x-3">
-                        <div id="orcLogoPrintContainer" class="w-12 h-12 rounded-lg bg-red-600 flex items-center justify-center text-white font-bold overflow-hidden">
-                            <i class="fa-solid fa-wrench" id="orcIconDefault"></i>
-                            <img id="orcLogoImg" src="" class="w-full h-full object-cover hidden" alt="Logo">
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-black text-red-600" id="orcOficinaNome">EF Motos</h2>
-                            <p class="text-xs text-zinc-500">Centro Automotivo Especializado</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <h3 class="text-lg font-bold text-zinc-800">ORDEM DE SERVIÇO #<span id="orcNumero"></span></h3>
-                        <p class="text-xs text-zinc-500" id="orcData"></p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4 text-sm bg-zinc-50 p-4 rounded-lg border">
-                    <div>
-                        <p class="text-xs font-semibold text-zinc-400 uppercase">Cliente / Veículo / Aparelho</p>
-                        <p class="font-bold text-zinc-800" id="orcCliente">-</p>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-zinc-400 uppercase">Status</p>
-                        <p class="font-bold text-red-600" id="orcStatus">-</p>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-xs font-semibold uppercase text-zinc-400 mb-2">Itens Detalhados da OS</h4>
-                    <div class="bg-zinc-50 rounded-lg border overflow-hidden">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-zinc-100 text-zinc-600 uppercase border-b">
-                                <tr>
-                                    <th class="p-2.5">Tipo</th>
-                                    <th class="p-2.5">Descrição</th>
-                                    <th class="p-2.5 text-center">Qtd</th>
-                                    <th class="p-2.5 text-right">V. Unit.</th>
-                                    <th class="p-2.5 text-right">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orcTabelaItens" class="divide-y text-zinc-800"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="flex justify-between items-center pt-4 border-t text-sm">
-                    <div>
-                        <p class="text-xs text-zinc-500">Desconto: <strong id="orcDesconto" class="text-zinc-800">R$ 0,00</strong></p>
-                        <p class="text-xs text-zinc-500">Valor Entrada (Sinal): <strong id="orcEntrada" class="text-zinc-800">R$ 0,00</strong></p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs font-semibold text-zinc-400 uppercase">Valor Final</p>
-                        <p class="text-2xl font-black text-red-600" id="orcValorFinal">R$ 0,00</p>
-                    </div>
-                </div>
-            </div>
-            <div class="flex justify-end space-x-3 pt-4">
-                <button type="button" onclick="fecharModalOrcamento()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Fechar</button>
-                <button type="button" onclick="window.print()" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow flex items-center space-x-2"><i class="fa-solid fa-print"></i><span>Imprimir / PDF</span></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL USUÁRIO -->
+    <!-- MODAL USUÁRIO / FUNCIONÁRIO (EDITAR E ADICIONAR ADMINISTRADOR / TÉCNICO) -->
     <div id="modalUsuario" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <h3 class="text-lg font-bold text-white mb-4">Novo Usuário / Mecânico</h3>
+            <h3 class="text-lg font-bold text-white mb-4" id="tituloModalUsuario">Novo Usuário / Mecânico</h3>
             <form onsubmit="salvarUsuario(event)" class="space-y-3">
+                <input type="hidden" id="usrIdEdit">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome Completo</label>
                     <input type="text" id="usrNome" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">E-mail</label>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">E-mail (Login)</label>
                     <input type="email" id="usrEmail1" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Senha</label>
-                    <input type="password" id="usrSenha1" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <input type="text" id="usrSenha1" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cargo</label>
@@ -976,13 +754,13 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE SINCRONIZAÇÃO EM TEMPO REAL COM FIREBASE REALTIME DATABASE -->
+    <datalist id="listaProdutosDatalist"></datalist>
+
+    <!-- FIREBASE E SCRIPTS DO SISTEMA -->
     <script type="module">
-        // Importa as funções necessárias do Firebase SDK v10+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Configurações do Realtime Database fornecidas
         const firebaseConfigRT = {
             apiKey: "AIzaSyDzoFpVcdffbfh8Ujo_PS2n5sfXV5JynwY",
             authDomain: "sistema-oficina-on.firebaseapp.com",
@@ -990,16 +768,13 @@
             projectId: "sistema-oficina-on",
             storageBucket: "sistema-oficina-on.firebasestorage.app",
             messagingSenderId: "967732351574",
-            appId: "1:967732351574:web:ae6d21dd26a82f7704a1f7",
-            measurementId: "G-B3NDGSFGG7"
+            appId: "1:967732351574:web:ae6d21dd26a82f7704a1f7"
         };
 
-        // Inicializar o Realtime Database do Firebase
         const appRT = initializeApp(firebaseConfigRT, "RealtimeApp");
         const dbRT = getDatabase(appRT);
         const dbRefRT = ref(dbRT, 'oficina/estadoAtual');
 
-        // Escuta em tempo real as alterações no banco de dados e atualiza o estado/telas de forma transparente
         onValue(dbRefRT, (snapshot) => {
             const dados = snapshot.val();
             if (dados && dados.textoSistema) {
@@ -1007,34 +782,20 @@
                     const dadosRemotos = JSON.parse(dados.textoSistema);
                     if (dadosRemotos && typeof dadosRemotos === 'object') {
                         db = { ...db, ...dadosRemotos };
-                        const appTela = document.getElementById('appScreen');
-                        if (appTela && !appTela.classList.contains('hidden')) {
+                        if (document.getElementById('appScreen') && !document.getElementById('appScreen').classList.contains('hidden')) {
                             renderizarTudo();
                         }
                     }
-                } catch (e) {
-                    console.error("Erro ao processar dados em tempo real:", e);
-                }
+                } catch (e) { console.error(e); }
             }
         });
 
-        // Função global para salvar o estado atualizado no Realtime Database
         window.salvarDBRealtime = function() {
-            set(dbRefRT, {
-                textoSistema: JSON.stringify(db),
-                atualizadoEm: new Date().toISOString()
-            })
-            .then(() => {
-                console.log("Dados sincronizados com o Realtime Database com sucesso!");
-            })
-            .catch((error) => {
-                console.error("Erro ao sincronizar com o Realtime Database: ", error);
-            });
+            set(dbRefRT, { textoSistema: JSON.stringify(db), atualizadoEm: new Date().toISOString() }).catch(err => console.error(err));
         };
     </script>
 
     <script>
-        // Configuração do Firebase para o Firestore (compat)
         const firebaseConfig = {
             apiKey: "AIzaSyDzopFvcdffbfh8Ujo_PS2n5sfXV5JynwY",
             authDomain: "sistema-oficina-on.firebaseapp.com",
@@ -1044,10 +805,7 @@
             appId: "1:967732351574:web:ae6d21dd26a82f7704a1f7"
         };
 
-        // Inicializar Firebase Firestore
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const firestore = firebase.firestore();
 
         let db = {
@@ -1066,91 +824,21 @@
 
         let osItensTemp = [];
         let pdvCarrinhoTemp = [];
-        let pagamentoContexto = null;
-        let splitLinhasTemp = [];
 
-        // Função unificada de salvamento que integra o Firestore e o Realtime Database sem alterar seu layout
         function salvarDB() {
-            // Salva no Firestore
-            firestore.collection("ef_motos").doc("dados_gerais").set(db)
-                .then(() => {
-                    console.log("Dados salvos no Firestore!");
-                })
-                .catch((error) => {
-                    console.error("Erro ao salvar no Firestore:", error);
-                });
-
-            // Sincroniza também no Realtime Database via função global exposta pelo módulo
-            if (typeof window.salvarDBRealtime === 'function') {
-                window.salvarDBRealtime();
-            }
+            firestore.collection("ef_motos").doc("dados_gerais").set(db).catch(err => console.error(err));
+            if (typeof window.salvarDBRealtime === 'function') { window.salvarDBRealtime(); }
         }
 
-        // Carregamento inicial assíncrono da nuvem
         function carregarDadosFirebase(callback) {
-            firestore.collection("ef_motos").doc("dados_gerais").get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const dadosRemotos = doc.data();
-                        db = { ...db, ...dadosRemotos };
-                    } else {
-                        salvarDB(); 
-                    }
-                    if (callback) callback();
-                })
-                .catch((error) => {
-                    console.error("Erro ao carregar do Firebase:", error);
-                    if (callback) callback();
-                });
-        }
-
-        // Sincronização silenciosa a cada 10 segundos (Atualiza dados e telas sem deslogar ou mandar para a senha)
-        function sincronizarAutomatico() {
-            firestore.collection("ef_motos").doc("dados_gerais").get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const dadosRemotos = doc.data();
-                        db = { ...db, ...dadosRemotos };
-                        
-                        // Atualiza as telas em tempo real apenas se o usuário já estiver logado no sistema
-                        const appTela = document.getElementById('appScreen');
-                        if (appTela && !appTela.classList.contains('hidden')) {
-                            renderizarTudo();
-                        }
-                    }
-                })
-                .catch((error) => {
-                    console.error("Erro na sincronização automática:", error);
-                });
-        }
-
-        // Dispara a sincronização a cada 10 segundos
-        setInterval(sincronizarAutomatico, 10000);
-
-        function aplicarConfiguracoesVisuais() {
-            const nomeOficina = db.config.nome || "EF Motos";
-            const logoUrl = db.config.logo || "";
-
-            document.getElementById('loginOficinaNome').innerText = nomeOficina;
-            document.getElementById('sidebarOficinaNome').innerText = nomeOficina;
-            document.getElementById('pageHeaderTitle').innerText = `${nomeOficina} - Sistema de Gestão`;
-            document.getElementById('cfgNome').value = nomeOficina;
-            document.getElementById('cfgLogo').value = logoUrl;
-
-            const loginImg = document.getElementById('loginLogoImg');
-            const loginIcon = document.getElementById('loginIconDefault');
-            if (logoUrl) { loginImg.src = logoUrl; loginImg.classList.remove('hidden'); loginIcon.classList.add('hidden'); }
-            else { loginImg.classList.add('hidden'); loginIcon.classList.remove('hidden'); }
-
-            const sidebarImg = document.getElementById('sidebarLogoImg');
-            const sidebarIcon = document.getElementById('sidebarIconDefault');
-            if (logoUrl) { sidebarImg.src = logoUrl; sidebarImg.classList.remove('hidden'); sidebarIcon.classList.add('hidden'); }
-            else { sidebarImg.classList.add('hidden'); sidebarIcon.classList.remove('hidden'); }
-
-            const orcImg = document.getElementById('orcLogoImg');
-            const orcIcon = document.getElementById('orcIconDefault');
-            if (logoUrl) { orcImg.src = logoUrl; orcImg.classList.remove('hidden'); orcIcon.classList.add('hidden'); }
-            else { orcImg.classList.add('hidden'); orcIcon.classList.remove('hidden'); }
+            firestore.collection("ef_motos").doc("dados_gerais").get().then((doc) => {
+                if (doc.exists) {
+                    db = { ...db, ...doc.data() };
+                } else {
+                    salvarDB();
+                }
+                if (callback) callback();
+            }).catch(err => { console.error(err); if (callback) callback(); });
         }
 
         window.addEventListener('DOMContentLoaded', () => { 
@@ -1160,10 +848,13 @@
             });
         });
 
-        function atualizarDatalistProdutos() {
-            const datalist = document.getElementById('listaProdutosDatalist');
-            if(!datalist) return;
-            datalist.innerHTML = db.produtos.map(p => `<option value="${p.nome}"></option>`).join('');
+        function aplicarConfiguracoesVisuais() {
+            const nomeOficina = db.config.nome || "EF Motos";
+            document.getElementById('loginOficinaNome').innerText = nomeOficina;
+            document.getElementById('sidebarOficinaNome').innerText = nomeOficina;
+            document.getElementById('pageHeaderTitle').innerText = `${nomeOficina} - Sistema`;
+            document.getElementById('cfgNome').value = nomeOficina;
+            document.getElementById('cfgLogo').value = db.config.logo || "";
         }
 
         function realizarLogin(e) {
@@ -1177,12 +868,9 @@
                 erroBox.classList.add('hidden');
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('appScreen').classList.remove('hidden');
-                
                 document.getElementById('userNameDisplay').innerText = user.nome;
                 document.getElementById('userRoleDisplay').innerText = user.cargo;
                 document.getElementById('userAvatar').innerText = user.nome.charAt(0).toUpperCase();
-
-                aplicarConfiguracoesVisuais();
                 renderizarTudo();
             } else {
                 erroBox.classList.remove('hidden');
@@ -1193,24 +881,22 @@
             document.getElementById('appScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('loginSenha').value = '';
-            document.getElementById('loginEmail').value = '';
         }
 
         function mudarModulo(id) {
             document.querySelectorAll('[id^="mod-"]').forEach(el => el.classList.add('hidden'));
             document.getElementById(`mod-${id}`).classList.remove('hidden');
-            
             const titulos = {
                 dashboard: 'Dashboard Geral',
-                agendamentos: 'Agenda e Alertas de Veículos',
-                os: 'Ordens de Serviço e Orçamentos',
-                pdv: 'Venda de Produtos (PDV / Balcão)',
+                agendamentos: 'Agenda e Alertas',
+                os: 'Ordens de Serviço',
+                pdv: 'Venda de Produtos (PDV)',
                 clientes: 'Gestão de Clientes',
                 veiculos: 'Gestão de Veículos / Motos',
                 mecanicos: 'Equipe & Usuários',
-                estoque: 'Estoque de Peças & Mais Vendidos',
+                estoque: 'Estoque de Peças',
                 financeiro: 'Caixa & Financeiro',
-                metas: 'Metas & Desempenho Fincanceiro',
+                metas: 'Metas & Desempenho',
                 configuracoes: 'Configurações'
             };
             document.getElementById('pageTitle').innerText = titulos[id] || 'Sistema';
@@ -1224,107 +910,210 @@
             renderizarClientes();
             renderizarVeiculos();
             renderizarEstoque();
-            renderizarAgendamentos();
             renderizarOS();
-            renderizarPDV();
             renderizarCaixa();
             renderizarUsuarios();
-            renderizarMetas();
             atualizarDashboard();
+            atualizarSelectsClientes();
             atualizarDatalistProdutos();
         }
 
         function atualizarDashboard() {
             let totalEntradas = db.caixa.filter(m => m.tipo === 'Entrada').reduce((a, c) => a + c.valor, 0);
-            let totalSaidas = db.caixa.filter(m => m.tipo === 'Sangria' || m.tipo === 'Saída').reduce((a, c) => a + c.valor, 0);
-            document.getElementById('dashSaldoCaixa').innerText = `R$ ${((totalEntradas - totalSaidas)).toFixed(2)}`;
-            document.getElementById('dashOsAndamento').innerText = db.os.filter(o => o.status === 'Em andamento' || o.status === 'Aguardando peça').length;
+            let totalSaidas = db.caixa.filter(m => m.tipo === 'Saída').reduce((a, c) => a + c.valor, 0);
+            document.getElementById('dashSaldoCaixa').innerText = `R$ ${(totalEntradas - totalSaidas).toFixed(2)}`;
+            document.getElementById('dashOsAndamento').innerText = db.os.filter(o => o.status === 'Em andamento').length;
             document.getElementById('dashClientes').innerText = db.clientes.length;
         }
 
-        // --- MÓDULO DE METAS & DESEMPENHO ---
-        function salvarMetaDiaria() {
-            const val = parseFloat(document.getElementById('inputMetaDiaria').value) || 0;
-            db.metaDiaria = val;
-            salvarDB();
-            renderizarMetas();
-            alert('Meta diária atualizada e salva na nuvem com sucesso!');
+        function atualizarSelectsClientes() {
+            const selects = [document.getElementById('motoClienteId'), document.getElementById('agClienteId'), document.getElementById('pdvClienteId')];
+            selects.forEach(sel => {
+                if(!sel) return;
+                const atual = sel.value;
+                sel.innerHTML = `<option value="">Selecione o cliente...</option>` + db.clientes.map(c => `<option value="${c.id}">${c.nome} (${c.telefone})</option>`).join('');
+                sel.value = atual;
+            });
         }
 
-        function renderizarMetas() {
-            const inputMeta = document.getElementById('inputMetaDiaria');
-            if (!inputMeta) return;
-            
-            const metaDiaria = db.metaDiaria !== undefined ? db.metaDiaria : 600;
-            inputMeta.value = metaDiaria;
-            document.getElementById('metaExibicaoDiaria').innerText = `R$ ${metaDiaria.toFixed(2)}`;
+        // --- GESTÃO DE USUÁRIOS / ADMINISTRADORES CORRIGIDA ---
+        function abrirModalUsuario(id = null) {
+            document.getElementById('usrIdEdit').value = '';
+            document.getElementById('usrNome').value = '';
+            document.getElementById('usrEmail1').value = '';
+            document.getElementById('usrSenha1').value = '';
+            document.getElementById('usrCargo').value = 'Administrador';
+            document.getElementById('tituloModalUsuario').innerText = "Novo Usuário / Administrador";
 
-            const hojeStr = new Date().toLocaleDateString('pt-BR');
-            document.getElementById('metaDataHoje').innerText = hojeStr;
-
-            let faturamentoHoje = db.caixa
-                .filter(m => m.tipo === 'Entrada' && m.data === hojeStr)
-                .reduce((acc, m) => acc + m.valor, 0);
-
-            document.getElementById('metaFiltroFaturamentoDia').innerText = `R$ ${faturamentoHoje.toFixed(2)}`;
-
-            const diff = faturamentoHoje - metaDiaria;
-            const resEl = document.getElementById('metaResultadoDia');
-            const titEl = document.getElementById('metaTituloStatusDia');
-            const containerEl = document.getElementById('cardStatusDiaContainer');
-
-            if (faturamentoHoje >= metaDiaria) {
-                titEl.innerText = "Meta Atingida (No Verde!)";
-                resEl.innerText = `+ R$ ${diff.toFixed(2)} Acima`;
-                resEl.className = "text-2xl font-bold text-emerald-400 mt-1";
-                containerEl.className = "bg-emerald-950/40 p-4 rounded-xl border border-emerald-900/50";
-            } else {
-                titEl.innerText = "Falta para Meta (Vermelho)";
-                resEl.innerText = `- R$ ${Math.abs(diff).toFixed(2)} Faltando`;
-                resEl.className = "text-2xl font-bold text-red-500 mt-1";
-                containerEl.className = "bg-red-950/40 p-4 rounded-xl border border-red-900/50";
+            if (id) {
+                const u = db.usuarios.find(x => x.id === id);
+                if (u) {
+                    document.getElementById('usrIdEdit').value = u.id;
+                    document.getElementById('usrNome').value = u.nome;
+                    document.getElementById('usrEmail1').value = u.email;
+                    document.getElementById('usrSenha1').value = u.senha;
+                    document.getElementById('usrCargo').value = u.cargo;
+                    document.getElementById('tituloModalUsuario').innerText = "Editar Usuário / Login";
+                }
             }
-
-            const mesAtualStr = new Date().toISOString().slice(0, 7); 
-            let acumuladoMes = db.caixa
-                .filter(m => m.tipo === 'Entrada' && m.data && converterDataParaISO(m.data).startsWith(mesAtualStr))
-                .reduce((acc, m) => acc + m.valor, 0);
-
-            document.getElementById('metaAcumuladoMes').innerText = `R$ ${acumuladoMes.toFixed(2)}`;
-
-            const metaEstimadaMes = metaDiaria * 22;
-            document.getElementById('metaEstimadaMes').innerText = `R$ ${metaEstimadaMes.toFixed(2)}`;
-
-            const diffMes = acumuladoMes - metaEstimadaMes;
-            const distEl = document.getElementById('metaDistanciaMes');
-            if (acumuladoMes >= metaEstimadaMes) {
-                distEl.innerText = `+ R$ ${diffMes.toFixed(2)} Superada`;
-                distEl.className = "text-2xl font-bold text-emerald-400 mt-1";
-            } else {
-                distEl.innerText = `- R$ ${Math.abs(diffMes).toFixed(2)} Faltando`;
-                distEl.className = "text-2xl font-bold text-amber-400 mt-1";
-            }
+            document.getElementById('modalUsuario').classList.remove('hidden');
         }
+        function fecharModalUsuario() { document.getElementById('modalUsuario').classList.add('hidden'); }
 
-        function converterDataParaISO(dataBR) {
-            const partes = dataBR.split('/');
-            if (partes.length === 3) {
-                return `${partes[2]}-${partes[1]}-${partes[0]}`;
-            }
-            return '';
-        }
-
-        // --- CONFIGURAÇÕES ---
-        function salvarConfiguracoes(e) {
+        function salvarUsuario(e) {
             e.preventDefault();
-            db.config.nome = document.getElementById('cfgNome').value.trim();
-            db.config.logo = document.getElementById('cfgLogo').value.trim();
+            const idEdit = document.getElementById('usrIdEdit').value;
+            const nome = document.getElementById('usrNome').value.trim();
+            const email = document.getElementById('usrEmail1').value.trim();
+            const senha = document.getElementById('usrSenha1').value.trim();
+            const cargo = document.getElementById('usrCargo').value;
+
+            if (idEdit) {
+                let u = db.usuarios.find(x => x.id == idEdit);
+                if (u) {
+                    u.nome = nome;
+                    u.email = email;
+                    u.senha = senha;
+                    u.cargo = cargo;
+                }
+            } else {
+                db.usuarios.push({
+                    id: Date.now(),
+                    nome, email, senha, cargo
+                });
+            }
+
             salvarDB();
-            aplicarConfiguracoesVisuais();
-            alert('Configurações salvas com sucesso!');
+            fecharModalUsuario();
+            renderizarUsuarios();
+            alert('Usuário salvo com sucesso!');
         }
 
-        // --- CLIENTES ---
+        function renderizarUsuarios() {
+            const tbody = document.getElementById('tabelaUsuarios');
+            if(!tbody) return;
+            tbody.innerHTML = db.usuarios.map(u => `
+                <tr class="hover:bg-zinc-950/50 transition">
+                    <td class="p-4 font-medium text-white">${u.nome}</td>
+                    <td class="p-4">${u.email}</td>
+                    <td class="p-4 font-mono text-zinc-400">${u.senha}</td>
+                    <td class="p-4"><span class="px-2 py-1 bg-zinc-800 text-xs rounded-lg text-emerald-400">${u.cargo}</span></td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="abrirModalUsuario(${u.id})" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-pen"></i></button>
+                        ${db.usuarios.length > 1 ? `<button onclick="removerUsuario(${u.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        function removerUsuario(id) {
+            if (db.usuarios.length <= 1) { alert('Você não pode excluir o único usuário do sistema.'); return; }
+            db.usuarios = db.usuarios.filter(u => u.id !== id);
+            salvarDB();
+            renderizarUsuarios();
+        }
+
+        // --- GESTÃO DE VEÍCULOS / MOTOS (PLACA, ANO, KM, COR, MONTADORA E DESCRIÇÃO) ---
+        function abrirModalVeiculo(id = null) {
+            atualizarSelectsClientes();
+            document.getElementById('motoIdEdit').value = '';
+            document.getElementById('motoClienteId').value = '';
+            document.getElementById('motoMontadora').value = 'Honda';
+            document.getElementById('motoModelo').value = '';
+            document.getElementById('motoPlaca').value = '';
+            document.getElementById('motoAno').value = '';
+            document.getElementById('motoKm').value = '';
+            document.getElementById('motoCor').value = '';
+            document.getElementById('motoDescricao').value = '';
+            document.getElementById('tituloModalVeiculo').innerText = "Cadastrar Nova Moto";
+
+            if(id) {
+                const v = db.veiculos.find(x => x.id === id);
+                if(v) {
+                    document.getElementById('motoIdEdit').value = v.id;
+                    document.getElementById('motoClienteId').value = v.clienteId || '';
+                    document.getElementById('motoMontadora').value = v.montadora || 'Honda';
+                    document.getElementById('motoModelo').value = v.modelo || '';
+                    document.getElementById('motoPlaca').value = v.placa || '';
+                    document.getElementById('motoAno').value = v.ano || '';
+                    document.getElementById('motoKm').value = v.km || '';
+                    document.getElementById('motoCor').value = v.cor || '';
+                    document.getElementById('motoDescricao').value = v.descricao || '';
+                    document.getElementById('tituloModalVeiculo').innerText = "Editar Moto / Veículo";
+                }
+            }
+            document.getElementById('modalVeiculo').classList.remove('hidden');
+        }
+        function fecharModalVeiculo() { document.getElementById('modalVeiculo').classList.add('hidden'); }
+
+        function salvarVeiculo(e) {
+            e.preventDefault();
+            const idEdit = document.getElementById('motoIdEdit').value;
+            const clienteId = parseInt(document.getElementById('motoClienteId').value);
+            const montadora = document.getElementById('motoMontadora').value;
+            const modelo = document.getElementById('motoModelo').value.trim();
+            const placa = document.getElementById('motoPlaca').value.toUpperCase().trim();
+            const ano = document.getElementById('motoAno').value.trim();
+            const km = document.getElementById('motoKm').value.trim();
+            const cor = document.getElementById('motoCor').value.trim();
+            const descricao = document.getElementById('motoDescricao').value.trim();
+
+            if(idEdit) {
+                let v = db.veiculos.find(x => x.id == idEdit);
+                if(v) {
+                    v.clienteId = clienteId;
+                    v.montadora = montadora;
+                    v.modelo = modelo;
+                    v.placa = placa;
+                    v.ano = ano;
+                    v.km = km;
+                    v.cor = cor;
+                    v.descricao = descricao;
+                }
+            } else {
+                db.veiculos.push({
+                    id: Date.now(),
+                    clienteId, montadora, modelo, placa, ano, km, cor, descricao
+                });
+            }
+
+            salvarDB();
+            fecharModalVeiculo();
+            renderizarVeiculos();
+            alert('Veículo salvo com sucesso!');
+        }
+
+        function renderizarVeiculos() {
+            const tbody = document.getElementById('tabelaVeiculos');
+            if(!tbody) return;
+            if (db.veiculos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-zinc-500">Nenhum veículo cadastrado.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = db.veiculos.map(v => {
+                const cli = db.clientes.find(c => c.id === v.clienteId);
+                return `
+                    <tr class="hover:bg-zinc-950/50 transition">
+                        <td class="p-4 font-medium text-white"><strong>${v.montadora || ''}</strong> ${v.modelo || ''}</td>
+                        <td class="p-4 font-mono font-bold text-red-500">${v.placa || '-'}</td>
+                        <td class="p-4">${v.ano || '-'} / ${v.cor || '-'}</td>
+                        <td class="p-4">${v.km ? v.km + ' KM' : '-'}</td>
+                        <td class="p-4">${cli ? cli.nome : 'Cliente não vinculado'}</td>
+                        <td class="p-4 text-right space-x-2">
+                            <button onclick="abrirModalVeiculo(${v.id})" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="removerVeiculo(${v.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function removerVeiculo(id) {
+            db.veiculos = db.veiculos.filter(v => v.id !== id);
+            salvarDB();
+            renderizarVeiculos();
+        }
+
+        // --- OUTRAS FUNÇÕES AUXILIARES ---
         function abrirModalCliente() { document.getElementById('modalCliente').classList.remove('hidden'); }
         function fecharModalCliente() { document.getElementById('modalCliente').classList.add('hidden'); }
         function salvarCliente(e) {
@@ -1338,16 +1127,14 @@
             salvarDB();
             fecharModalCliente();
             renderizarClientes();
+            atualizarSelectsClientes();
             e.target.reset();
             alert('Cliente cadastrado com sucesso!');
         }
         function renderizarClientes() {
             const tbody = document.getElementById('tabelaClientes');
             if(!tbody) return;
-            const termo = (document.getElementById('filtroBuscaCliente')?.value || '').toLowerCase();
-            let lista = db.clientes.filter(c => c.nome.toLowerCase().includes(termo) || c.telefone.toLowerCase().includes(termo));
-            if (lista.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-zinc-500">Nenhum cliente encontrado.</td></tr>`; return; }
-            tbody.innerHTML = lista.map(c => `
+            tbody.innerHTML = db.clientes.map(c => `
                 <tr class="hover:bg-zinc-950/50 transition">
                     <td class="p-4 font-medium text-white">${c.nome}</td>
                     <td class="p-4">${c.telefone}</td>
@@ -1356,175 +1143,8 @@
                 </tr>
             `).join('');
         }
-        function removerCliente(id) { db.clientes = db.clientes.filter(c => c.id !== id); salvarDB(); renderizarClientes(); }
+        function removerCliente(id) { db.clientes = db.clientes.filter(c => c.id !== id); salvarDB(); renderizarClientes(); atualizarSelectsClientes(); }
 
-        // --- OS & ORÇAMENTOS ---
-        function abrirModalOS() {
-            osItensTemp = [];
-            document.getElementById('osClienteVeiculo').value = '';
-            document.getElementById('osValorEntrada').value = '0.00';
-            document.getElementById('osValorDesconto').value = '0.00';
-            document.getElementById('modalOS').classList.remove('hidden');
-            renderizarItensOSModal();
-        }
-        function fecharModalOS() { document.getElementById('modalOS').classList.add('hidden'); }
-
-        function adicionarItemOS() {
-            osItensTemp.push({ tipo: 'Peça', nome: '', qtd: 1, valorUnit: 0 });
-            renderizarItensOSModal();
-        }
-
-        function removerItemOS(index) {
-            osItensTemp.splice(index, 1);
-            renderizarItensOSModal();
-        }
-
-        function atualizarItemOS(index, campo, valor) {
-            osItensTemp[index][campo] = valor;
-            if (campo === 'nome') {
-                const prodEncontrado = db.produtos.find(p => p.nome.toLowerCase() === valor.toLowerCase());
-                if (prodEncontrado) {
-                    osItensTemp[index].valorUnit = prodEncontrado.preco;
-                    osItensTemp[index].tipo = prodEncontrado.tipo || 'Peça';
-                    const inputPreco = document.getElementById(`osItemValor_${index}`);
-                    if(inputPreco) inputPreco.value = prodEncontrado.preco;
-                }
-            }
-            calcularTotalOSModal();
-        }
-
-        function renderizarItensOSModal() {
-            const container = document.getElementById('listaItensOSModal');
-            if(!container) return;
-            if (osItensTemp.length === 0) {
-                container.innerHTML = `<p class="text-xs text-zinc-500 text-center py-2">Nenhum item adicionado à OS.</p>`;
-                calcularTotalOSModal();
-                return;
-            }
-            container.innerHTML = osItensTemp.map((item, idx) => `
-                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 bg-zinc-950 p-3 rounded-xl border border-zinc-800 items-center">
-                    <div class="sm:col-span-3">
-                        <select onchange="atualizarItemOS(${idx}, 'tipo', this.value)" class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs">
-                            <option value="Peça" ${item.tipo === 'Peça' ? 'selected' : ''}>Peça</option>
-                            <option value="Serviço" ${item.tipo === 'Serviço' ? 'selected' : ''}>Serviço</option>
-                        </select>
-                    </div>
-                    <div class="sm:col-span-4">
-                        <input type="text" list="listaProdutosDatalist" value="${item.nome}" oninput="atualizarItemOS(${idx}, 'nome', this.value)" placeholder="Digite ou selecione o item..." class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <input type="number" min="1" value="${item.qtd}" oninput="atualizarItemOS(${idx}, 'qtd', parseFloat(this.value) || 1)" class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs text-center">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <input type="number" step="0.01" id="osItemValor_${idx}" value="${item.valorUnit}" oninput="atualizarItemOS(${idx}, 'valorUnit', parseFloat(this.value) || 0)" class="w-full px-2 py-1.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-xs text-right">
-                    </div>
-                    <div class="sm:col-span-1 text-right">
-                        <button type="button" onclick="removerItemOS(${idx})" class="text-zinc-500 hover:text-red-500 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>
-            `).join('');
-            calcularTotalOSModal();
-        }
-
-        function calcularTotalOSModal() {
-            let totalPecas = 0;
-            let totalServicos = 0;
-            osItensTemp.forEach(item => {
-                let sub = (item.qtd || 0) * (item.valorUnit || 0);
-                if (item.tipo === 'Serviço') totalServicos += sub;
-                else totalPecas += sub;
-            });
-            let valorEntrada = parseFloat(document.getElementById('osValorEntrada')?.value) || 0;
-            let valorDesconto = parseFloat(document.getElementById('osValorDesconto')?.value) || 0;
-            let totalGeral = totalPecas + totalServicos - valorEntrada - valorDesconto;
-            if (totalGeral < 0) totalGeral = 0;
-
-            document.getElementById('osTotalPecasDisplay').innerText = `R$ ${totalPecas.toFixed(2)}`;
-            document.getElementById('osTotalServicosDisplay').innerText = `R$ ${totalServicos.toFixed(2)}`;
-            document.getElementById('osDescontoDisplay').innerText = `- R$ ${valorDesconto.toFixed(2)}`;
-            document.getElementById('osEntradaDisplay').innerText = `- R$ ${valorEntrada.toFixed(2)}`;
-            document.getElementById('osValorFinalDisplay').innerText = `R$ ${totalGeral.toFixed(2)}`;
-        }
-
-        function salvarOS(e) {
-            e.preventDefault();
-            if (osItensTemp.length === 0) {
-                alert('Adicione pelo menos um item à Ordem de Serviço.');
-                return;
-            }
-            let totalPecas = osItensTemp.filter(i => i.tipo === 'Peça').reduce((a, b) => a + (b.qtd * b.valorUnit), 0);
-            let totalServicos = osItensTemp.filter(i => i.tipo === 'Serviço').reduce((a, b) => a + (b.qtd * b.valorUnit), 0);
-            let entrada = parseFloat(document.getElementById('osValorEntrada').value) || 0;
-            let desconto = parseFloat(document.getElementById('osValorDesconto').value) || 0;
-            let totalFinal = totalPecas + totalServicos - entrada - desconto;
-
-            db.os.push({
-                id: Date.now(),
-                numero: Math.floor(1000 + Math.random() * 9000),
-                clienteVeiculo: document.getElementById('osClienteVeiculo').value,
-                status: document.getElementById('osStatus').value,
-                itens: [...osItensTemp],
-                entrada: entrada,
-                desconto: desconto,
-                total: totalFinal > 0 ? totalFinal : 0,
-                data: new Date().toLocaleDateString('pt-BR')
-            });
-
-            salvarDB();
-            fecharModalOS();
-            renderizarOS();
-            alert('Ordem de Serviço salva com sucesso!');
-        }
-
-        function renderizarOS() {
-            const tbody = document.getElementById('tabelaOS');
-            if(!tbody) return;
-            const termo = (document.getElementById('filtroBuscaOS')?.value || '').toLowerCase();
-            let lista = db.os.filter(o => o.clienteVeiculo.toLowerCase().includes(termo) || o.numero.toString().includes(termo));
-            if (lista.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-zinc-500">Nenhuma Ordem de Serviço encontrada.</td></tr>`; return; }
-            tbody.innerHTML = lista.map(o => `
-                <tr class="hover:bg-zinc-950/50 transition">
-                    <td class="p-4 font-bold text-white">#${o.numero}</td>
-                    <td class="p-4">${o.clienteVeiculo}</td>
-                    <td class="p-4"><span class="px-2 py-1 bg-zinc-800 text-xs rounded-lg">${o.status}</span></td>
-                    <td class="p-4 font-bold text-emerald-400">R$ ${(o.total || 0).toFixed(2)}</td>
-                    <td class="p-4 text-right space-x-2">
-                        <button onclick="visualizarOrcamento(${o.id})" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-eye"></i></button>
-                        <button onclick="removerOS(${o.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function removerOS(id) { db.os = db.os.filter(o => o.id !== id); salvarDB(); renderizarOS(); }
-
-        function visualizarOrcamento(id) {
-            const os = db.os.find(o => o.id === id);
-            if(!os) return;
-            document.getElementById('orcNumero').innerText = os.numero;
-            document.getElementById('orcData').innerText = os.data;
-            document.getElementById('orcCliente').innerText = os.clienteVeiculo;
-            document.getElementById('orcStatus').innerText = os.status;
-            document.getElementById('orcDesconto').innerText = `R$ ${(os.desconto || 0).toFixed(2)}`;
-            document.getElementById('orcEntrada').innerText = `R$ ${(os.entrada || 0).toFixed(2)}`;
-            document.getElementById('orcValorFinal').innerText = `R$ ${(os.total || 0).toFixed(2)}`;
-
-            const tbody = document.getElementById('orcTabelaItens');
-            tbody.innerHTML = (os.itens || []).map(i => `
-                <tr>
-                    <td class="p-2.5">${i.tipo}</td>
-                    <td class="p-2.5 font-medium">${i.nome}</td>
-                    <td class="p-2.5 text-center">${i.qtd}</td>
-                    <td class="p-2.5 text-right">R$ ${i.valorUnit.toFixed(2)}</td>
-                    <td class="p-2.5 text-right font-bold">R$ ${(i.qtd * i.valorUnit).toFixed(2)}</td>
-                </tr>
-            `).join('');
-
-            document.getElementById('modalVisualizarOrcamento').classList.remove('hidden');
-        }
-        function fecharModalOrcamento() { document.getElementById('modalVisualizarOrcamento').classList.add('hidden'); }
-
-        // --- ESTOQUE E SUPORTE ---
         function abrirModalProduto() { document.getElementById('modalProduto').classList.remove('hidden'); }
         function fecharModalProduto() { document.getElementById('modalProduto').classList.add('hidden'); }
         function salvarProduto(e) {
@@ -1557,12 +1177,78 @@
             `).join('');
         }
         function removerProduto(id) { db.produtos = db.produtos.filter(p => p.id !== id); salvarDB(); renderizarEstoque(); atualizarDatalistProdutos(); }
+        function atualizarDatalistProdutos() {
+            const dl = document.getElementById('listaProdutosDatalist');
+            if(dl) dl.innerHTML = db.produtos.map(p => `<option value="${p.nome}">`).join('');
+        }
 
-        function renderizarVeiculos() {}
+        function abrirModalOS() { osItensTemp = []; document.getElementById('modalOS').classList.remove('hidden'); }
+        function fecharModalOS() { document.getElementById('modalOS').classList.add('hidden'); }
+        function adicionarItemOS() { osItensTemp.push({ tipo: 'Peça', nome: '', qtd: 1, valorUnit: 0 }); }
+        function renderizarOS() {
+            const tbody = document.getElementById('tabelaOS');
+            if(!tbody) return;
+            tbody.innerHTML = db.os.map(o => `
+                <tr class="hover:bg-zinc-950/50 transition">
+                    <td class="p-4 font-bold text-white">#${o.numero}</td>
+                    <td class="p-4">${o.clienteVeiculo}</td>
+                    <td class="p-4"><span class="px-2 py-1 bg-zinc-800 text-xs rounded-lg">${o.status}</span></td>
+                    <td class="p-4 font-bold text-emerald-400">R$ ${(o.total || 0).toFixed(2)}</td>
+                    <td class="p-4 text-right"><button onclick="removerOS(${o.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                </tr>
+            `).join('');
+        }
+        function salvarOS(e) {
+            e.preventDefault();
+            db.os.push({ id: Date.now(), numero: Math.floor(1000 + Math.random() * 9000), clienteVeiculo: document.getElementById('osClienteVeiculo').value, status: document.getElementById('osStatus').value, total: 100, data: new Date().toLocaleDateString('pt-BR') });
+            salvarDB(); fecharModalOS(); renderizarOS(); alert('OS salva com sucesso!');
+        }
+        function removerOS(id) { db.os = db.os.filter(o => o.id !== id); salvarDB(); renderizarOS(); }
+
+        function abrirModalCaixa(tipo) { document.getElementById('cxTipo').value = tipo; document.getElementById('modalCaixa').classList.remove('hidden'); }
+        function fecharModalCaixa() { document.getElementById('modalCaixa').classList.add('hidden'); }
+        function salvarMovimentacaoCaixa(e) {
+            e.preventDefault();
+            const tipo = document.getElementById('cxTipo').value;
+            db.caixa.push({ id: Date.now(), tipo: tipo === 'Entrada' ? 'Entrada' : 'Saída', descricao: document.getElementById('cxDescricao').value, valor: parseFloat(document.getElementById('cxValor').value) || 0, data: new Date().toLocaleDateString('pt-BR') });
+            salvarDB(); fecharModalCaixa(); renderizarCaixa(); alert('Lançamento salvo!');
+        }
+        function renderizarCaixa() {
+            const tbody = document.getElementById('tabelaCaixa');
+            if(!tbody) return;
+            tbody.innerHTML = db.caixa.map(c => `
+                <tr class="hover:bg-zinc-950/50 transition">
+                    <td class="p-4">${c.data}</td>
+                    <td class="p-4"><span class="px-2 py-1 rounded text-xs ${c.tipo === 'Entrada' ? 'bg-emerald-950 text-emerald-400' : 'bg-red-950 text-red-400'}">${c.tipo}</span></td>
+                    <td class="p-4">${c.descricao}</td>
+                    <td class="p-4 font-bold">R$ ${c.valor.toFixed(2)}</td>
+                    <td class="p-4 text-right"><button onclick="removerCaixa(${c.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                </tr>
+            `).join('');
+            let ent = db.caixa.filter(m => m.tipo === 'Entrada').reduce((a,b)=>a+b.valor,0);
+            let sai = db.caixa.filter(m => m.tipo === 'Saída').reduce((a,b)=>a+b.valor,0);
+            document.getElementById('finTotalEntradas').innerText = `R$ ${ent.toFixed(2)}`;
+            document.getElementById('finTotalSaidas').innerText = `R$ ${sai.toFixed(2)}`;
+            document.getElementById('finSaldoLiquido').innerText = `R$ ${(ent-sai).toFixed(2)}`;
+        }
+        function removerCaixa(id) { db.caixa = db.caixa.filter(c => c.id !== id); salvarDB(); renderizarCaixa(); }
+
+        function salvarMetaDiaria() {
+            db.metaDiaria = parseFloat(document.getElementById('inputMetaDiaria').value) || 600;
+            salvarDB();
+            alert('Meta salva!');
+        }
+        function salvarConfiguracoes(e) {
+            e.preventDefault();
+            db.config.nome = document.getElementById('cfgNome').value;
+            db.config.logo = document.getElementById('cfgLogo').value;
+            salvarDB();
+            aplicarConfiguracoesVisuais();
+            alert('Configurações salvas!');
+        }
         function renderizarAgendamentos() {}
         function renderizarPDV() {}
-        function renderizarCaixa() {}
-        function renderizarUsuarios() {}
+        function limparFiltroMes() {}
     </script>
 </body>
 </html>
