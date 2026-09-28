@@ -26,7 +26,7 @@
 <body class="bg-zinc-950 text-zinc-100 font-sans antialiased">
 
     <!-- ========================================== -->
-    <!-- TELA DE LOGIN -->
+    <!-- TELA DE LOGIN ATUALIZADA -->
     <!-- ========================================== -->
     <div id="loginScreen" class="fixed inset-0 bg-zinc-950 flex items-center justify-center z-50 p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden">
@@ -41,15 +41,17 @@
             </div>
 
             <div id="loginErrorMsg" class="hidden mb-4 p-3 bg-red-900/40 border border-red-700/50 text-red-300 text-xs rounded-xl text-center">
-                E-mail ou senha incorretos! Verifique os dados.
+                Usuário ou senha incorretos! Verifique os dados.
             </div>
 
             <form onsubmit="realizarLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">E-mail de Acesso</label>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome de Acesso ou E-mail</label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500"><i class="fa-solid fa-envelope"></i></span>
-                        <input type="email" id="loginEmail" required class="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-red-600 transition" value="admin@efmotos.com">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500"><i class="fa-solid fa-user"></i></span>
+                        <!-- Input com suporte a datalist para histórico de logins -->
+                        <input type="text" id="loginEmail" list="historicoLoginsList" required class="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-red-600 transition" placeholder="Digite seu nome ou e-mail" autocomplete="username">
+                        <datalist id="historicoLoginsList"></datalist>
                     </div>
                 </div>
 
@@ -57,8 +59,20 @@
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Senha</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" id="loginSenha" required class="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-red-600 transition" value="123456">
+                        <input type="password" id="loginSenha" required class="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-red-600 transition" placeholder="Sua senha" autocomplete="current-password">
                     </div>
+                </div>
+
+                <!-- Opções: Lembrar login e Salvar senha -->
+                <div class="flex items-center justify-between text-xs text-zinc-400 pt-1">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="checkLembrarLogin" class="rounded bg-zinc-950 border-zinc-800 text-red-600 focus:ring-0">
+                        <span>Lembrar meu login</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="checkSalvarSenha" class="rounded bg-zinc-950 border-zinc-800 text-red-600 focus:ring-0">
+                        <span>Salvar senha</span>
+                    </label>
                 </div>
 
                 <div class="pt-2">
@@ -335,7 +349,7 @@
                     </div>
                 </div>
 
-                <!-- VEÍCULOS / MOTOS (CONFIGURADO COM PLACA, ANO, KM, COR, MONTADORA E DESCRIÇÃO) -->
+                <!-- VEÍCULOS / MOTOS -->
                 <div id="mod-veiculos" class="hidden space-y-6">
                     <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
                         <span class="text-sm font-semibold text-zinc-300">Motos / Veículos Cadastrados</span>
@@ -360,12 +374,12 @@
                     </div>
                 </div>
 
-                <!-- EQUIPE / MECÂNICOS & USUÁRIOS (LOGIN, SENHA E EDITAR ADMIN PRINCIPAL) -->
+                <!-- EQUIPE / MECÂNICOS & USUÁRIOS -->
                 <div id="mod-mecanicos" class="hidden space-y-6">
                     <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
                         <div>
                             <span class="text-sm font-semibold text-zinc-300">Gerenciar Equipe, Administradores e Técnicos</span>
-                            <p class="text-xs text-zinc-400">Adicione ou edite o login principal, administradores e funcionários.</p>
+                            <p class="text-xs text-zinc-400">Adicione nomes curtos (ex: Elizeu) ou edite o login e senha.</p>
                         </div>
                         <button onclick="abrirModalUsuario()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center space-x-2">
                             <i class="fa-solid fa-user-plus"></i><span>Novo Usuário / Administrador</span>
@@ -375,8 +389,8 @@
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-800">
-                                    <th class="p-4">Nome</th>
-                                    <th class="p-4">E-mail (Login)</th>
+                                    <th class="p-4">Nome / Apelido de Login</th>
+                                    <th class="p-4">E-mail (Opcional)</th>
                                     <th class="p-4">Senha</th>
                                     <th class="p-4">Cargo</th>
                                     <th class="p-4 text-right">Ações</th>
@@ -595,7 +609,7 @@
         </div>
     </div>
 
-    <!-- MODAL NOVO VEÍCULO / MOTO (ATUALIZADO COM PLACA, ANO, KM, COR, MONTADORA E DESCRIÇÃO) -->
+    <!-- MODAL NOVO VEÍCULO / MOTO -->
     <div id="modalVeiculo" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <h3 class="text-lg font-bold text-white mb-4" id="tituloModalVeiculo">Cadastrar Nova Moto</h3>
@@ -695,19 +709,19 @@
         </div>
     </div>
 
-    <!-- MODAL USUÁRIO / FUNCIONÁRIO (EDITAR E ADICIONAR ADMINISTRADOR / TÉCNICO) -->
+    <!-- MODAL USUÁRIO / FUNCIONÁRIO -->
     <div id="modalUsuario" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <h3 class="text-lg font-bold text-white mb-4" id="tituloModalUsuario">Novo Usuário / Mecânico</h3>
             <form onsubmit="salvarUsuario(event)" class="space-y-3">
                 <input type="hidden" id="usrIdEdit">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome Completo</label>
-                    <input type="text" id="usrNome" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome Completo / Apelido Curto (Ex: Elizeu)</label>
+                    <input type="text" id="usrNome" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Ex: Elizeu">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">E-mail (Login)</label>
-                    <input type="email" id="usrEmail1" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">E-mail (Opcional se usar nome curto)</label>
+                    <input type="email" id="usrEmail1" class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="email@exemplo.com">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Senha</label>
@@ -810,7 +824,8 @@
 
         let db = {
             usuarios: [
-                { id: 1, nome: 'Administrador Master', email: 'admin@efmotos.com', senha: '123456', cargo: 'Administrador' }
+                { id: 1, nome: 'Administrador Master', email: 'admin@efmotos.com', senha: '123456', cargo: 'Administrador' },
+                { id: 2, nome: 'Elizeu', email: 'elizeu@efmotos.com', senha: '123', cargo: 'Administrador' }
             ],
             clientes: [],
             veiculos: [],
@@ -845,6 +860,8 @@
             carregarDadosFirebase(() => {
                 aplicarConfiguracoesVisuais(); 
                 atualizarDatalistProdutos();
+                atualizarDatalistLogins();
+                verificarLoginSalvoLocalStorage();
             });
         });
 
@@ -857,15 +874,60 @@
             document.getElementById('cfgLogo').value = db.config.logo || "";
         }
 
+        function atualizarDatalistLogins() {
+            const dl = document.getElementById('historicoLoginsList');
+            if (!dl) return;
+            // Pega todos os nomes e e-mails cadastrados na oficina para aparecer na janelinha suspensa
+            let listaOpcoes = db.usuarios.map(u => `<option value="${u.nome}">`).join('');
+            let listaEmails = db.usuarios.map(u => u.email ? `<option value="${u.email}">` : '').join('');
+            dl.innerHTML = listaOpcoes + listaEmails;
+        }
+
+        function verificarLoginSalvoLocalStorage() {
+            const salvoLogin = localStorage.getItem('ef_motos_lembrar_login');
+            const salvoSenha = localStorage.getItem('ef_motos_salvar_senha');
+            
+            if (salvoLogin) {
+                document.getElementById('loginEmail').value = salvoLogin;
+                document.getElementById('checkLembrarLogin').checked = true;
+            }
+            if (salvoSenha) {
+                document.getElementById('loginSenha').value = salvoSenha;
+                document.getElementById('checkSalvarSenha').checked = true;
+            }
+        }
+
         function realizarLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
-            const senha = document.getElementById('loginSenha').value.trim();
+            const inputDigitado = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const senhaDigitada = document.getElementById('loginSenha').value.trim();
             const erroBox = document.getElementById('loginErrorMsg');
 
-            const user = db.usuarios.find(u => u.email === email && u.senha === senha);
-            if (user) {
+            const lembrarLogin = document.getElementById('checkLembrarLogin').checked;
+            const salvarSenha = document.getElementById('checkSalvarSenha').checked;
+
+            // Busca o usuário comparando com o Nome (em minúsculo) ou E-mail
+            const user = db.usuarios.find(u => 
+                (u.nome && u.nome.trim().toLowerCase() === inputDigitado) || 
+                (u.email && u.email.trim().toLowerCase() === inputDigitado)
+            );
+
+            if (user && user.senha === senhaDigitada) {
                 erroBox.classList.add('hidden');
+
+                // Gerenciar preferências de salvamento local
+                if (lembrarLogin) {
+                    localStorage.setItem('ef_motos_lembrar_login', document.getElementById('loginEmail').value.trim());
+                } else {
+                    localStorage.removeItem('ef_motos_lembrar_login');
+                }
+
+                if (salvarSenha) {
+                    localStorage.setItem('ef_motos_salvar_senha', senhaDigitada);
+                } else {
+                    localStorage.removeItem('ef_motos_salvar_senha');
+                }
+
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('appScreen').classList.remove('hidden');
                 document.getElementById('userNameDisplay').innerText = user.nome;
@@ -880,7 +942,11 @@
         function realizarLogout() {
             document.getElementById('appScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('loginSenha').value = '';
+            // Se a senha não estiver marcada para salvar, limpa o campo de senha
+            if (!document.getElementById('checkSalvarSenha').checked) {
+                document.getElementById('loginSenha').value = '';
+            }
+            atualizarDatalistLogins();
         }
 
         function mudarModulo(id) {
@@ -916,6 +982,7 @@
             atualizarDashboard();
             atualizarSelectsClientes();
             atualizarDatalistProdutos();
+            atualizarDatalistLogins();
         }
 
         function atualizarDashboard() {
@@ -950,7 +1017,7 @@
                 if (u) {
                     document.getElementById('usrIdEdit').value = u.id;
                     document.getElementById('usrNome').value = u.nome;
-                    document.getElementById('usrEmail1').value = u.email;
+                    document.getElementById('usrEmail1').value = u.email || '';
                     document.getElementById('usrSenha1').value = u.senha;
                     document.getElementById('usrCargo').value = u.cargo;
                     document.getElementById('tituloModalUsuario').innerText = "Editar Usuário / Login";
@@ -986,6 +1053,7 @@
             salvarDB();
             fecharModalUsuario();
             renderizarUsuarios();
+            atualizarDatalistLogins();
             alert('Usuário salvo com sucesso!');
         }
 
@@ -995,7 +1063,7 @@
             tbody.innerHTML = db.usuarios.map(u => `
                 <tr class="hover:bg-zinc-950/50 transition">
                     <td class="p-4 font-medium text-white">${u.nome}</td>
-                    <td class="p-4">${u.email}</td>
+                    <td class="p-4">${u.email || '<span class="text-zinc-600">Apenas nome curto</span>'}</td>
                     <td class="p-4 font-mono text-zinc-400">${u.senha}</td>
                     <td class="p-4"><span class="px-2 py-1 bg-zinc-800 text-xs rounded-lg text-emerald-400">${u.cargo}</span></td>
                     <td class="p-4 text-right space-x-2">
@@ -1010,9 +1078,10 @@
             db.usuarios = db.usuarios.filter(u => u.id !== id);
             salvarDB();
             renderizarUsuarios();
+            atualizarDatalistLogins();
         }
 
-        // --- GESTÃO DE VEÍCULOS / MOTOS (PLACA, ANO, KM, COR, MONTADORA E DESCRIÇÃO) ---
+        // --- GESTÃO DE VEÍCULOS / MOTOS ---
         function abrirModalVeiculo(id = null) {
             atualizarSelectsClientes();
             document.getElementById('motoIdEdit').value = '';
