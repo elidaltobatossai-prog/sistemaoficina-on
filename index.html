@@ -74,10 +74,10 @@
                 <div class="flex items-center justify-between text-xs text-zinc-400 pt-1">
                     <label class="flex items-center space-x-2 cursor-pointer">
                         <input type="checkbox" id="checkLembrarLogin" class="rounded bg-zinc-950 border-zinc-800 text-red-600 focus:ring-0">
-                        <span>Lembrar meu login</span>
+                        <span>Lembrar usuário e senha</span>
                     </label>
-                    <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" id="checkSalvarSenha" class="rounded bg-zinc-950 border-zinc-800 text-red-600 focus:ring-0">
+                    <label class="hidden" aria-hidden="true">
+                        <input type="checkbox" tabindex="-1" id="checkSalvarSenha" class="rounded bg-zinc-950 border-zinc-800 text-red-600 focus:ring-0">
                         <span>Salvar senha</span>
                     </label>
                 </div>
@@ -151,7 +151,9 @@
                 <a href="#" onclick="mudarModulo('configuracoes')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition">
                     <i class="fa-solid fa-gear w-5"></i><span>Configurações</span>
                 </a>
-            </nav>
+            <a href="#" onclick="mudarModulo('assistente')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition"><i class="fa-solid fa-robot"></i><span>Assistente de IA</span></a>
+<a href="#" id="navComissoes" onclick="mudarModulo('comissoes')" class="nav-btn hidden px-3 py-2.5 rounded-xl text-sm hover:bg-zinc-800">Comissões dos mecânicos</a>
+</nav>
 
             <!-- Rodapé Perfil -->
             <div class="p-4 border-t border-zinc-800 bg-zinc-950 flex items-center justify-between">
@@ -191,6 +193,7 @@
                 
                 <!-- DASHBOARD -->
                 <div id="mod-dashboard" class="space-y-6">
+<div class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-3"><div class="flex flex-wrap justify-between gap-3"><h3 class="font-bold">Produtos mais vendidos</h3><div class="text-sm text-zinc-400">Valor de venda do estoque: <b id="valorEstoquePainel" class="text-emerald-400">R$ 0,00</b></div></div><p class="text-xs text-zinc-400">Top 10 por quantidade, em todo o histórico: peças nas OS faturadas e produtos nas vendas de balcão com itens registrados na auditoria. Mão de obra não entra no ranking. Vendas antigas sem detalhamento não podem ser contabilizadas.</p><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="text-zinc-400"><tr><th class="p-3 text-left">Produto</th><th class="p-3 text-right">Quantidade vendida</th><th class="p-3 text-right">Valor vendido</th></tr></thead><tbody id="rankingProdutosVendidos"></tbody></table></div></div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-sm">
                             <p class="text-xs font-semibold text-zinc-400 uppercase">Saldo em Caixa</p>
@@ -463,6 +466,7 @@
 
                 <!-- ESTOQUE & PRODUTOS -->
                 <div id="mod-estoque" class="hidden space-y-6">
+<div class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl"><p class="text-sm text-zinc-400">Valor de venda do estoque</p><p id="valorEstoqueCadastro" class="text-2xl font-bold text-emerald-400">R$ 0,00</p><p id="quantidadeEstoqueResumo" class="text-xs text-zinc-400"></p><p class="text-xs text-zinc-500 mt-2">Quantidade disponível × preço de venda cadastrado. O cadastro atual não informa custo de compra.</p></div>
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
                         <div class="w-full sm:w-72">
                             <input type="text" id="filtroBuscaProduto" oninput="renderizarEstoque()" placeholder="Buscar produto por nome ou tipo..." class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:outline-none focus:border-red-600">
@@ -594,6 +598,7 @@
                 <div id="mod-metas" class="hidden space-y-6">
                     <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl max-w-5xl space-y-6">
                         <h3 class="text-lg font-bold text-white flex items-center"><i class="fa-solid fa-bullseye text-emerald-400 mr-2"></i> Controle Inteligente de Metas de Faturamento</h3>
+<label class="flex items-center gap-2 text-sm text-zinc-300"><input type="checkbox" id="checkMetaGuiada" onchange="configurarModoMeta()">Meta guiada</label><p class="text-xs text-zinc-400">Na meta guiada, defina o valor mensal. A meta semanal é proporcional aos dias de segunda a sexta da semana dentro do mês, sem descontar feriados. O progresso considera as entradas líquidas registradas no caixa.</p>
                         
                         <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
                             <div>
@@ -605,13 +610,14 @@
                                 <input type="number" step="1.00" id="inputMetaSemanal" readonly class="w-full px-4 py-2.5 bg-zinc-900/50 border border-zinc-800 text-amber-400 font-bold rounded-xl text-base focus:outline-none cursor-not-allowed">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Meta Mensal (Automática)</label>
-                                <input type="number" step="1.00" id="inputMetaMensal" readonly class="w-full px-4 py-2.5 bg-zinc-900/50 border border-zinc-800 text-blue-400 font-bold rounded-xl text-base focus:outline-none cursor-not-allowed">
+                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Meta Mensal (Automática / Guiada)</label>
+                                <input type="number" step="1.00" id="inputMetaMensal" oninput="calcularMetasAutomaticas()" readonly class="w-full px-4 py-2.5 bg-zinc-900/50 border border-zinc-800 text-blue-400 font-bold rounded-xl text-base focus:outline-none cursor-not-allowed">
                             </div>
                         </div>
                         <div class="flex justify-end">
                             <button type="button" onclick="salvarMetas()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">Salvar Metas</button>
                         </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div class="bg-zinc-950 border border-zinc-800 p-4 rounded-xl space-y-2"><h4 class="font-bold text-blue-400">Meta mensal</h4><div id="progressoMetaMensal" class="space-y-2 text-sm"></div></div><div class="bg-zinc-950 border border-zinc-800 p-4 rounded-xl space-y-2"><h4 class="font-bold text-amber-400">Meta semanal</h4><div id="progressoMetaSemanal" class="space-y-2 text-sm"></div></div></div>
                     </div>
                 </div>
 
@@ -635,6 +641,8 @@
 
             <div id="mod-minhas-os" class="hidden space-y-4"><h3 class="text-lg font-bold">Minhas Ordens de Serviço</h3><div id="listaMinhasOS" class="space-y-3"></div></div>
 <div id="mod-auditoria" class="hidden space-y-4"><h3 class="text-lg font-bold">Solicitações de alteração</h3><div id="listaSolicitacoes" class="space-y-3"></div><h3 class="text-lg font-bold">Auditoria</h3><div id="listaAuditoria" class="space-y-3"></div></div>
+<div id="mod-assistente" class="hidden space-y-4"><div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4"><h3 class="font-bold text-lg"><i class="fa-solid fa-robot mr-2"></i>Assistente de IA</h3><p id="assistenteStatus" role="status" class="text-sm text-amber-400">IA não conectada.</p><form id="configAssistente" onsubmit="salvarConfiguracaoAssistente(event)" class="hidden space-y-3 border border-zinc-800 rounded-xl p-4"><label for="assistenteEndpoint" class="text-sm">Endereço da conexão com a IA</label><input id="assistenteEndpoint" type="url" placeholder="https://seu-servico.com/assistente" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-3"><p class="text-xs text-zinc-400">Configure o serviço quando estiver disponível. A configuração fica neste navegador. Não coloque uma chave secreta nesta tela.</p><details class="text-xs text-zinc-400"><summary>Formato para configurar o serviço</summary><p class="mt-2">O serviço deve aceitar POST em JSON com o campo pergunta e devolver JSON com o campo resposta. Se autorizado na caixa abaixo, recebe também resumo do estoque e dos produtos mais vendidos. Precisa permitir a conexão deste sistema por CORS e manter as chaves da IA no servidor.</p></details><button class="bg-red-600 px-4 py-2 rounded-xl">Salvar conexão</button></form><div id="assistenteConversa" aria-live="polite" class="space-y-3 max-h-96 overflow-y-auto"></div><form onsubmit="enviarPerguntaAssistente(event)" class="space-y-3"><label for="assistentePergunta" class="text-sm">Sua pergunta</label><textarea id="assistentePergunta" required rows="3" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-3" placeholder="Digite sua pergunta para o assistente"></textarea><label class="flex items-center gap-2 text-xs text-zinc-400"><input id="assistenteCompartilharResumo" type="checkbox">Enviar também o resumo do estoque e dos produtos mais vendidos</label><button id="assistenteEnviar" class="bg-red-600 px-5 py-2.5 rounded-xl disabled:opacity-50">Enviar pergunta</button></form></div></div>
+<div id="mod-comissoes" class="hidden space-y-4"><div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4"><h3 class="font-bold text-lg">Faturamento e comissões por mecânico</h3><label class="text-sm">Mês do faturamento <input id="comissaoFiltroMes" type="month" onchange="renderizarComissoes()" class="bg-zinc-950 border border-zinc-700 p-2 rounded-xl"></label><button onclick="document.getElementById('comissaoFiltroMes').value='';renderizarComissoes()" class="text-sm text-amber-400 ml-3">Todo o histórico</button><p class="text-xs text-zinc-400">Comissões exibidas calculadas sobre as OS faturadas usando as porcentagens informadas abaixo. Ao digitar, os valores em reais são atualizados para conferência; clique em Salvar porcentagens para gravar o cadastro. Esta consulta não altera as OS, as comissões registradas no faturamento ou o caixa.</p><div class="flex flex-wrap gap-3"><select id="comissaoFiltroMecanico" aria-label="Filtrar mecânico" onchange="renderizarComissoes()" class="bg-zinc-950 border border-zinc-700 rounded-xl p-2"><option value="">Todos os mecânicos</option></select><select id="comissaoFiltroTipo" aria-label="Filtrar comissão por tipo" onchange="renderizarComissoes()" class="bg-zinc-950 border border-zinc-700 rounded-xl p-2"><option value="">Peças e mão de obra</option><option value="pecas">Somente peças</option><option value="servicos">Somente mão de obra</option></select></div><p id="comissaoPeriodoSelecionado" class="text-sm text-zinc-400"></p><div id="camposPercentuaisMecanicos" class="space-y-3"></div><p id="comissaoSemResponsavel" class="text-sm text-amber-400"></p><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="text-zinc-400"><tr><th class="p-3 text-left">Mecânico</th><th class="p-3">Peças</th><th class="p-3">Mão de obra</th><th class="p-3">Faturamento total</th><th class="p-3">Comissão peças</th><th class="p-3">Comissão serviços</th><th class="p-3">Comissão total</th></tr></thead><tbody id="tabelaComissoes"></tbody></table></div><div class="space-y-3 mt-4"><h4 class="font-bold">Comissão em reais por produto e serviço</h4><p class="text-sm">Comissão total dos filtros: <b id="comissaoTotalFiltrado" class="text-emerald-400"></b></p><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="text-zinc-400"><tr><th class="p-3">Mecânico</th><th class="p-3">OS</th><th class="p-3">Produto / serviço</th><th class="p-3">Tipo</th><th class="p-3">Valor vendido</th><th class="p-3">Porcentagem</th><th class="p-3">Comissão (R$)</th></tr></thead><tbody id="comissaoDetalhesItens"></tbody></table></div></div></div></div>
 </main>
         </div>
     </div>
@@ -744,7 +752,8 @@
                                 <option value="Concluída">Concluída</option>
                             </select>
                         </div>
-                        <div id="osBlocoDiagnostico" class="space-y-3">
+                        <div><label for="osMecanicoExecucaoId" class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Mecânico responsável pela execução</label><select id="osMecanicoExecucaoId" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl"><option value="">Selecione o responsável...</option></select><p class="text-xs text-zinc-500 mt-1">Responsável pelo serviço e pela comissão. O mecânico do diagnóstico continua separado.</p></div>
+<div id="osBlocoDiagnostico" class="space-y-3">
                             <div>
                                 <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Mecânico responsável pelo diagnóstico</label>
                                 <select id="osMecanicoId" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
@@ -891,7 +900,7 @@
     <div id="modalUsuario" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full p-6">
             <h3 id="modalUsuarioTitulo" class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-user-gear text-red-500 mr-2"></i>Novo Usuário / Administrador</h3>
-            <form onsubmit="salvarUsuario(event)" class="space-y-4">
+            <form onsubmit="salvarUsuario(event)" class="space-y-4"><div class="grid grid-cols-2 gap-3"><div><label class="text-xs text-zinc-400" for="uComissaoPecas">Comissão de peças (%)</label><input id="uComissaoPecas" type="number" min="0" max="100" step="0.01" value="0" class="w-full bg-zinc-950 border border-zinc-800 p-2 rounded-xl"></div><div><label class="text-xs text-zinc-400" for="uComissaoServicos">Comissão de mão de obra (%)</label><input id="uComissaoServicos" type="number" min="0" max="100" step="0.01" value="0" class="w-full bg-zinc-950 border border-zinc-800 p-2 rounded-xl"></div></div>
                 <input type="hidden" id="usuarioIdEdit">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Nome / Apelido de Acesso</label>
@@ -1634,7 +1643,7 @@
                 numero: anterior?.numero || proximoNumeroOS(),
                 clienteId, motoInfo, veiculoId: document.getElementById('osVeiculoId').value || null, status, formaPagamento, parcelas,
                 itens: itensTempOS, total: totalOSBruto, valorLiquido: calculoTaxa.valorLiquido,
-                mecanicoId, diagnosticoInterno, diagnosticoCliente,
+                mecanicoId, diagnosticoInterno, diagnosticoCliente, ...dadosComissaoOS(anterior, status),
                 faturado, estoqueBaixado,
                 data: anterior?.data || dataHoje,
                 dataDiagnostico: anterior?.dataDiagnostico || (status === 'Diagnóstico' ? agora.toISOString() : ''),
@@ -2009,7 +2018,9 @@
             const senha = document.getElementById('uSenha').value.trim();
             const cargo = document.getElementById('uCargo').value;
             if (!db.usuarios) db.usuarios = [];
-            db.usuarios.push({ id: Date.now(), nome, email, senha, cargo });
+            const comissaoPecas=Number(document.getElementById('uComissaoPecas').value),comissaoServicos=Number(document.getElementById('uComissaoServicos').value);
+            if(!percentuaisComissaoValidos(comissaoPecas,comissaoServicos)){alert('Informe comissões entre 0 e 100.');return;}
+            db.usuarios.push({ id: Date.now(), nome, email, senha, cargo, comissaoPecas, comissaoServicos });
             salvarDB();
             fecharModalUsuario();
             renderizarUsuarios();
@@ -2320,7 +2331,7 @@ salvarOS = async function(e) {
     if(status==='Concluída' && !anterior?.faturado) {alert('Fat ure a OS antes de concluir.'.replace('Fat ure','Fature'));return;}
     if(status==='Faturada' && !anterior?.faturado && !validarEstoque(itensTempOS)) return;
     if(ehAtendente() && anterior && (anterior.total>itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0) || anterior.itens?.some(i=> !itensTempOS.some(n=>n.id===i.id) || itensTempOS.find(n=>n.id===i.id)?.valor!==i.valor))) {
-        solicitarAlteracao('Editar OS',anterior.id,JSON.parse(JSON.stringify(anterior)),{...anterior,itens:JSON.parse(JSON.stringify(itensTempOS)),total:itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0),status,formaPagamento:el('osFormaPagamento').value,parcelas:Number(el('osParcelas').value),motoInfo:el('osMotoInfo').value,clienteId:el('osClienteId').value,veiculoId:el('osVeiculoId').value,observacoes:el('osObservacoes').value}); return;
+        solicitarAlteracao('Editar OS',anterior.id,JSON.parse(JSON.stringify(anterior)),{...anterior,...dadosComissaoOS(anterior,status),itens:JSON.parse(JSON.stringify(itensTempOS)),total:itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0),status,formaPagamento:el('osFormaPagamento').value,parcelas:Number(el('osParcelas').value),motoInfo:el('osMotoInfo').value,clienteId:el('osClienteId').value,veiculoId:el('osVeiculoId').value,observacoes:el('osObservacoes').value}); return;
     }
     const tamanho=(db.os||[]).length; const antes=anterior ? JSON.parse(JSON.stringify(anterior)) : null;
     osSalvando=true;try{await salvarOSOriginal(e);}finally{osSalvando=false;}
@@ -2499,6 +2510,389 @@ if(document.modelContext?.registerTool) {
     Promise.resolve(document.modelContext.registerTool(tool,{signal:lifecycle.signal})).catch(console.error);window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});
 }
 
+</script>
+<div id="modalEditarPagamentoCaixa" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"><form onsubmit="salvarEdicaoPagamentoCaixa(event)" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-md w-full space-y-4"><h3 class="font-bold">Editar forma de pagamento</h3><p id="editarPagamentoCaixaInfo" class="text-sm text-zinc-400"></p><select id="editarPagamentoCaixaForma" required class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-xl"><option value="">Selecione a forma de pagamento</option><option value="Dinheiro">Dinheiro</option><option value="Pix">Pix</option><option value="Cartao_Debito">Cartão de débito</option><option value="Cartao_Credito">Cartão de crédito</option></select><p class="text-xs text-zinc-400">Corrige somente a forma registrada. Valores, taxas e saldo são preservados.</p><div class="flex justify-end gap-3"><button type="button" onclick="document.getElementById('modalEditarPagamentoCaixa').classList.add('hidden')" class="px-4 py-2 rounded-xl bg-zinc-800">Cancelar</button><button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600">Salvar alteração</button></div></form></div>
+<script>
+// Correções pontuais: pagamento, lembrança local de acesso e meta guiada.
+const formasCaixaPermitidas = ['Dinheiro','Pix','Cartao_Debito','Cartao_Credito'];
+function formaAtualCaixa(m) {
+    const os = (db.os || []).find(o => o.id == m.osId);
+    return m.formaPagamento || os?.formaPagamento || m.descricao?.match(/\((Dinheiro|Pix|Cartao_Debito|Cartao_Credito)(?:[^)]*)\)$/)?.[1] || '';
+}
+let pagamentoCaixaEmEdicao = null;
+function abrirEdicaoPagamentoCaixa(id) {
+    if (!ehAdmin() || !exigirAtendimento()) return;
+    const m = (db.caixa || []).find(x => x.id == id); if (!m) return;
+    pagamentoCaixaEmEdicao = JSON.parse(JSON.stringify(m));
+    el('editarPagamentoCaixaForma').value = formaAtualCaixa(m);
+    el('editarPagamentoCaixaInfo').textContent = `${m.descricao} · ${moeda(m.valor)}`;
+    el('modalEditarPagamentoCaixa').classList.remove('hidden');
+}
+async function salvarEdicaoPagamentoCaixa(event) {
+    event.preventDefault();
+    if (!ehAdmin() || !exigirAtendimento()) return;
+    const anterior = pagamentoCaixaEmEdicao;
+    const m = (db.caixa || []).find(x => x.id == anterior?.id);
+    const forma = el('editarPagamentoCaixaForma').value;
+    if (!m || !formasCaixaPermitidas.includes(forma)) return;
+    if (JSON.stringify(m) !== JSON.stringify(anterior)) { alert('O lançamento foi atualizado. Abra a edição novamente.'); return; }
+    const os = (db.os || []).find(o => m.osId != null && o.id == m.osId);
+    const outras = (db.caixa || []).filter(x => m.osId != null && x.osId == m.osId && x.id != m.id);
+    if (outras.length) { alert('Esta OS possui vários lançamentos. A forma de cada pagamento precisa ser conferida antes de alterar.'); return; }
+    const estadoAntes = JSON.parse(JSON.stringify(db));
+    const descricao = m.descricao || '';
+    const parcelas = Number(m.parcelas || os?.parcelas || descricao.match(/(\d+)x\)$/)?.[1] || 1);
+    m.formaPagamento = forma;
+    const sufixo = `(${forma}${forma === 'Cartao_Credito' ? ' em ' + parcelas + 'x' : ''})`;
+    m.descricao = /\((Dinheiro|Pix|Cartao_Debito|Cartao_Credito)[^)]*\)$/.test(descricao)
+        ? descricao.replace(/\((Dinheiro|Pix|Cartao_Debito|Cartao_Credito)[^)]*\)$/, sufixo) : `${descricao} ${sufixo}`;
+    if (os) os.formaPagamento = forma;
+    // Corrigir classificação, sem recalcular taxas, valores, parcelas ou saldo.
+    auditar('Editar forma de pagamento', m.id, anterior, JSON.parse(JSON.stringify(m)));
+    if (!await salvarDB()) { db = estadoAntes; alert('Não foi possível salvar a alteração. Tente novamente.'); return; }
+    el('modalEditarPagamentoCaixa').classList.add('hidden'); pagamentoCaixaEmEdicao = null;
+    renderizarTudo();
+}
+const caixaRenderPagamentoOriginal = renderizarCaixa;
+renderizarCaixa = function() {
+    caixaRenderPagamentoOriginal();
+    if (ehAdmin()) for (const [index, m] of (db.caixa || []).entries()) {
+        const celula = el('tabelaCaixa')?.rows[index]?.cells[4]; if (!celula) continue;
+        const botao = document.createElement('button'); botao.type = 'button';
+        botao.className = 'text-amber-400 mr-3'; botao.textContent = 'Editar pagamento';
+        botao.onclick = () => abrirEdicaoPagamentoCaixa(m.id); celula.prepend(botao);
+    }
+    atualizarProgressoMetas();
+};
+
+// Preferência exclusivamente local. Não integra o objeto db nem é enviada ao Firebase.
+const chaveAcessoLocal = 'ef_motos_acesso_local_v2';
+let acessoLocalInicializado = false, versaoAcessoLocal = 0;
+function limparAcessoLocal() {
+    versaoAcessoLocal++;
+    for (const key of [chaveAcessoLocal, 'ef_motos_lembrar_login', 'ef_motos_salvar_senha']) localStorage.removeItem(key);
+    el('historicoLoginsList').innerHTML = '';
+}
+async function chaveCriptoAcesso(raw) {
+    return crypto.subtle.importKey('raw', new Uint8Array(raw), 'AES-GCM', false, ['encrypt','decrypt']);
+}
+verificarLoginSalvoLocalStorage = async function() {
+    if (acessoLocalInicializado) return;
+    acessoLocalInicializado = true;
+    // Preferências antigas sem consentimento combinado deixam de preencher o formulário.
+    localStorage.removeItem('ef_motos_lembrar_login'); localStorage.removeItem('ef_motos_salvar_senha');
+    el('checkLembrarLogin').checked = false; el('checkSalvarSenha').checked = false;
+    const versao = versaoAcessoLocal;
+    try {
+        const salvo = JSON.parse(localStorage.getItem(chaveAcessoLocal) || 'null');
+        if (!salvo || !crypto.subtle) return;
+        const bytes = await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(salvo.iv)}, await chaveCriptoAcesso(salvo.key), new Uint8Array(salvo.dados));
+        if (versao !== versaoAcessoLocal || usuarioLogadoAtual) return;
+        const acesso = JSON.parse(new TextDecoder().decode(bytes));
+        el('loginEmail').value = acesso.usuario; el('loginSenha').value = acesso.senha;
+        el('checkLembrarLogin').checked = true; el('checkSalvarSenha').checked = true;
+    } catch (err) { limparAcessoLocal(); }
+};
+async function gravarAcessoLocal(usuario, senha) {
+    if (!el('checkLembrarLogin').checked) { limparAcessoLocal(); return; }
+    const versao = versaoAcessoLocal;
+    try {
+        if (!crypto.subtle) throw new Error('Criptografia indisponível');
+        const key = crypto.getRandomValues(new Uint8Array(32)), iv = crypto.getRandomValues(new Uint8Array(12));
+        const dados = await crypto.subtle.encrypt({name:'AES-GCM',iv}, await chaveCriptoAcesso(key), new TextEncoder().encode(JSON.stringify({usuario,senha})));
+        if (versao !== versaoAcessoLocal || !el('checkLembrarLogin').checked) return;
+        localStorage.setItem(chaveAcessoLocal, JSON.stringify({key:Array.from(key),iv:Array.from(iv),dados:Array.from(new Uint8Array(dados))}));
+    } catch (err) {
+        limparAcessoLocal(); el('checkLembrarLogin').checked = false; el('checkSalvarSenha').checked = false;
+        alert('O acesso foi realizado, mas este navegador não permitiu lembrar os dados. Você pode usar o gerenciador de senhas do navegador.');
+    }
+}
+const loginLembrancaOriginal = realizarLogin;
+realizarLogin = function(event) {
+    const usuario = el('loginEmail').value.trim(), senha = el('loginSenha').value.trim();
+    loginLembrancaOriginal(event);
+    if (usuarioLogadoAtual && el('loginScreen').classList.contains('hidden')) gravarAcessoLocal(usuario, senha);
+};
+const logoutLembrancaOriginal = realizarLogout;
+realizarLogout = function() {
+    logoutLembrancaOriginal();
+    if (!el('checkLembrarLogin').checked) { limparAcessoLocal(); el('loginEmail').value = ''; el('loginSenha').value = ''; }
+};
+el('checkLembrarLogin').addEventListener('change', function() {
+    el('checkSalvarSenha').checked = this.checked;
+    if (!this.checked) { limparAcessoLocal(); el('loginEmail').value = ''; el('loginSenha').value = ''; }
+});
+
+function periodoMetaGuiada(agora = new Date()) {
+    const ano = agora.getFullYear(), mes = agora.getMonth();
+    const inicioMes = new Date(ano,mes,1), fimMes = new Date(ano,mes+1,0);
+    const segunda = new Date(ano,mes,agora.getDate() - ((agora.getDay()+6)%7));
+    const domingo = new Date(segunda); domingo.setDate(segunda.getDate()+6);
+    const inicioSemana = new Date(Math.max(+inicioMes,+segunda));
+    const fimSemana = new Date(Math.min(+fimMes,+domingo));
+    const uteis = (inicio,fim) => { let n=0; for(let d=new Date(inicio);d<=fim;d.setDate(d.getDate()+1)) if(d.getDay()>0 && d.getDay()<6)n++; return n; };
+    return {inicioMes,fimMes,inicioSemana,fimSemana,diasMes:uteis(inicioMes,fimMes),diasSemana:uteis(inicioSemana,fimSemana)};
+}
+function dataMovimentoMeta(valor) {
+    const br = String(valor || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if(br) return new Date(Number(br[3]),Number(br[2])-1,Number(br[1]));
+    const iso = String(valor || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return iso ? new Date(Number(iso[1]),Number(iso[2])-1,Number(iso[3])) : null;
+}
+function faturamentoPeriodoMeta(inicio,fim) {
+    return (db.caixa || []).filter(m => {const d=dataMovimentoMeta(m.data);return m.tipo==='Entrada' && d && d>=inicio && d<=fim;}).reduce((s,m)=>s+Number(m.valor || 0),0);
+}
+const calcularMetasManualOriginal = calcularMetasAutomaticas;
+calcularMetasAutomaticas = function() {
+    if (!el('checkMetaGuiada').checked) { calcularMetasManualOriginal(); return; }
+    const mensal = Math.max(0,Number(el('inputMetaMensal').value) || 0), p = periodoMetaGuiada();
+    el('inputMetaDiaria').value = (mensal/p.diasMes).toFixed(2);
+    el('inputMetaSemanal').value = (mensal*p.diasSemana/p.diasMes).toFixed(2);
+};
+function configurarModoMeta() {
+    const guiada = el('checkMetaGuiada').checked;
+    el('inputMetaMensal').readOnly = !guiada; el('inputMetaDiaria').readOnly = guiada;
+    el('inputMetaMensal').classList.toggle('cursor-not-allowed',!guiada);
+    el('inputMetaDiaria').classList.toggle('cursor-not-allowed',guiada);
+    if (guiada) calcularMetasAutomaticas(); else calcularMetasManualOriginal();
+    atualizarProgressoMetas();
+}
+const renderMetasProgressoOriginal = renderizarMetas;
+renderizarMetas = function() {
+    renderMetasProgressoOriginal();
+    el('checkMetaGuiada').checked = db.metaGuiada === true;
+    for(const [id,campo] of [['inputMetaDiaria','metaDiaria'],['inputMetaSemanal','metaSemanal'],['inputMetaMensal','metaMensal']]) if(db[campo] != null)el(id).value=db[campo];
+    el('inputMetaMensal').readOnly = !db.metaGuiada; el('inputMetaDiaria').readOnly = !!db.metaGuiada;
+    if(db.metaGuiada)calcularMetasAutomaticas();
+    atualizarProgressoMetas();
+};
+salvarMetas = async function() {
+    if (!ehAdmin() || !exigirAtendimento()) return;
+    if (![el('inputMetaDiaria'),el('inputMetaMensal')].every(x=>Number.isFinite(Number(x.value)) && Number(x.value)>=0)) {alert('Informe metas válidas, sem valores negativos.');return;}
+    calcularMetasAutomaticas();
+    const estadoAntes=JSON.parse(JSON.stringify(db));
+    db.metaGuiada=el('checkMetaGuiada').checked;
+    db.metaDiaria=Number(el('inputMetaDiaria').value);db.metaSemanal=Number(el('inputMetaSemanal').value);db.metaMensal=Number(el('inputMetaMensal').value);
+    auditar('salvarMetas','administração');
+    if(!await salvarDB()){db=estadoAntes;alert('Não foi possível salvar as metas. Tente novamente.');return;}
+    renderizarMetas();alert('Metas atualizadas e salvas com sucesso!');
+};
+function atualizarProgressoMetas() {
+    if(!el('progressoMetaMensal'))return;
+    const p=periodoMetaGuiada(), mensal=Number(db.metaMensal || 0);
+    const semanal=db.metaGuiada?mensal*p.diasSemana/p.diasMes:Number(db.metaSemanal || 0);
+    for(const [id,meta,inicio,fim] of [['progressoMetaMensal',mensal,p.inicioMes,p.fimMes],['progressoMetaSemanal',semanal,p.inicioSemana,p.fimSemana]]) {
+        const faturado=faturamentoPeriodoMeta(inicio,fim), falta=Math.max(0,meta-faturado);
+        el(id).innerHTML=`<p class="text-zinc-400 text-xs">${inicio.toLocaleDateString('pt-BR')} a ${fim.toLocaleDateString('pt-BR')}</p><p>Meta do período: <b>${moeda(meta)}</b></p><p>Você faturou: <b class="text-emerald-400">${moeda(faturado)}</b></p><p>Falta para atingir a meta: <b>${moeda(falta)}</b></p>${faturado>=meta?'<p class="text-emerald-400 font-bold">Meta atingida!</p>':''}`;
+    }
+}
+const dashboardMetasOriginal=atualizarDashboard;
+atualizarDashboard=function(){dashboardMetasOriginal();atualizarProgressoMetas();};
+</script>
+<script>
+// Acréscimos: ranking, valor de venda do estoque e assistente configurável.
+function resumoEstoqueAtual() {
+ return (db.produtos||[]).reduce((r,p)=>{const qtd=Math.max(0,Number(p.qtd)||0);r.quantidade+=qtd;r.valor+=qtd*Math.max(0,Number(p.preco)||0);return r;},{quantidade:0,valor:0});
+}
+function produtosMaisVendidos() {
+ const grupos=new Map();
+ function adicionar(itens){for(const i of itens||[]){if(!i.produtoId && !['peca','peca_livre','estoque'].includes(i.tipo))continue;
+ const qtd=Number(i.qtd),valor=Number(i.valor);if(!Number.isFinite(qtd)||qtd<=0||!Number.isFinite(valor))continue;
+ const key=i.produtoId?'produto:'+i.produtoId:'nome:'+String(i.nome||'').trim().toLocaleLowerCase('pt-BR');
+ const p=(db.produtos||[]).find(p=>String(p.id)===String(i.produtoId));
+ const r=grupos.get(key)||{nome:p?.nome||i.nome||'Produto',quantidade:0,valor:0};r.quantidade+=qtd;r.valor+=qtd*valor;grupos.set(key,r);
+ }}
+ for(const os of db.os||[])if(os.faturado===true || os.status==='Faturada')adicionar(os.itens);
+ const vistos=new Set(),caixa=new Set((db.caixa||[]).map(m=>String(m.id)));
+ for(const a of db.auditoria||[]){if(a.acao!=='Venda de balcão'||!caixa.has(String(a.referencia))||vistos.has(String(a.referencia)))continue;vistos.add(String(a.referencia));adicionar(a.novo?.itens);}
+ return [...grupos.values()].sort((a,b)=>b.quantidade-a.quantidade||b.valor-a.valor||a.nome.localeCompare(b.nome)).slice(0,10);
+}
+function renderizarResumoProdutos(){
+ if(ehMecanico())return;
+ const r=resumoEstoqueAtual();for(const id of ['valorEstoquePainel','valorEstoqueCadastro'])el(id).textContent=moeda(r.valor);
+ el('quantidadeEstoqueResumo').textContent=`${r.quantidade.toLocaleString('pt-BR')} unidades cadastradas`;
+ el('rankingProdutosVendidos').innerHTML=produtosMaisVendidos().map((p,i)=>`<tr class="border-t border-zinc-800"><td class="p-3">${i+1}. ${esc(p.nome)}</td><td class="p-3 text-right">${p.quantidade.toLocaleString('pt-BR')}</td><td class="p-3 text-right">${moeda(p.valor)}</td></tr>`).join('')||'<tr><td colspan="3" class="p-3 text-zinc-400">Ainda não há vendas de produtos com itens registrados.</td></tr>';
+}
+const estoqueResumoOriginal=renderizarEstoque;
+renderizarEstoque=function(){estoqueResumoOriginal();renderizarResumoProdutos();};
+const dashboardResumoOriginal=atualizarDashboard;
+atualizarDashboard=function(){dashboardResumoOriginal();renderizarResumoProdutos();};
+const moduloAssistenteOriginal=mudarModulo;
+mudarModulo=function(id){if(id==='assistente'&&ehMecanico())return;moduloAssistenteOriginal(id);if(id==='assistente'){el('pageTitle').textContent='Assistente de IA';renderizarConfiguracaoAssistente();}};
+const configAssistenteKey='ef_motos_assistente_endpoint';
+function renderizarConfiguracaoAssistente(){
+ el('configAssistente').classList.toggle('hidden',!ehAdmin());
+ el('assistenteEndpoint').value=localStorage.getItem(configAssistenteKey)||'';
+ el('assistenteStatus').textContent=el('assistenteEndpoint').value?'Conexão configurada. Envie uma pergunta para testar.':'IA não conectada. O administrador pode configurar a conexão abaixo.';
+}
+function salvarConfiguracaoAssistente(event){
+ event.preventDefault();if(!ehAdmin())return;
+ const valor=el('assistenteEndpoint').value.trim();
+ if(valor){try{const url=new URL(valor);if(url.protocol!=='https:'||url.username||url.password)throw new Error();}catch(e){el('assistenteStatus').textContent='Informe um endereço HTTPS válido, sem credenciais na URL.';return;}}
+ if(valor)localStorage.setItem(configAssistenteKey,valor);else localStorage.removeItem(configAssistenteKey);
+ renderizarConfiguracaoAssistente();
+}
+let assistenteEnviando=false;
+function mensagemAssistente(papel,texto){const bloco=document.createElement('div');bloco.className='p-3 rounded-xl border border-zinc-800 whitespace-pre-wrap';bloco.textContent=(papel==='usuario'?'Você: ':'Assistente: ')+texto;el('assistenteConversa').appendChild(bloco);bloco.scrollIntoView?.({block:'nearest'});}
+async function enviarPerguntaAssistente(event){
+ event.preventDefault();if(!usuarioLogadoAtual||ehMecanico()||assistenteEnviando)return;
+ const endpoint=localStorage.getItem(configAssistenteKey),pergunta=el('assistentePergunta').value.trim();if(!pergunta)return;
+ if(!endpoint){el('assistenteStatus').textContent='Configure a conexão para receber respostas da IA.';return;}
+ assistenteEnviando=true;el('assistenteEnviar').disabled=true;el('assistenteStatus').textContent='Aguardando resposta…';mensagemAssistente('usuario',pergunta);
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
+ try{
+ const body={pergunta};
+ if(el('assistenteCompartilharResumo').checked)body.resumo={estoque:resumoEstoqueAtual(),produtosMaisVendidos:produtosMaisVendidos()};
+ const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal,credentials:'omit'});
+ if(!response.ok)throw new Error('O serviço respondeu com erro '+response.status+'.');
+ const data=await response.json();if(typeof data.resposta!=='string'||!data.resposta.trim())throw new Error('O serviço precisa devolver um campo resposta com texto.');
+ mensagemAssistente('assistente',data.resposta);el('assistentePergunta').value='';el('assistenteStatus').textContent='Resposta recebida.';
+ }catch(e){el('assistenteStatus').textContent=e.name==='AbortError'?'O serviço demorou demais. Tente novamente.':`Não foi possível consultar a IA. ${e.message}`;}
+ finally{clearTimeout(timer);assistenteEnviando=false;el('assistenteEnviar').disabled=false;}
+}
+</script>
+<div id="modalComissaoMecanico" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"><form onsubmit="salvarComissaoMecanico(event)" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 max-w-md w-full space-y-4"><h3 class="font-bold">Comissões · <span id="comissaoUsuarioNome"></span></h3><input id="comissaoUsuarioId" type="hidden"><label class="block text-sm">Peças (%)<input id="comissaoPecasPercentual" type="number" required min="0" max="100" step="0.01" class="w-full bg-zinc-950 rounded-xl p-3"></label><label class="block text-sm">Mão de obra (%)<input id="comissaoServicosPercentual" type="number" required min="0" max="100" step="0.01" class="w-full bg-zinc-950 rounded-xl p-3"></label><div class="flex justify-end gap-3"><button type="button" onclick="document.getElementById('modalComissaoMecanico').classList.add('hidden')">Cancelar</button><button class="bg-red-600 rounded-xl px-4 py-2">Salvar</button></div></form></div><script>
+function percentuaisComissaoValidos(pecas,servicos){return [pecas,servicos].every(v=>Number.isFinite(v)&&v>=0&&v<=100);}
+function configurarComissaoMecanico(id){
+ if(!ehAdmin())return;const u=(db.usuarios||[]).find(u=>u.id==id);if(!u)return;
+ el('comissaoUsuarioId').value=u.id;el('comissaoUsuarioNome').textContent=u.nome;
+ el('comissaoPecasPercentual').value=u.comissaoPecas||0;el('comissaoServicosPercentual').value=u.comissaoServicos||0;el('modalComissaoMecanico').classList.remove('hidden');
+}
+async function salvarComissaoMecanico(event){
+ event.preventDefault();if(!ehAdmin()||!exigirAtendimento())return;
+ const u=(db.usuarios||[]).find(u=>u.id==el('comissaoUsuarioId').value);if(!u)return;
+ const pecas=Number(el('comissaoPecasPercentual').value),servicos=Number(el('comissaoServicosPercentual').value);
+ if(!percentuaisComissaoValidos(pecas,servicos)){alert('Informe percentuais entre 0 e 100.');return;}
+ const antes=JSON.parse(JSON.stringify(db));u.comissaoPecas=pecas;u.comissaoServicos=servicos;
+ auditar('Configurar comissão',u.id,null,{pecas,servicos});
+ if(!await salvarDB()){db=antes;alert('Não foi possível salvar. Tente novamente.');return;}
+ el('modalComissaoMecanico').classList.add('hidden');renderizarUsuarios();renderizarComissoes();
+}
+const usuariosComissaoOriginal=renderizarUsuarios;
+renderizarUsuarios=function(){usuariosComissaoOriginal();if(ehAdmin())for(const [i,u]of(db.usuarios||[]).entries()){
+ if(!/mec[aâ]nico|t[eé]cnico/i.test(u.cargo||''))continue;
+ const cell=el('tabelaUsuarios')?.rows[i]?.cells[4];if(!cell)continue;
+ const b=document.createElement('button');b.type='button';b.textContent='Comissão';b.className='text-amber-400 mr-3';b.onclick=()=>configurarComissaoMecanico(u.id);cell.prepend(b);
+}};
+const abrirOSExecucaoOriginal=abrirModalOS;
+abrirModalOS=function(id=null){abrirOSExecucaoOriginal(id);const os=(db.os||[]).find(o=>o.id==id);
+ const responsavel=os?.mecanicoExecucaoId||'';
+ el('osMecanicoExecucaoId').innerHTML='<option value="">Selecione o responsável pela execução...</option>'+(db.usuarios||[]).filter(u=>/mec[aâ]nico|t[eé]cnico/i.test(u.cargo||'')).map(u=>`<option value="${esc(u.id)}">${esc(u.nome)}</option>`).join('');
+ el('osMecanicoExecucaoId').value=responsavel;
+ el('osMecanicoExecucaoId').disabled=!!os?.faturado&&!!responsavel;
+};
+function dadosComissaoOS(anterior,status){
+ const id=el('osMecanicoExecucaoId').value;
+ const u=(db.usuarios||[]).find(u=>u.id==id);
+ return {mecanicoExecucaoId:id,comissaoRegistrada:anterior?.comissaoRegistrada||((status==='Faturada'||anterior?.faturado)&&u?{pecas:Number(u.comissaoPecas)||0,servicos:Number(u.comissaoServicos)||0}:null)};
+}
+const salvarOSExecucaoOriginal=salvarOS;
+salvarOS=async function(event){
+ event.preventDefault();const os=(db.os||[]).find(o=>o.id==el('osIdEdit').value),status=el('osStatus').value,id=el('osMecanicoExecucaoId').value;
+ if(['Faturada','Em andamento','Aprovada / Em andamento'].includes(status)&&!os?.faturado&&!id){alert('Selecione o mecânico responsável pela execução do serviço.');return;}
+ if(os?.faturado&&os.mecanicoExecucaoId&&String(os.mecanicoExecucaoId)!==id){alert('O responsável de uma OS faturada fica preservado.');return;}
+ if(os?.faturado&&!os.mecanicoExecucaoId&&id&&!ehAdmin()){alert('Somente o administrador pode atribuir o responsável de uma OS já faturada.');return;}
+ await salvarOSExecucaoOriginal(event);renderizarComissoes();
+};
+function resumoComissoes(mes=''){
+ const mapa=new Map((db.usuarios||[]).filter(u=>/mec[aâ]nico|t[eé]cnico/i.test(u.cargo||'')).map(u=>[String(u.id),{nome:u.nome,pecas:0,servicos:0,comissaoPecas:0,comissaoServicos:0}]));
+ let semResponsavel=0;
+ for(const os of db.os||[]){if(!os.faturado&&os.status!=='Faturada')continue;
+ const data=String(os.dataFaturamento||'').slice(0,10);const d=dataMovimentoMeta(data||os.data);
+ if(mes&&(!d||`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`!==mes))continue;
+ const r=mapa.get(String(os.mecanicoExecucaoId));if(!r){semResponsavel++;continue;}
+ for(const i of os.itens||[]){const valor=(Number(i.qtd)||0)*(Number(i.valor)||0);if(i.tipo==='mao_de_obra'){r.servicos+=valor;r.comissaoServicos+=valor*(Number(os.comissaoRegistrada?.servicos)||0)/100;}else{r.pecas+=valor;r.comissaoPecas+=valor*(Number(os.comissaoRegistrada?.pecas)||0)/100;}}
+ }return {mecanicos:[...mapa.values()],semResponsavel};
+}
+function renderizarComissoes(){if(!ehAdmin())return;const r=resumoComissoes(el('comissaoFiltroMes').value);
+ el('comissaoSemResponsavel').textContent=r.semResponsavel?`${r.semResponsavel} OS faturada(s) sem responsável pela execução. Abra a OS para atribuir o mecânico; o diagnóstico permanece preservado.`:'';
+ el('tabelaComissoes').innerHTML=r.mecanicos.map(m=>`<tr class="border-t border-zinc-800"><td class="p-3">${esc(m.nome)}</td>${[m.pecas,m.servicos,m.pecas+m.servicos,m.comissaoPecas,m.comissaoServicos,m.comissaoPecas+m.comissaoServicos].map(v=>`<td class="p-3 text-right">${moeda(v)}</td>`).join('')}</tr>`).join('')||'<tr><td colspan="7" class="p-3">Nenhum mecânico cadastrado.</td></tr>';
+}
+const tudoComissaoOriginal=renderizarTudo;
+renderizarTudo=function(){tudoComissaoOriginal();renderizarComissoes();};
+const moduloComissaoOriginal=mudarModulo;
+mudarModulo=function(id){if(id==='comissoes'&&!ehAdmin())return;moduloComissaoOriginal(id);if(id==='comissoes'){el('pageTitle').textContent='Comissões dos mecânicos';renderizarComissoes();}};
+const papelComissaoOriginal=aplicarPapel;
+aplicarPapel=function(){papelComissaoOriginal();el('navComissoes').classList.toggle('hidden',!ehAdmin());};
+</script>
+<script>
+
+// Campos visíveis de percentuais; utiliza a gravação e o cálculo já existentes.
+const renderizarComissoesPercentuaisOriginal = renderizarComissoes;
+renderizarComissoes = function() {
+    renderizarComissoesPercentuaisOriginal();
+    const area = el('camposPercentuaisMecanicos');
+    if (!ehAdmin()) { area.innerHTML = ''; return; }
+    area.innerHTML = (db.usuarios || []).filter(u => /mec[aâ]nico|t[eé]cnico/i.test(u.cargo || '')).map(u => `
+        <form onsubmit="salvarPercentuaisVisiveis(event)" data-mecanico="${esc(u.id)}" class="border border-zinc-800 bg-zinc-950 rounded-xl p-4 space-y-3">
+            <h4 class="font-bold">${esc(u.nome)}</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                <label class="text-sm text-zinc-300">Comissão sobre peças (%)
+                    <input name="pecas" aria-label="Comissão sobre peças de ${esc(u.nome)}" type="number" required min="0" max="100" step="0.01" value="${Number(u.comissaoPecas) || 0}" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 mt-1">
+                </label>
+                <label class="text-sm text-zinc-300">Comissão sobre mão de obra (%)
+                    <input name="servicos" aria-label="Comissão sobre mão de obra de ${esc(u.nome)}" type="number" required min="0" max="100" step="0.01" value="${Number(u.comissaoServicos) || 0}" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 mt-1">
+                </label>
+                <button type="submit" class="bg-red-600 hover:bg-red-700 rounded-xl px-4 py-2 disabled:opacity-50">Salvar porcentagens</button>
+            </div>
+            <p class="text-xs text-zinc-400">Cálculo automático: valor vendido × porcentagem ÷ 100. Os valores desta consulta acompanham as porcentagens digitadas; o histórico registrado nas OS é preservado.</p>
+        </form>`).join('') || '<p class="text-sm text-zinc-400">Cadastre um mecânico em Equipe para definir suas porcentagens.</p>';
+};
+async function salvarPercentuaisVisiveis(event) {
+    event.preventDefault();
+    if (!ehAdmin() || !exigirAtendimento()) return;
+    const form = event.currentTarget;
+    const pecas = Number(form.elements.namedItem('pecas').value), servicos = Number(form.elements.namedItem('servicos').value);
+    if (!percentuaisComissaoValidos(pecas, servicos)) { alert('Informe porcentagens entre 0 e 100.'); return; }
+    const u = (db.usuarios || []).find(u => String(u.id) === form.dataset.mecanico); if (!u) return;
+    const botao = form.querySelector('button[type="submit"]'); if (botao.disabled) return;
+    botao.disabled = true;
+    try {
+        el('comissaoUsuarioId').value = u.id;
+        el('comissaoPecasPercentual').value = pecas;
+        el('comissaoServicosPercentual').value = servicos;
+        await salvarComissaoMecanico({preventDefault(){}});
+    } finally { botao.disabled = false; }
+}
+</script>
+<script>
+function periodoFiltroComissao(mes){
+ if(!/^\d{4}-\d{2}$/.test(mes||''))return null;
+ const [ano,m]=mes.split('-').map(Number);if(m<1||m>12)return null;
+ return {inicio:new Date(ano,m-1,1),fim:new Date(ano,m,1)};
+}
+function linhasComissaoFiltradas(){
+ const periodo=periodoFiltroComissao(el('comissaoFiltroMes').value),mecanico=el('comissaoFiltroMecanico').value,tipo=el('comissaoFiltroTipo').value,linhas=[];
+ for(const os of db.os||[]){if(!os.faturado&&os.status!=='Faturada')continue;
+ const d=os.dataFaturamento?new Date(os.dataFaturamento):dataMovimentoMeta(os.data);
+ if(periodo&&(!d||!Number.isFinite(+d)||d<periodo.inicio||d>=periodo.fim))continue;
+ if(mecanico&&String(os.mecanicoExecucaoId)!==mecanico)continue;
+ const u=(db.usuarios||[]).find(u=>String(u.id)===String(os.mecanicoExecucaoId));if(!u)continue;
+ const form=[...el('camposPercentuaisMecanicos').querySelectorAll('form[data-mecanico]')].find(f=>f.dataset.mecanico===String(u.id));
+ for(const i of os.itens||[]){const servico=i.tipo==='mao_de_obra';if(tipo==='pecas'&&servico||tipo==='servicos'&&!servico)continue;
+ const pct=Number(form?.elements.namedItem(servico?'servicos':'pecas')?.value??(servico?u.comissaoServicos:u.comissaoPecas))||0;
+ const valor=(Number(i.qtd)||0)*(Number(i.valor)||0);
+ linhas.push({mecanicoId:String(u.id),mecanico:u.nome,os:numeroOS(os),nome:i.nome||'Item',tipo:servico?'Mão de obra':'Peça',valor,percentual:pct,comissao:valor*pct/100});
+ }}return linhas;
+}
+function atualizarValoresComissaoFiltrada(){
+ if(!ehAdmin())return;
+ const p=periodoFiltroComissao(el('comissaoFiltroMes').value);
+ if(p){const ultimo=new Date(p.fim);ultimo.setDate(ultimo.getDate()-1);el('comissaoPeriodoSelecionado').textContent=`Período: ${p.inicio.toLocaleDateString('pt-BR')} a ${ultimo.toLocaleDateString('pt-BR')}`;}else el('comissaoPeriodoSelecionado').textContent='Período: todo o histórico';
+ const linhas=linhasComissaoFiltradas(),grupos=new Map();
+ for(const l of linhas){const r=grupos.get(l.mecanicoId)||{nome:l.mecanico,pecas:0,servicos:0,cp:0,cs:0};if(l.tipo==='Mão de obra'){r.servicos+=l.valor;r.cs+=l.comissao;}else{r.pecas+=l.valor;r.cp+=l.comissao;}grupos.set(l.mecanicoId,r);}
+ el('tabelaComissoes').innerHTML=[...grupos.values()].map(r=>`<tr class="border-t border-zinc-800"><td class="p-3">${esc(r.nome)}</td>${[r.pecas,r.servicos,r.pecas+r.servicos,r.cp,r.cs,r.cp+r.cs].map(v=>`<td class="p-3 text-right">${moeda(v)}</td>`).join('')}</tr>`).join('')||'<tr><td colspan="7" class="p-3 text-zinc-400">Nenhuma OS faturada para os filtros selecionados.</td></tr>';
+ el('comissaoDetalhesItens').innerHTML=linhas.map(l=>`<tr class="border-t border-zinc-800"><td class="p-3">${esc(l.mecanico)}</td><td class="p-3">${esc(l.os)}</td><td class="p-3">${esc(l.nome)}</td><td class="p-3">${l.tipo}</td><td class="p-3 text-right">${moeda(l.valor)}</td><td class="p-3 text-right">${l.percentual.toLocaleString('pt-BR')}%</td><td class="p-3 text-right text-emerald-400">${moeda(l.comissao)}</td></tr>`).join('')||'<tr><td colspan="7" class="p-3 text-zinc-400">Nenhum item no período.</td></tr>';
+ el('comissaoTotalFiltrado').textContent=moeda(linhas.reduce((s,l)=>s+l.comissao,0));
+}
+const renderizarComissoesFiltroOriginal=renderizarComissoes;
+renderizarComissoes=function(){
+ renderizarComissoesFiltroOriginal();if(!ehAdmin())return;
+ const sel=el('comissaoFiltroMecanico'),atual=sel.value;
+ sel.innerHTML='<option value="">Todos os mecânicos</option>'+(db.usuarios||[]).filter(u=>/mec[aâ]nico|t[eé]cnico/i.test(u.cargo||'')).map(u=>`<option value="${esc(u.id)}">${esc(u.nome)}</option>`).join('');sel.value=atual;
+ for(const input of el('camposPercentuaisMecanicos').querySelectorAll('input[type="number"]'))input.addEventListener('input',atualizarValoresComissaoFiltrada);
+ atualizarValoresComissaoFiltrada();
+};
 </script>
 </body>
 </html>
