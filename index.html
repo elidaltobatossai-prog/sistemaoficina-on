@@ -1587,7 +1587,14 @@
             const status = document.getElementById('osStatus').value;
             const formaPagamento = document.getElementById('osFormaPagamento').value;
             const parcelas = parseInt(document.getElementById('osParcelas').value) || 1;
-            const mecanicoId = document.getElementById('osMecanicoId')?.value || '';
+            // Diagnóstico: aceitar o responsável selecionado na execução quando não há diagnóstico atribuído.
+            const campoMecanicoDiagnostico = document.getElementById('osMecanicoId');
+            if (status === 'Diagnóstico' && !campoMecanicoDiagnostico.value) {
+                const selecionado = document.getElementById('osMecanicoExecucaoId')?.value || '';
+                const mecanico = (db.usuarios || []).find(u => String(u.id) === selecionado && /mec[aâ]nico|t[eé]cnico/i.test(u.cargo || ''));
+                if (mecanico) campoMecanicoDiagnostico.value = String(mecanico.id);
+            }
+            const mecanicoId = campoMecanicoDiagnostico.value || '';
             const diagnosticoInterno = document.getElementById('osDiagnosticoInterno')?.value.trim() || '';
             const diagnosticoCliente = document.getElementById('osDiagnosticoCliente')?.value.trim() || '';
 
