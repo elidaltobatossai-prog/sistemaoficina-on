@@ -692,7 +692,7 @@
 
                         <div class="sm:col-span-2" id="divOsItemEstoqueContainer">
                             <label class="block text-[10px] uppercase text-zinc-400 mb-1">Selecione a Peça do Estoque</label>
-                            <select id="osItemEstoqueId" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs">
+                            <select id="osItemEstoqueId" onchange="preencherPrecoEstoqueOS()" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs">
                                 <option value="">Selecione...</option>
                             </select>
                         </div>
@@ -1056,7 +1056,7 @@
             if (dados && dados.textoSistema) {
                 try {
                     const dadosRemotos = JSON.parse(dados.textoSistema);
-                    if (dadosRemotos && typeof dadosRemotos === 'object') {
+                    if (dadosRemotos && typeof dadosRemotos === 'object' && !window.osGravacaoEmCurso) {
                         db = { ...db, ...dadosRemotos };
                         window.firebaseRealtimePronto?.();
                         if (document.getElementById('appScreen') && !document.getElementById('appScreen').classList.contains('hidden')) {
@@ -1452,6 +1452,12 @@
             document.getElementById('modalOS').classList.add('hidden');
         }
 
+        function preencherPrecoEstoqueOS() {
+            const produto = (db.produtos || []).find(p => String(p.id) === document.getElementById('osItemEstoqueId').value);
+            const preco = produto ? Number(String(produto.preco).replace(',', '.')) : NaN;
+            document.getElementById('osItemValor').value = Number.isFinite(preco) ? preco.toFixed(2) : '';
+        }
+
         function alternarTipoItemOS() {
             const tipo = document.getElementById('osItemTipo').value;
             const divEstoque = document.getElementById('divOsItemEstoqueContainer');
@@ -1461,7 +1467,7 @@
             if (tipo === 'peca_estoque') {
                 divEstoque.classList.remove('hidden');
                 divLivre.classList.add('hidden');
-                inputValor.value = '';
+                preencherPrecoEstoqueOS();
             } else {
                 divEstoque.classList.add('hidden');
                 divLivre.classList.remove('hidden');
@@ -1481,7 +1487,7 @@
                 const prodId = document.getElementById('osItemEstoqueId').value;
                 if (!prodId) { alert('Selecione uma peça do estoque.'); return; }
                 const produto = (db.produtos || []).find(p => p.id == prodId);
-                if (produto) { nomeItem = produto.nome; valor = produto.preco; produtoId = produto.id; }
+                if (produto) { nomeItem = produto.nome; valor = document.getElementById('osItemValor').value.trim() ? parseFloat(document.getElementById('osItemValor').value) : Number(String(produto.preco).replace(',', '.')); produtoId = produto.id; }
             } else if (tipo === 'peca_livre' || tipo === 'mao_de_obra') {
                 nomeItem = document.getElementById('osItemDescricaoLivre').value.trim();
                 if (!nomeItem) { alert('Digite a descrição.'); return; }
@@ -1514,7 +1520,8 @@
 
             let totalGeral = 0;
             tbody.innerHTML = itensTempOS.map(i => {
-                const subtotal = i.qtd * i.valor;
+                const valorUnitario = Number(String(i.valor).replace(',', '.'));
+                const subtotal = Number(i.qtd) * valorUnitario;
                 totalGeral += subtotal;
                 let bolinhaHtml = i.tipo === 'peca' ? `<span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span> Peça` : `<span class="inline-block w-3 h-3 rounded-full bg-red-600 mr-2"></span> Mão de Obra`;
                 return `
@@ -1522,7 +1529,7 @@
                         <td class="p-3">${bolinhaHtml}</td>
                         <td class="p-3 font-medium text-white">${i.nome}</td>
                         <td class="p-3 text-center">${i.qtd}</td>
-                        <td class="p-3 text-right font-mono">R$ ${i.valor.toFixed(2)}</td>
+                        <td class="p-3 text-right font-mono">R$ ${valorUnitario.toFixed(2)}</td>
                         <td class="p-3 text-right font-mono text-emerald-400 font-bold">R$ ${subtotal.toFixed(2)}</td>
                         <td class="p-3 text-right">${ehAdmin() && !(db.os || []).find(o => o.id == document.getElementById('osIdEdit').value)?.faturado ? `<button type="button" onclick="editarItemOS(${i.id})" class="text-amber-400 hover:text-amber-300 mr-3">EDITAR</button>` : ''}<button type="button" onclick="removerItemOS(${i.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
@@ -1587,7 +1594,6 @@
             const status = document.getElementById('osStatus').value;
             const formaPagamento = document.getElementById('osFormaPagamento').value;
             const parcelas = parseInt(document.getElementById('osParcelas').value) || 1;
-            // Diagnóstico: aceitar o responsável selecionado na execução quando não há diagnóstico atribuído.
             const campoMecanicoDiagnostico = document.getElementById('osMecanicoId');
             if (status === 'Diagnóstico' && !campoMecanicoDiagnostico.value) {
                 const selecionado = document.getElementById('osMecanicoExecucaoId')?.value || '';
@@ -1658,11 +1664,20 @@
                 dataFaturamento
             };
 
+            dadosOS.observacoes = document.getElementById('osObservacoes').value.trim();
+            if (status === 'Aprovada / Em andamento' || status === 'Em andamento') dadosOS.dataAprovacao ||= agora.toISOString();
+            if (status === 'Concluída') dadosOS.dataConclusao ||= agora.toISOString();
+            if (dadosOS.diagnosticoDevolvido) dadosOS.devolucaoTratada = true;
+            if (status === 'Diagnóstico' && anterior?.status !== 'Diagnóstico') { dadosOS.diagnosticoDevolvido = false; dadosOS.devolucaoTratada = false; }
+            auditar('Salvar OS', dadosOS.id, anterior ? JSON.parse(JSON.stringify(anterior)) : null, {numero:dadosOS.numero,status:dadosOS.status,total:dadosOS.total});
             if (idEdit) db.os = db.os.map(o => o.id == idEdit ? dadosOS : o);
             else db.os.push(dadosOS);
 
-            if (!await salvarDB()) { db = estadoAntes; alert('Não foi possível gravar a OS. Seus itens continuam na tela para tentar novamente.'); return; }
+            let osGravada = false;
+            try { osGravada = await salvarDB(); } catch (erro) { console.error('Falha ao gravar OS', erro); }
+            if (!osGravada) { db = estadoAntes; alert('Não foi possível gravar a OS. Seus itens continuam na tela para tentar novamente.'); return; }
             fecharModalOS();
+            mudarModulo('os');
             renderizarOS();
             atualizarDashboard();
             renderizarEstoque();
@@ -2342,15 +2357,7 @@ salvarOS = async function(e) {
     }
     const tamanho=(db.os||[]).length; const antes=anterior ? JSON.parse(JSON.stringify(anterior)) : null;
     osSalvando=true;try{await salvarOSOriginal(e);}finally{osSalvando=false;}
-    const os=id?(db.os||[]).find(o=>o.id==id):(db.os||[])[tamanho];
-    if(!os || !el('modalOS').classList.contains('hidden')) return;
-    os.observacoes=el('osObservacoes').value.trim();
-    const agora=new Date().toISOString();
-    if(status==='Aprovada / Em andamento' || status==='Em andamento') os.dataAprovacao ||= agora;
-    if(status==='Concluída') os.dataConclusao ||= agora;
-    if(os.diagnosticoDevolvido) os.devolucaoTratada=true;
-    if(status==='Diagnóstico' && antes?.status!=='Diagnóstico') {os.diagnosticoDevolvido=false;os.devolucaoTratada=false;}
-    auditar('Salvar OS',os.id,antes,{numero:os.numero,status:os.status,total:os.total}); salvarDB(); renderizarOS();
+    renderizarOS();
 };
 const CHECKLIST = {
 'Motor':['Óleo','Vazamentos','Tampa de válvulas','Juntas / Retentores','Ruídos','Marcha lenta','Vela','Filtro de ar','Filtro de combustível','Válvulas','Injeção / TBI'],
@@ -2461,7 +2468,7 @@ let carregamentoFirebaseConcluido=false;
 const carregarOriginal=carregarDadosFirebase;
 carregarDadosFirebase=function(callback) {
     firestore.collection('ef_motos').doc('dados_gerais').get().then(doc=>{
-        if(doc.exists)db={...db,...doc.data()};
+        if(doc.exists && !window.osGravacaoEmCurso)db={...db,...doc.data()};
         carregamentoFirebaseConcluido=true;garantirNumeracaoOS();el('statusSincronizacao').textContent='Dados conectados';if(callback)callback();
     }).catch(err=>{console.error(err);if(!carregamentoFirebaseConcluido)el('statusSincronizacao').textContent='Conectando ao banco da oficina…';if(callback)callback();});
 };
@@ -2899,6 +2906,17 @@ renderizarComissoes=function(){
  sel.innerHTML='<option value="">Todos os mecânicos</option>'+(db.usuarios||[]).filter(u=>/mec[aâ]nico|t[eé]cnico/i.test(u.cargo||'')).map(u=>`<option value="${esc(u.id)}">${esc(u.nome)}</option>`).join('');sel.value=atual;
  for(const input of el('camposPercentuaisMecanicos').querySelectorAll('input[type="number"]'))input.addEventListener('input',atualizarValoresComissaoFiltrada);
  atualizarValoresComissaoFiltrada();
+};
+</script>
+<script>
+
+const salvarOSConfirmacaoOriginal = salvarOS;
+salvarOS = async function(event) {
+    event.preventDefault();
+    if (window.osGravacaoEmCurso) return;
+    window.osGravacaoEmCurso = true;
+    try { await salvarOSConfirmacaoOriginal(event); }
+    finally { window.osGravacaoEmCurso = false; }
 };
 </script>
 </body>
