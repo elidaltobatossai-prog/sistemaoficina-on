@@ -227,6 +227,22 @@
                     </div>
                 </div>
 
+                <!-- DIAGNÓSTICO EXCLUSIVO DO MECÂNICO -->
+                <div id="mod-diagnostico" class="hidden space-y-6">
+                    <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
+                        <h3 class="font-bold text-white"><i class="fa-solid fa-stethoscope text-red-500 mr-2"></i>Diagnósticos enviados para mim</h3>
+                        <p class="text-xs text-zinc-400 mt-1">Aqui aparecem somente as ordens em Diagnóstico atribuídas ao mecânico logado. Depois que a OS sair de Diagnóstico, ela fica bloqueada para o mecânico.</p>
+                    </div>
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead><tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] border-b border-zinc-800">
+                                <th class="p-4">Nº OS</th><th class="p-4">Cliente / Moto</th><th class="p-4">Status</th><th class="p-4 text-right">Ação</th>
+                            </tr></thead>
+                            <tbody id="tabelaDiagnosticosMecanico" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- OS & ORÇAMENTOS -->
                 <div id="mod-os" class="hidden space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
@@ -650,6 +666,14 @@
                     </div>
                 </div>
 
+                <div id="boxMecanicoOS" class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Enviar diagnóstico para o mecânico</label>
+                    <select id="osMecanicoId" class="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-sm">
+                        <option value="">Selecione o mecânico...</option>
+                    </select>
+                    <p class="text-[10px] text-zinc-500 mt-1">O mecânico verá esta OS somente enquanto o status estiver em Diagnóstico.</p>
+                </div>
+
                 <!-- Adicionar Itens à OS -->
                 <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
                     <h4 class="text-xs font-bold uppercase text-zinc-300">Adicionar Peças ou Mão de Obra</h4>
@@ -716,6 +740,7 @@
                         <div>
                             <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Status da Ordem de Serviço</label>
                             <select id="osStatus" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                                <option value="Diagnóstico">Diagnóstico</option>
                                 <option value="Orçamento aguardando peça">Orçamento aguardando peça</option>
                                 <option value="Em andamento">Em andamento</option>
                                 <option value="Faturada">Faturada (Vai para o Caixa)</option>
@@ -2085,5 +2110,195 @@
             alert('Configurações salvas com sucesso!');
         }
     </script>
+
+<script>
+// ===== ACESSO RESTRITO DO MECÂNICO / FLUXO DIAGNÓSTICO =====
+function efEhMecanico(){ return usuarioLogadoAtual && usuarioLogadoAtual.cargo === 'Mecânico / Técnico'; }
+
+function efPopularMecanicos(){
+    const sel=document.getElementById('osMecanicoId');
+    if(!sel) return;
+    const atual=sel.value;
+    sel.innerHTML='<option value="">Selecione o mecânico...</option>' +
+      (db.usuarios||[]).filter(u=>u.cargo==='Mecânico / Técnico').map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
+    sel.value=atual;
+}
+
+function efAplicarAcesso(){
+    if(!usuarioLogadoAtual) return;
+    if(efEhMecanico()){
+        document.querySelectorAll('.nav-btn').forEach(el=>el.style.display='none');
+        document.querySelectorAll('[id^="mod-"]').forEach(el=>el.classList.add('hidden'));
+        document.getElementById('mod-diagnostico')?.classList.remove('hidden');
+        document.getElementById('pageTitle').innerText='Diagnóstico';
+        renderizarDiagnosticosMecanico();
+    } else {
+        document.querySelectorAll('.nav-btn').forEach(el=>el.style.display='');
+    }
+}
+
+function renderizarDiagnosticosMecanico(){
+    const tbody=document.getElementById('tabelaDiagnosticosMecanico');
+    if(!tbody || !usuarioLogadoAtual) return;
+    const lista=(db.os||[]).filter(o => o.status==='Diagnóstico' && String(o.mecanicoId||'')===String(usuarioLogadoAtual.id));
+    if(!lista.length){
+        tbody.innerHTML='<tr><td colspan="4" class="p-5 text-center text-zinc-500">Nenhum diagnóstico enviado para você.</td></tr>';
+        return;
+    }
+    tbody.innerHTML=lista.map(o=>{
+        const c=o.clienteId==='generico'?'Cliente':((db.clientes||[]).find(x=>x.id==o.clienteId)?.nome||'Cliente');
+        return `<tr>
+          <td class="p-4 font-bold text-white">#${o.id}</td>
+          <td class="p-4">${c}<br><span class="text-xs text-zinc-500">${o.motoInfo||''}</span></td>
+          <td class="p-4"><span class="px-2 py-1 rounded-full bg-purple-950 text-purple-300 border border-purple-800 text-xs">Diagnóstico</span></td>
+          <td class="p-4 text-right"><button onclick="abrirDiagnosticoMecanico(${o.id})" class="bg-red-600 hover:bg-red-700 px-3 py-2 rounded-xl text-xs font-semibold">Abrir diagnóstico</button></td>
+        </tr>`;
+    }).join('');
+}
+
+function abrirDiagnosticoMecanico(id){
+    if(!efEhMecanico()) return abrirModalOS(id);
+    const os=(db.os||[]).find(o=>o.id===id);
+    if(!os || os.status!=='Diagnóstico' || String(os.mecanicoId||'')!==String(usuarioLogadoAtual.id)){
+        alert('Esta ordem não está mais disponível para diagnóstico.');
+        renderizarDiagnosticosMecanico();
+        return;
+    }
+    abrirModalOS(id);
+    document.getElementById('modalOSTitulo').innerHTML='<i class="fa-solid fa-stethoscope text-red-500 mr-2"></i>Diagnóstico da OS #'+id;
+    ['osClienteId','osMotoInfo','osStatus','osFormaPagamento','osParcelas','osItemEstoqueId','osItemValor'].forEach(k=>{
+        const e=document.getElementById(k); if(e) e.disabled=true;
+    });
+    document.getElementById('boxMecanicoOS')?.classList.add('hidden');
+    const tipo=document.getElementById('osItemTipo');
+    if(tipo){
+        tipo.innerHTML='<option value="mao_de_obra">Serviço / item encontrado no diagnóstico</option>';
+        tipo.value='mao_de_obra'; alternarTipoItemOS();
+    }
+    const valor=document.getElementById('osItemValor'); if(valor){valor.value='0'; valor.closest('div').classList.add('hidden');}
+}
+
+const efRealizarLoginOriginal=realizarLogin;
+realizarLogin=function(e){
+    efRealizarLoginOriginal(e);
+    if(usuarioLogadoAtual) setTimeout(efAplicarAcesso,0);
+};
+
+const efMudarModuloOriginal=mudarModulo;
+mudarModulo=function(id){
+    if(efEhMecanico()){
+        document.querySelectorAll('[id^="mod-"]').forEach(el=>el.classList.add('hidden'));
+        document.getElementById('mod-diagnostico')?.classList.remove('hidden');
+        document.getElementById('pageTitle').innerText='Diagnóstico';
+        renderizarDiagnosticosMecanico();
+        return;
+    }
+    efMudarModuloOriginal(id);
+};
+
+const efRenderizarTudoOriginal=renderizarTudo;
+renderizarTudo=function(){
+    if(efEhMecanico()){
+        renderizarDiagnosticosMecanico();
+        efAplicarAcesso();
+        return;
+    }
+    efRenderizarTudoOriginal();
+    efPopularMecanicos();
+};
+
+const efAbrirModalOSOriginal=abrirModalOS;
+abrirModalOS=function(id=null){
+    if(efEhMecanico()){
+        if(!id) return;
+        const os=(db.os||[]).find(o=>o.id===id);
+        if(!os || os.status!=='Diagnóstico' || String(os.mecanicoId||'')!==String(usuarioLogadoAtual.id)){
+            alert('Você só pode acessar ordens em Diagnóstico enviadas para você.');
+            return;
+        }
+    }
+    efAbrirModalOSOriginal(id);
+    efPopularMecanicos();
+    if(id){
+        const os=(db.os||[]).find(o=>o.id===id);
+        if(document.getElementById('osMecanicoId')) document.getElementById('osMecanicoId').value=os?.mecanicoId||'';
+    }
+};
+
+const efAdicionarItemOSOriginal=adicionarItemOS;
+adicionarItemOS=function(){
+    if(efEhMecanico()){
+        const id=Number(document.getElementById('osIdEdit').value);
+        const os=(db.os||[]).find(o=>o.id===id);
+        if(!os || os.status!=='Diagnóstico'){ alert('A OS saiu de Diagnóstico e não pode mais ser alterada pelo mecânico.'); return; }
+        const desc=document.getElementById('osItemDescricaoLivre').value.trim();
+        const qtd=parseInt(document.getElementById('osItemQtd').value)||1;
+        if(!desc){alert('Digite o serviço ou item encontrado no diagnóstico.');return;}
+        itensTempOS.push({id:Date.now(),tipo:'mao_de_obra',nome:desc,qtd,valor:0,produtoId:null,diagnostico:true,mecanicoId:usuarioLogadoAtual.id});
+        document.getElementById('osItemDescricaoLivre').value='';
+        document.getElementById('osItemQtd').value='1';
+        atualizarTabelaItensOS();
+        return;
+    }
+    efAdicionarItemOSOriginal();
+};
+
+const efSalvarOSOriginal=salvarOS;
+salvarOS=function(e){
+    if(efEhMecanico()){
+        e.preventDefault();
+        const id=Number(document.getElementById('osIdEdit').value);
+        const os=(db.os||[]).find(o=>o.id===id);
+        if(!os || os.status!=='Diagnóstico' || String(os.mecanicoId||'')!==String(usuarioLogadoAtual.id)){
+            alert('A OS não está mais disponível para diagnóstico.');
+            fecharModalOS(); renderizarDiagnosticosMecanico(); return;
+        }
+        os.itens=itensTempOS.map(i=>({...i, valor:Number(i.valor)||0}));
+        os.atualizadoDiagnosticoEm=new Date().toLocaleString('pt-BR');
+        os.atualizadoDiagnosticoPor=usuarioLogadoAtual.nome;
+        salvarDB(); fecharModalOS(); renderizarDiagnosticosMecanico();
+        alert('Diagnóstico salvo. Os itens encontrados ficaram disponíveis para o atendimento colocar os valores.');
+        return;
+    }
+    const idEdit=document.getElementById('osIdEdit').value;
+    const mecanicoId=document.getElementById('osMecanicoId')?.value||'';
+    efSalvarOSOriginal(e);
+    const id=idEdit?Number(idEdit):(db.os||[]).slice(-1)[0]?.id;
+    const os=(db.os||[]).find(o=>o.id===id);
+    if(os){ os.mecanicoId=mecanicoId; salvarDB(); }
+};
+
+const efRemoverItemOSOriginal=removerItemOS;
+removerItemOS=function(id){
+    if(efEhMecanico()){
+        const osId=Number(document.getElementById('osIdEdit').value);
+        const os=(db.os||[]).find(o=>o.id===osId);
+        const item=itensTempOS.find(i=>i.id===id);
+        if(!os || os.status!=='Diagnóstico' || !item?.diagnostico || String(item.mecanicoId)!==String(usuarioLogadoAtual.id)){
+            alert('Você só pode remover itens que adicionou enquanto a OS está em Diagnóstico.');
+            return;
+        }
+    }
+    efRemoverItemOSOriginal(id);
+};
+
+const efAtualizarTabelaItensOSOriginal=atualizarTabelaItensOS;
+atualizarTabelaItensOS=function(){
+    efAtualizarTabelaItensOSOriginal();
+    if(efEhMecanico()){
+        document.querySelectorAll('#tabelaOsItens tr').forEach(tr=>{
+            const cells=tr.querySelectorAll('td');
+            if(cells.length>=5){
+                cells[3].innerHTML='<span class="text-zinc-500">A definir</span>';
+                cells[4].innerHTML='<span class="text-zinc-500">A definir</span>';
+            }
+        });
+        const total=document.getElementById('osTotalDisplay'); if(total) total.innerText='Valores definidos pelo atendimento';
+    }
+};
+
+setTimeout(()=>{ if(usuarioLogadoAtual) efAplicarAcesso(); },300);
+</script>
+
 </body>
 </html>
