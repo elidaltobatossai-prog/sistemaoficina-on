@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageHeaderTitle">EF Motos - Sistema de Gestão</title>
+    <title id="pageHeaderTitle">EF Oficina Pro</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23dc2626'/%3E%3Ctext x='4' y='23' font-family='Arial' font-size='21' font-weight='bold' fill='white'%3EEF%3C/text%3E%3C/svg%3E">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome para Ícones -->
@@ -21,6 +22,14 @@
             #modalImprimirOrcamento, #modalImprimirOrcamento * { visibility: visible; }
             #modalImprimirOrcamento { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 20px; background: white !important; color: black !important; }
         }
+    
+        .text-xs, .text-\[10px\] { font-size: .875rem !important; }
+        label { line-height: 1.4; }
+        button, a, select { touch-action: manipulation; }
+        [id^="modal"] > div { max-height: calc(100dvh - 2rem); overflow-y: auto; }
+        [id^="mod-"] table { min-width: 560px; }
+        [id^="mod-"] .overflow-hidden:has(table), #modalOS .overflow-hidden:has(table) { overflow-x: auto; }
+        @media(max-width:640px) { #modalOS > div { padding: 1rem; margin: 0; } #modalOS .flex.justify-end { flex-wrap: wrap; gap: .5rem; } }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 font-sans antialiased">
@@ -107,7 +116,9 @@
 
             <!-- Navegação -->
             <nav class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-1">
-                <a href="#" onclick="mudarModulo('dashboard')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white transition shadow-sm">
+                <a href="#" id="navMinhasOS" onclick="mudarModulo('minhas-os')" class="nav-btn hidden px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800">Minhas Ordens de Serviço</a>
+<a href="#" id="navAuditoria" onclick="mudarModulo('auditoria')" class="nav-btn hidden px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800">Solicitações e Auditoria</a>
+<a href="#" onclick="mudarModulo('dashboard')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white transition shadow-sm">
                     <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard</span>
                 </a>
                 <a href="#" onclick="mudarModulo('agendamentos')" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-800 text-zinc-300 transition relative">
@@ -227,24 +238,9 @@
                     </div>
                 </div>
 
-                <!-- DIAGNÓSTICO EXCLUSIVO DO MECÂNICO -->
-                <div id="mod-diagnostico" class="hidden space-y-6">
-                    <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl">
-                        <h3 class="font-bold text-white"><i class="fa-solid fa-stethoscope text-red-500 mr-2"></i>Diagnósticos enviados para mim</h3>
-                        <p class="text-xs text-zinc-400 mt-1">Aqui aparecem somente as ordens em Diagnóstico atribuídas ao mecânico logado. Depois que a OS sair de Diagnóstico, ela fica bloqueada para o mecânico.</p>
-                    </div>
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead><tr class="bg-zinc-950 text-zinc-400 uppercase text-[11px] border-b border-zinc-800">
-                                <th class="p-4">Nº OS</th><th class="p-4">Cliente / Moto</th><th class="p-4">Status</th><th class="p-4 text-right">Ação</th>
-                            </tr></thead>
-                            <tbody id="tabelaDiagnosticosMecanico" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
-                        </table>
-                    </div>
-                </div>
-
                 <!-- OS & ORÇAMENTOS -->
                 <div id="mod-os" class="hidden space-y-6">
+<div id="osDevolvidas" class="bg-zinc-900 border border-amber-800 rounded-2xl p-4"></div>
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-900 border border-zinc-800 p-4 rounded-2xl gap-3">
                         <div class="w-full sm:w-72">
                             <input type="text" id="filtroBuscaOS" oninput="renderizarOS()" placeholder="Buscar OS por nº, cliente ou moto..." class="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:outline-none focus:border-red-600">
@@ -288,7 +284,7 @@
                                     
                                     <div class="flex border-b border-zinc-800 pb-2 space-x-4">
                                         <button type="button" onclick="alternarTipoItemPDV('estoque')" id="btnTabPdvEstoque" class="text-xs font-bold text-red-500 border-b-2 border-red-500 pb-1">Do Estoque</button>
-                                        <button type="button" onclick="alternarTipoItemPDV('livre')" id="btnTabPdvLivre" class="text-xs font-bold text-zinc-400 pb-1">Item Livre</button>
+                                        <button type="button" onclick="alternarTipoItemPDV('livre')" id="btnTabPdvLivre" class="text-xs font-bold text-zinc-400 pb-1">Produto Genérico / Sem Estoque</button>
                                     </div>
 
                                     <div id="secaoPdvEstoque" class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
@@ -632,12 +628,14 @@
                                 <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">URL do Logotipo da Oficina</label>
                                 <input type="url" id="cfgLogo" placeholder="https://exemplo.com/logo.png" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:outline-none focus:border-red-600">
                             </div>
-                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">Salvar Configurações</button>
+                            <div><label for="cfgTelefone" class="block text-sm text-zinc-400 mb-1">Telefone da oficina</label><input id="cfgTelefone" type="tel" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl"></div><div><label for="cfgEndereco" class="block text-sm text-zinc-400 mb-1">Endereço da oficina</label><input id="cfgEndereco" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl"></div><button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow transition">Salvar Configurações</button>
                         </form>
                     </div>
                 </div>
 
-            </main>
+            <div id="mod-minhas-os" class="hidden space-y-4"><h3 class="text-lg font-bold">Minhas Ordens de Serviço</h3><div id="listaMinhasOS" class="space-y-3"></div></div>
+<div id="mod-auditoria" class="hidden space-y-4"><h3 class="text-lg font-bold">Solicitações de alteração</h3><div id="listaSolicitacoes" class="space-y-3"></div><h3 class="text-lg font-bold">Auditoria</h3><div id="listaAuditoria" class="space-y-3"></div></div>
+</main>
         </div>
     </div>
 
@@ -656,25 +654,20 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente</label>
-                        <select id="osClienteId" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                        <select id="osClienteId" onchange="atualizarMotosOS(true)" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                             <option value="generico">Cliente</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Veículo / Moto</label>
+                        <select id="osVeiculoId" onchange="selecionarMotoOS()" aria-label="Moto cadastrada" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm mb-2"><option value="">Informar moto manualmente</option></select>
                         <input type="text" id="osMotoInfo" placeholder="Ex: Honda CG 150 - Placa ABC-1234" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                     </div>
                 </div>
 
-                <div id="boxMecanicoOS" class="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Enviar diagnóstico para o mecânico</label>
-                    <select id="osMecanicoId" class="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-sm">
-                        <option value="">Selecione o mecânico...</option>
-                    </select>
-                    <p class="text-[10px] text-zinc-500 mt-1">O mecânico verá esta OS somente enquanto o status estiver em Diagnóstico.</p>
-                </div>
-
-                <!-- Adicionar Itens à OS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label for="osDataExibida" class="block text-sm text-zinc-400">Data da OS</label><input id="osDataExibida" readonly class="w-full bg-zinc-950 rounded-xl px-4 py-2"></div><div><label for="osObservacoes" class="block text-sm text-zinc-400">Observações</label><textarea id="osObservacoes" rows="2" class="w-full bg-zinc-950 rounded-xl px-4 py-2"></textarea></div></div>
+<div id="osApontamentos" class="hidden bg-zinc-950 border border-amber-800 rounded-xl p-4 space-y-3"></div>
+<!-- Adicionar Itens à OS -->
                 <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
                     <h4 class="text-xs font-bold uppercase text-zinc-300">Adicionar Peças ou Mão de Obra</h4>
                     
@@ -683,8 +676,8 @@
                             <label class="block text-[10px] uppercase text-zinc-400 mb-1">Tipo de Item</label>
                             <select id="osItemTipo" onchange="alternarTipoItemOS()" class="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-xs">
                                 <option value="peca_estoque">1. Peça (Do Estoque)</option>
-                                <option value="peca_livre">1. Peça (Item Livre)</option>
-                                <option value="mao_de_obra">2. Mão de Obra</option>
+                                <option value="peca_livre">2. Peça Genérica / Sem Estoque</option>
+                                <option value="mao_de_obra">3. Mão de Obra</option>
                             </select>
                         </div>
 
@@ -739,13 +732,32 @@
                     <div class="space-y-3">
                         <div>
                             <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Status da Ordem de Serviço</label>
-                            <select id="osStatus" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                            <select id="osStatus" required onchange="atualizarCamposFluxoOS()" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                                 <option value="Diagnóstico">Diagnóstico</option>
-                                <option value="Orçamento aguardando peça">Orçamento aguardando peça</option>
+                                <option value="Orçamento">Orçamento</option>
+                                <option value="Aguardando peça">Aguardando peça</option>
+                                <option value="Aguardando aprovação">Aguardando aprovação</option>
+                                <option value="Aprovada / Em andamento">Aprovada / Em andamento</option>
                                 <option value="Em andamento">Em andamento</option>
                                 <option value="Faturada">Faturada (Vai para o Caixa)</option>
                                 <option value="Concluída">Concluída</option>
                             </select>
+                        </div>
+                        <div id="osBlocoDiagnostico" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Mecânico responsável pelo diagnóstico</label>
+                                <select id="osMecanicoId" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                                    <option value="">Selecione o mecânico...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Diagnóstico interno do mecânico</label>
+                                <textarea id="osDiagnosticoInterno" rows="3" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Apontamentos técnicos do mecânico"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Diagnóstico para enviar ao cliente</label>
+                                <textarea id="osDiagnosticoCliente" rows="3" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Texto do diagnóstico que será apresentado ao cliente"></textarea>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Forma de Pagamento (Se Faturada)</label>
@@ -784,6 +796,8 @@
 
                 <div class="flex justify-end space-x-3 pt-4">
                     <button type="button" onclick="fecharModalOS()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
+                    <button type="button" onclick="imprimirDiagnosticoCliente()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow">Diagnóstico do Cliente</button>
+                    <button type="button" onclick="imprimirOrcamentoOS()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl shadow">Orçamento</button>
                     <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow">Salvar Ordem de Serviço</button>
                 </div>
             </form>
@@ -807,6 +821,14 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">CPF ou CNPJ</label>
                     <input type="text" id="cDoc" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="000.000.000-00">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Endereço</label>
+                    <input type="text" id="cEndereco" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none" placeholder="Rua, número, bairro, cidade">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Data de aniversário</label>
+                    <input type="date" id="cAniversario" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" onclick="fecharModalCliente()" class="px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 rounded-xl">Cancelar</button>
@@ -977,13 +999,13 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Cliente</label>
-                    <select id="agClienteId" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <select id="agClienteId" onchange="atualizarMotosAgenda()" required class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                         <option value="generico">Cliente</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Moto / Veículo</label>
-                    <input type="text" id="agMoto" required placeholder="Ex: Honda CG 150 - Placa ABC-1234" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
+                    <select id="agVeiculoId" onchange="selecionarMotoAgenda()" aria-label="Moto cadastrada no agendamento" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm mb-2"></select><input type="text" id="agMoto" required placeholder="Ex: Honda CG 150 - Placa ABC-1234" class="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-sm focus:border-red-600 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-zinc-400 mb-1">Serviço Agendado</label>
@@ -997,7 +1019,9 @@
         </div>
     </div>
 
-    <!-- FIREBASE E SCRIPTS DO SISTEMA -->
+    <div id="statusSincronizacao" role="status" class="fixed bottom-3 right-3 z-50 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-sm">Conectando aos dados da oficina…</div>
+<div id="modalChecklist" class="hidden fixed inset-0 bg-black/70 z-50 p-4 overflow-y-auto"><div class="bg-zinc-900 border border-zinc-700 rounded-2xl max-w-3xl mx-auto p-5 my-4"><h3 id="checklistTitulo" class="text-xl font-bold mb-4">Diagnóstico · Revisão completa</h3><div id="checklistCampos" class="space-y-4"></div><label for="checklistObservacoes" class="block mt-4">Peças, serviços necessários e observações</label><textarea id="checklistObservacoes" rows="3" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-3 mt-2"></textarea><div class="flex flex-wrap gap-3 mt-4"><button onclick="salvarChecklist(false)" class="bg-blue-600 rounded-xl px-4 py-3">Salvar diagnóstico</button><button onclick="salvarChecklist(true)" class="bg-red-600 rounded-xl px-4 py-3">Finalizar / Devolver diagnóstico</button><button onclick="document.getElementById('modalChecklist').classList.add('hidden')" class="rounded-xl px-4 py-3 border border-zinc-700">Fechar</button></div></div></div>
+<!-- FIREBASE E SCRIPTS DO SISTEMA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1023,16 +1047,17 @@
                     const dadosRemotos = JSON.parse(dados.textoSistema);
                     if (dadosRemotos && typeof dadosRemotos === 'object') {
                         db = { ...db, ...dadosRemotos };
+                        window.firebaseRealtimePronto?.();
                         if (document.getElementById('appScreen') && !document.getElementById('appScreen').classList.contains('hidden')) {
                             renderizarTudo();
                         }
                     }
                 } catch (e) { console.error(e); }
             }
-        });
+        }, err => { console.error(err); window.firebaseRealtimeFalhou?.(); });
 
         window.salvarDBRealtime = function() {
-            set(dbRefRT, { textoSistema: JSON.stringify(db), atualizadoEm: new Date().toISOString() }).catch(err => console.error(err));
+            return set(dbRefRT, { textoSistema: JSON.stringify(db), atualizadoEm: new Date().toISOString() });
         };
     </script>
 
@@ -1234,8 +1259,8 @@
             const optionsClientes = '<option value="generico">Cliente</option>' + 
                 (db.clientes || []).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
             
-            if(document.getElementById('osClienteId')) document.getElementById('osClienteId').innerHTML = optionsClientes;
-            if(document.getElementById('pdvClienteId')) document.getElementById('pdvClienteId').innerHTML = optionsClientes;
+            if(document.getElementById('osClienteId')) { const sel = document.getElementById('osClienteId'); const atual = sel.value; sel.innerHTML = optionsClientes; sel.value = atual || 'generico'; }
+            if(document.getElementById('pdvClienteId')) { const sel = document.getElementById('pdvClienteId'); const atual = sel.value; sel.innerHTML = optionsClientes.replace('>Cliente</option>', '>Cliente Balcão</option>'); sel.value = atual || 'generico'; }
             if(document.getElementById('agClienteId')) document.getElementById('agClienteId').innerHTML = optionsClientes;
             if(document.getElementById('vClienteId')) document.getElementById('vClienteId').innerHTML = '<option value="">Selecione o cliente...</option>' + (db.clientes || []).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
 
@@ -1371,7 +1396,7 @@
         function abrirModalOS(id = null) {
             document.getElementById('osIdEdit').value = '';
             document.getElementById('osMotoInfo').value = '';
-            document.getElementById('osStatus').value = 'Orçamento aguardando peça';
+            document.getElementById('osStatus').value = 'Orçamento';
             document.getElementById('osFormaPagamento').value = 'Dinheiro';
             document.getElementById('osContainerParcelas').classList.add('hidden');
             itensTempOS = [];
@@ -1395,6 +1420,20 @@
                 }
             }
             atualizarSelectsClientesEProdutos();
+            atualizarSelectMecanicosOS();
+            if (id) {
+                const osAtual = (db.os || []).find(o => o.id == id);
+                if (osAtual) {
+                    document.getElementById('osMecanicoId').value = osAtual.mecanicoId || '';
+                    document.getElementById('osDiagnosticoInterno').value = osAtual.diagnosticoInterno || '';
+                    document.getElementById('osDiagnosticoCliente').value = osAtual.diagnosticoCliente || '';
+                }
+            } else {
+                document.getElementById('osMecanicoId').value = '';
+                document.getElementById('osDiagnosticoInterno').value = '';
+                document.getElementById('osDiagnosticoCliente').value = '';
+            }
+            atualizarCamposFluxoOS();
             document.getElementById('modalOS').classList.remove('hidden');
         }
 
@@ -1423,7 +1462,8 @@
             const tipo = document.getElementById('osItemTipo').value;
             let nomeItem = '';
             let valor = parseFloat(document.getElementById('osItemValor').value) || 0;
-            const qtd = parseInt(document.getElementById('osItemQtd').value) || 1;
+            const qtd = Number(document.getElementById('osItemQtd').value);
+            if (!Number.isInteger(qtd) || qtd <= 0) { alert('Informe uma quantidade inteira maior que zero.'); return; }
             let produtoId = null;
 
             if (tipo === 'peca_estoque') {
@@ -1491,7 +1531,44 @@
             }
         }
 
-        function salvarOS(e) {
+        function atualizarCamposFluxoOS() {
+            const status = document.getElementById('osStatus')?.value || '';
+            const bloco = document.getElementById('osBlocoDiagnostico');
+            if (bloco) bloco.classList.toggle('hidden', !['Diagnóstico','Orçamento','Aguardando peça','Aguardando aprovação','Aprovada / Em andamento','Em andamento'].includes(status));
+        }
+
+        function atualizarSelectMecanicosOS() {
+            const sel = document.getElementById('osMecanicoId');
+            if (!sel) return;
+            const atual = sel.value;
+            const mecanicos = (db.usuarios || []).filter(u => /mec[aâ]nico|t[eé]cnico/i.test(u.cargo || ''));
+            sel.innerHTML = '<option value="">Selecione o mecânico...</option>' + mecanicos.map(u => `<option value="${u.id}">${u.nome}</option>`).join('');
+            if (atual) sel.value = atual;
+        }
+
+        function imprimirDiagnosticoCliente() {
+            const clienteId = document.getElementById('osClienteId').value;
+            const cliente = (db.clientes || []).find(c => c.id == clienteId);
+            const moto = document.getElementById('osMotoInfo').value || '';
+            const diag = document.getElementById('osDiagnosticoCliente').value.trim();
+            if (!diag) { alert('Preencha o diagnóstico para o cliente antes de gerar.'); return; }
+            const w = window.open('', '_blank');
+            w.document.write(`<html><head><title>Diagnóstico</title></head><body style="font-family:Arial;padding:32px"><h2>DIAGNÓSTICO - ${db.config?.nomeOficina || 'EF Motos'}</h2><p><b>Cliente:</b> ${cliente?.nome || 'Cliente'}</p><p><b>Veículo:</b> ${moto}</p><hr><p style="white-space:pre-wrap">${diag}</p><script>window.print()<\/script></body></html>`);
+            w.document.close();
+        }
+
+        function imprimirOrcamentoOS() {
+            const clienteId = document.getElementById('osClienteId').value;
+            const cliente = (db.clientes || []).find(c => c.id == clienteId);
+            const moto = document.getElementById('osMotoInfo').value || '';
+            const linhas = itensTempOS.map(i => `<tr><td>${i.nome}</td><td>${i.qtd}</td><td>R$ ${Number(i.valor).toFixed(2)}</td><td>R$ ${(i.qtd*i.valor).toFixed(2)}</td></tr>`).join('');
+            const total = itensTempOS.reduce((s,i)=>s+(i.qtd*i.valor),0);
+            const w = window.open('', '_blank');
+            w.document.write(`<html><head><title>Orçamento</title></head><body style="font-family:Arial;padding:32px"><h2>ORÇAMENTO - ${db.config?.nomeOficina || 'EF Motos'}</h2><p><b>Cliente:</b> ${cliente?.nome || 'Cliente'}</p><p><b>Veículo:</b> ${moto}</p><table border="1" cellspacing="0" cellpadding="8" width="100%"><tr><th>Item/Serviço</th><th>Qtd</th><th>Unitário</th><th>Subtotal</th></tr>${linhas}</table><h3>Total: R$ ${total.toFixed(2)}</h3><script>window.print()<\/script></body></html>`);
+            w.document.close();
+        }
+
+        async function salvarOS(e) {
             e.preventDefault();
             const idEdit = document.getElementById('osIdEdit').value;
             const clienteId = document.getElementById('osClienteId').value;
@@ -1499,62 +1576,80 @@
             const status = document.getElementById('osStatus').value;
             const formaPagamento = document.getElementById('osFormaPagamento').value;
             const parcelas = parseInt(document.getElementById('osParcelas').value) || 1;
+            const mecanicoId = document.getElementById('osMecanicoId')?.value || '';
+            const diagnosticoInterno = document.getElementById('osDiagnosticoInterno')?.value.trim() || '';
+            const diagnosticoCliente = document.getElementById('osDiagnosticoCliente')?.value.trim() || '';
 
-            if (itensTempOS.length === 0) {
-                alert('Adicione pelo menos um item ou serviço à Ordem de Serviço.');
+            if (status !== 'Diagnóstico' && itensTempOS.length === 0) {
+                alert('Adicione pelo menos um item/serviço ou mantenha a OS em Diagnóstico.');
+                return;
+            }
+            if (status === 'Diagnóstico' && !mecanicoId) {
+                alert('Selecione o mecânico responsável pelo diagnóstico.');
                 return;
             }
 
-            let totalOSBruto = itensTempOS.reduce((acc, item) => acc + (item.qtd * item.valor), 0);
+            const estadoAntes = JSON.parse(JSON.stringify(db));
+            const anterior = idEdit ? (db.os || []).find(o => o.id == idEdit) : null;
+            const totalOSBruto = itensTempOS.reduce((acc, item) => acc + (item.qtd * item.valor), 0);
             const calculoTaxa = calcularTaxaInfinitePay(totalOSBruto, formaPagamento, parcelas);
-            let nomeClienteStr = clienteId === 'generico' ? 'Cliente' : ((db.clientes || []).find(c => c.id == clienteId)?.nome || 'Cliente');
-
+            const nomeClienteStr = clienteId === 'generico' ? 'Cliente' : ((db.clientes || []).find(c => c.id == clienteId)?.nome || 'Cliente');
+            const agora = new Date();
+            const dataHoje = agora.toLocaleDateString('pt-BR');
             if (!db.os) db.os = [];
 
-            if (status === 'Faturada') {
-                itensTempOS.forEach(item => {
-                    if (item.produtoId) {
-                        const prod = (db.produtos || []).find(p => p.id == item.produtoId);
-                        if (prod) prod.qtd = Math.max(0, prod.qtd - item.qtd);
-                    }
-                });
+            let faturado = anterior?.faturado === true;
+            let estoqueBaixado = anterior?.estoqueBaixado === true;
+            let dataFaturamento = anterior?.dataFaturamento || '';
+
+            if (status === 'Faturada' && !faturado) {
+                if (!estoqueBaixado) {
+                    itensTempOS.forEach(item => {
+                        if (item.produtoId) {
+                            const prod = (db.produtos || []).find(p => p.id == item.produtoId);
+                            if (prod) prod.qtd = Math.max(0, prod.qtd - item.qtd);
+                        }
+                    });
+                    estoqueBaixado = true;
+                }
                 if (!db.caixa) db.caixa = [];
-                let descPagamento = `OS #${idEdit || Date.now()} - ${nomeClienteStr} (${formaPagamento}${formaPagamento === 'Cartao_Credito' ? ' em ' + parcelas + 'x' : ''})`;
+                const osIdFinal = idEdit ? Number(idEdit) : Date.now();
                 db.caixa.push({
                     id: Date.now(),
                     tipo: 'Entrada',
-                    descricao: descPagamento,
+                    descricao: `OS #${osIdFinal} - ${nomeClienteStr} (${formaPagamento}${formaPagamento === 'Cartao_Credito' ? ' em ' + parcelas + 'x' : ''})`,
                     valor: calculoTaxa.valorLiquido,
-                    data: new Date().toLocaleDateString('pt-BR')
+                    data: dataHoje,
+                    osId: osIdFinal
                 });
+                faturado = true;
+                dataFaturamento = agora.toISOString();
             }
 
             const dadosOS = {
+                ...(anterior || {}),
                 id: idEdit ? Number(idEdit) : Date.now(),
-                clienteId,
-                motoInfo,
-                status,
-                formaPagamento,
-                parcelas,
-                itens: itensTempOS,
-                total: totalOSBruto,
-                valorLiquido: calculoTaxa.valorLiquido,
-                data: new Date().toLocaleDateString('pt-BR')
+                numero: anterior?.numero || proximoNumeroOS(),
+                clienteId, motoInfo, veiculoId: document.getElementById('osVeiculoId').value || null, status, formaPagamento, parcelas,
+                itens: itensTempOS, total: totalOSBruto, valorLiquido: calculoTaxa.valorLiquido,
+                mecanicoId, diagnosticoInterno, diagnosticoCliente,
+                faturado, estoqueBaixado,
+                data: anterior?.data || dataHoje,
+                dataDiagnostico: anterior?.dataDiagnostico || (status === 'Diagnóstico' ? agora.toISOString() : ''),
+                dataOrcamento: anterior?.dataOrcamento || (status === 'Orçamento' ? agora.toISOString() : ''),
+                dataFaturamento
             };
 
-            if (idEdit) {
-                db.os = db.os.map(o => o.id == idEdit ? dadosOS : o);
-            } else {
-                db.os.push(dadosOS);
-            }
+            if (idEdit) db.os = db.os.map(o => o.id == idEdit ? dadosOS : o);
+            else db.os.push(dadosOS);
 
-            salvarDB();
+            if (!await salvarDB()) { db = estadoAntes; alert('Não foi possível gravar a OS. Seus itens continuam na tela para tentar novamente.'); return; }
             fecharModalOS();
             renderizarOS();
             atualizarDashboard();
             renderizarEstoque();
             renderizarCaixa();
-            alert('Ordem de Serviço salva com sucesso!');
+            alert(status === 'Orçamento' ? 'Orçamento salvo sem lançamento no caixa.' : 'Ordem de Serviço salva com sucesso!');
         }
 
         function renderizarOS() {
@@ -1562,6 +1657,8 @@
             if (!tbody) return;
             const filtro = (document.getElementById('filtroBuscaOS')?.value || '').toLowerCase();
             const lista = (db.os || []).filter(o => 
+                numeroOS(o).includes(filtro) ||
+                ((db.clientes || []).find(c => c.id == o.clienteId)?.nome || '').toLowerCase().includes(filtro) ||
                 String(o.id).includes(filtro) ||
                 (o.motoInfo && o.motoInfo.toLowerCase().includes(filtro)) ||
                 (o.status && o.status.toLowerCase().includes(filtro))
@@ -1587,7 +1684,7 @@
 
                 return `
                     <tr class="hover:bg-zinc-950/50">
-                        <td class="p-4 font-bold text-white">#${o.id}</td>
+                        <td class="p-4 font-bold text-white">OS ${numeroOS(o)}</td>
                         <td class="p-4 text-zinc-300">${cliente}<br><span class="text-xs text-zinc-500">${o.motoInfo}</span></td>
                         <td class="p-4">${badgeStatus}</td>
                         <td class="p-4 font-mono font-bold text-emerald-400">R$ ${(o.total || 0).toFixed(2)}</td>
@@ -1725,12 +1822,13 @@
             document.getElementById('pdvTotalDisplay').innerText = `R$ ${totalGeral.toFixed(2)}`;
         }
 
-        function finalizarVendaPDV() {
+        async function finalizarVendaPDV() {
             if (itensTempPDV.length === 0) {
                 alert('O carrinho de vendas está vazio.');
                 return;
             }
 
+            const estadoAntes = JSON.parse(JSON.stringify(db));
             const clienteId = document.getElementById('pdvClienteId').value;
             const formaPagamento = document.getElementById('pdvFormaPagamento').value;
             const parcelas = parseInt(document.getElementById('pdvParcelas').value) || 1;
@@ -1755,7 +1853,7 @@
                 data: new Date().toLocaleDateString('pt-BR')
             });
 
-            salvarDB();
+            if (!await salvarDB()) { db = estadoAntes; alert('Não foi possível gravar a venda. O carrinho continua na tela para tentar novamente.'); return; }
             itensTempPDV = [];
             atualizarTabelaPDV();
             renderizarEstoque();
@@ -1791,6 +1889,8 @@
             document.getElementById('cNome').value = '';
             document.getElementById('cTelefone').value = '';
             document.getElementById('cDoc').value = '';
+            document.getElementById('cEndereco').value = '';
+            document.getElementById('cAniversario').value = '';
             if (id) {
                 const c = (db.clientes || []).find(x => x.id === id);
                 if (c) {
@@ -1798,6 +1898,8 @@
                     document.getElementById('cNome').value = c.nome;
                     document.getElementById('cTelefone').value = c.telefone;
                     document.getElementById('cDoc').value = c.doc || '';
+                    document.getElementById('cEndereco').value = c.endereco || '';
+                    document.getElementById('cAniversario').value = c.aniversario || '';
                 }
             }
             document.getElementById('modalCliente').classList.remove('hidden');
@@ -1809,11 +1911,13 @@
             const nome = document.getElementById('cNome').value.trim();
             const telefone = document.getElementById('cTelefone').value.trim();
             const doc = document.getElementById('cDoc').value.trim();
+            const endereco = document.getElementById('cEndereco').value.trim();
+            const aniversario = document.getElementById('cAniversario').value;
             if (!db.clientes) db.clientes = [];
             if (idEdit) {
-                db.clientes = db.clientes.map(c => c.id == idEdit ? { ...c, nome, telefone, doc } : c);
+                db.clientes = db.clientes.map(c => c.id == idEdit ? { ...c, nome, telefone, doc, endereco, aniversario } : c);
             } else {
-                db.clientes.push({ id: Date.now(), nome, telefone, doc });
+                db.clientes.push({ id: Date.now(), nome, telefone, doc, endereco, aniversario });
             }
             salvarDB();
             fecharModalCliente();
@@ -2103,6 +2207,8 @@
 
         function salvarConfiguracoes(e) {
             e.preventDefault();
+            db.config.telefone = document.getElementById('cfgTelefone').value.trim();
+            db.config.endereco = document.getElementById('cfgEndereco').value.trim();
             db.config.nome = document.getElementById('cfgNome').value.trim();
             db.config.logo = document.getElementById('cfgLogo').value.trim();
             salvarDB();
@@ -2110,195 +2216,259 @@
             alert('Configurações salvas com sucesso!');
         }
     </script>
-
 <script>
-// ===== ACESSO RESTRITO DO MECÂNICO / FLUXO DIAGNÓSTICO =====
-function efEhMecanico(){ return usuarioLogadoAtual && usuarioLogadoAtual.cargo === 'Mecânico / Técnico'; }
-
-function efPopularMecanicos(){
-    const sel=document.getElementById('osMecanicoId');
-    if(!sel) return;
-    const atual=sel.value;
-    sel.innerHTML='<option value="">Selecione o mecânico...</option>' +
-      (db.usuarios||[]).filter(u=>u.cargo==='Mecânico / Técnico').map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
-    sel.value=atual;
+// Extensões aditivas do Teste 10: as credenciais e integrações originais são preservadas.
+const el = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const moeda = v => Number(v || 0).toLocaleString('pt-BR', {style:'currency',currency:'BRL'});
+const ehMecanico = () => /mec[aâ]nico|t[eé]cnico/i.test(usuarioLogadoAtual?.cargo || '');
+const ehAdmin = () => /administrador/i.test(usuarioLogadoAtual?.cargo || '');
+const ehAtendente = () => /atendente/i.test(usuarioLogadoAtual?.cargo || '');
+function exigirAtendimento() { if (!carregamentoFirebaseConcluido) { alert('Aguarde a conexão com os dados da oficina antes de continuar.'); return false; } if (!usuarioLogadoAtual || ehMecanico()) { alert('Esta ação é exclusiva do atendimento.'); return false; } return true; }
+function auditar(acao, referencia, anterior = null, novo = null, aprovacao = null) {
+    if (!db.auditoria) db.auditoria = [];
+    db.auditoria.push({id: crypto.randomUUID(), usuarioId: usuarioLogadoAtual?.id, usuario: usuarioLogadoAtual?.nome, cargo: usuarioLogadoAtual?.cargo, dataHora: new Date().toISOString(), acao, referencia, anterior, novo, aprovacao});
 }
-
-function efAplicarAcesso(){
-    if(!usuarioLogadoAtual) return;
-    if(efEhMecanico()){
-        document.querySelectorAll('.nav-btn').forEach(el=>el.style.display='none');
-        document.querySelectorAll('[id^="mod-"]').forEach(el=>el.classList.add('hidden'));
-        document.getElementById('mod-diagnostico')?.classList.remove('hidden');
-        document.getElementById('pageTitle').innerText='Diagnóstico';
-        renderizarDiagnosticosMecanico();
-    } else {
-        document.querySelectorAll('.nav-btn').forEach(el=>el.style.display='');
-    }
+function proximoNumeroOS() {
+    const max = Math.max(Number(db.ultimoNumeroOS || 0), ...(db.os || []).map(o => Number(o.numero || 0)));
+    db.ultimoNumeroOS = max + 1; return db.ultimoNumeroOS;
 }
-
-function renderizarDiagnosticosMecanico(){
-    const tbody=document.getElementById('tabelaDiagnosticosMecanico');
-    if(!tbody || !usuarioLogadoAtual) return;
-    const lista=(db.os||[]).filter(o => o.status==='Diagnóstico' && String(o.mecanicoId||'')===String(usuarioLogadoAtual.id));
-    if(!lista.length){
-        tbody.innerHTML='<tr><td colspan="4" class="p-5 text-center text-zinc-500">Nenhum diagnóstico enviado para você.</td></tr>';
-        return;
+function garantirNumeracaoOS() {
+    for (const os of db.os || []) if (!os.numero) os.numero = proximoNumeroOS();
+}
+function numeroOS(os) { return String(os.numero || '').padStart(3,'0'); }
+function textoMoto(v) { return [v.marca, v.modelo, v.placa].filter(Boolean).join(' · '); }
+function preencherMotos(prefix, idAtual = '') {
+    const cliente = el(prefix+'ClienteId').value;
+    const sel = el(prefix+'VeiculoId');
+    const lista = (db.veiculos || []).filter(v => cliente === 'generico' || String(v.clienteId) === String(cliente));
+    sel.innerHTML = '<option value="">Informar moto manualmente</option>'+lista.map(v => `<option value="${esc(v.id)}">${esc(textoMoto(v))}</option>`).join('');
+    sel.value = lista.some(v => String(v.id) === String(idAtual)) ? String(idAtual) : '';
+}
+function atualizarMotosOS(limpar = false) { preencherMotos('os', limpar ? '' : el('osVeiculoId').value); if(limpar) el('osMotoInfo').value = ''; }
+function selecionarMotoOS() {
+    const v = (db.veiculos || []).find(v => String(v.id) === el('osVeiculoId').value);
+    if(v) { el('osMotoInfo').value = textoMoto(v); if(v.clienteId) el('osClienteId').value = String(v.clienteId); preencherMotos('os', v.id); }
+}
+function atualizarMotosAgenda() { preencherMotos('ag', el('agVeiculoId').value); }
+function selecionarMotoAgenda() { const v = (db.veiculos || []).find(v => String(v.id) === el('agVeiculoId').value); if(v) { el('agMoto').value=textoMoto(v); el('agClienteId').value=String(v.clienteId || 'generico'); preencherMotos('ag',v.id); } }
+const selectsOriginais = atualizarSelectsClientesEProdutos;
+atualizarSelectsClientesEProdutos = function() { selectsOriginais(); atualizarMotosOS(); atualizarMotosAgenda(); };
+const abrirOSOriginal = abrirModalOS;
+let apontamentoSelecionado = null;
+abrirModalOS = function(id = null) {
+    if(ehMecanico()) { if(id) abrirChecklist(id); return; }
+    if(!exigirAtendimento()) return;
+    garantirNumeracaoOS();
+    // Reset prevents stale customer from the last edited order.
+    if(!id) el('osClienteId').value='generico';
+    abrirOSOriginal(id);
+    const os = (db.os || []).find(o => o.id == id);
+    el('osClienteId').value = os?.clienteId || 'generico'; preencherMotos('os',os?.veiculoId || '');
+    el('osDataExibida').value = os?.data || new Date().toLocaleDateString('pt-BR');
+    el('osObservacoes').value = os?.observacoes || '';
+    el('modalOSTitulo').textContent = os ? 'Ordem de Serviço '+numeroOS(os) : 'Nova Ordem de Serviço / Orçamento';
+    el('osDiagnosticoInterno').readOnly = true;
+    apontamentoSelecionado=null;
+    renderizarApontamentos(os);
+    const bloquear = os?.faturado;
+    for(const field of ['osClienteId','osVeiculoId','osMotoInfo','osFormaPagamento','osParcelas','osItemTipo','osItemEstoqueId','osItemDescricaoLivre','osItemQtd','osItemValor']) el(field).disabled=!!bloquear;
+    el('osStatus').disabled=false;
+};
+const abrirAgendaOriginal = abrirModalAgendamento;
+abrirModalAgendamento = function(id = null) { if(!exigirAtendimento()) return; abrirAgendaOriginal(id); const a=(db.agendamentos||[]).find(a=>a.id==id); preencherMotos('ag',a?.veiculoId || ''); };
+const salvarAgendaOriginal = salvarAgendamento;
+salvarAgendamento = function(e) { if(!exigirAtendimento()) {e.preventDefault();return;} const id=el('agendamentoIdEdit').value; const before=(db.agendamentos||[]).length; salvarAgendaOriginal(e); const a=id?(db.agendamentos||[]).find(a=>a.id==id):(db.agendamentos||[])[before]; if(a) {a.veiculoId=el('agVeiculoId').value || null; auditar('Salvar agendamento',a.id); salvarDB();} };
+const adicionarItemOriginal = adicionarItemOS;
+adicionarItemOS = function() {
+    if(!exigirAtendimento()) return;
+    const os = (db.os||[]).find(o => o.id == el('osIdEdit').value);
+    if(os?.faturado) {alert('A OS já foi faturada. Solicite uma alteração financeira.');return;}
+    if(apontamentoSelecionado!==null) {const tipo=el('osItemTipo').value==='mao_de_obra'?'mao_de_obra':'peca';if(itensTempOS.some(i=>i.apontamentoId===apontamentoSelecionado && i.tipo===tipo)){alert('Este tipo de item já foi adicionado para o apontamento.');return;}}
+    const oldLength=itensTempOS.length; adicionarItemOriginal();
+    if(itensTempOS.length > oldLength) { const item=itensTempOS.at(-1); item.id=Date.now()+Math.floor(Math.random()*1000); if(apontamentoSelecionado!==null) item.apontamentoId=apontamentoSelecionado; apontamentoSelecionado=null; renderizarApontamentos(os); }
+};
+const removerItemOriginal=removerItemOS;
+removerItemOS = function(id) { if(!exigirAtendimento()) return; const os=(db.os||[]).find(o=>o.id==el('osIdEdit').value); if(os?.faturado) {alert('A OS já foi faturada. Solicite uma alteração financeira.'); return;} removerItemOriginal(id); renderizarApontamentos(os); };
+function validarEstoque(itens) {
+    const consumo=new Map(); for(const item of itens) {
+        if(!Number.isFinite(item.valor) || item.valor<0 || !Number.isInteger(item.qtd) || item.qtd<=0) {alert('Confira quantidade e preço dos itens.');return false;}
+        if(item.produtoId) consumo.set(String(item.produtoId), (consumo.get(String(item.produtoId)) || 0)+item.qtd);
     }
-    tbody.innerHTML=lista.map(o=>{
-        const c=o.clienteId==='generico'?'Cliente':((db.clientes||[]).find(x=>x.id==o.clienteId)?.nome||'Cliente');
-        return `<tr>
-          <td class="p-4 font-bold text-white">#${o.id}</td>
-          <td class="p-4">${c}<br><span class="text-xs text-zinc-500">${o.motoInfo||''}</span></td>
-          <td class="p-4"><span class="px-2 py-1 rounded-full bg-purple-950 text-purple-300 border border-purple-800 text-xs">Diagnóstico</span></td>
-          <td class="p-4 text-right"><button onclick="abrirDiagnosticoMecanico(${o.id})" class="bg-red-600 hover:bg-red-700 px-3 py-2 rounded-xl text-xs font-semibold">Abrir diagnóstico</button></td>
-        </tr>`;
+    for(const [id,qtd] of consumo) { const p=(db.produtos||[]).find(p=>String(p.id)===id); if(!p || p.qtd < qtd) {alert('Estoque insuficiente: '+(p?.nome || 'produto removido'));return false;} }
+    return true;
+}
+function solicitarAlteracao(tipo, referencia, anterior, novo) {
+    if(!db.solicitacoes) db.solicitacoes=[];
+    if(db.solicitacoes.some(s=>s.status==='Pendente' && s.tipo===tipo && String(s.referencia)===String(referencia))) {alert('Já existe uma solicitação pendente para este registro.');return;}
+    const s={id:crypto.randomUUID(),tipo,referencia,anterior,novo,status:'Pendente',usuarioId:usuarioLogadoAtual.id,usuario:usuarioLogadoAtual.nome,dataHora:new Date().toISOString()};
+    db.solicitacoes.push(s); auditar('Solicitar alteração', referencia, anterior, novo); salvarDB(); alert('Solicitação enviada ao administrador para aprovação.');
+}
+let osSalvando=false;
+const salvarOSOriginal = salvarOS;
+salvarOS = async function(e) {
+    e.preventDefault(); if(osSalvando || !exigirAtendimento()) return;
+    const id=el('osIdEdit').value; const anterior=(db.os||[]).find(o=>o.id==id);
+    const status=el('osStatus').value;
+    if(!el('osMotoInfo').value.trim()) {alert('Selecione ou informe a moto.'); return;}
+    if(anterior?.faturado && !['Faturada','Concluída'].includes(status)) {alert('Uma OS faturada precisa ser estornada antes de voltar ao orçamento.');return;}
+    if(anterior?.faturado && (JSON.stringify(itensTempOS)!==JSON.stringify(anterior.itens) || el('osFormaPagamento').value!==anterior.formaPagamento || Number(el('osParcelas').value || 1)!==Number(anterior.parcelas || 1))) {alert('Os valores e o pagamento de uma OS faturada ficam protegidos.');return;}
+    if(status==='Concluída' && !anterior?.faturado) {alert('Fat ure a OS antes de concluir.'.replace('Fat ure','Fature'));return;}
+    if(status==='Faturada' && !anterior?.faturado && !validarEstoque(itensTempOS)) return;
+    if(ehAtendente() && anterior && (anterior.total>itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0) || anterior.itens?.some(i=> !itensTempOS.some(n=>n.id===i.id) || itensTempOS.find(n=>n.id===i.id)?.valor!==i.valor))) {
+        solicitarAlteracao('Editar OS',anterior.id,JSON.parse(JSON.stringify(anterior)),{...anterior,itens:JSON.parse(JSON.stringify(itensTempOS)),total:itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0),status,formaPagamento:el('osFormaPagamento').value,parcelas:Number(el('osParcelas').value),motoInfo:el('osMotoInfo').value,clienteId:el('osClienteId').value,veiculoId:el('osVeiculoId').value,observacoes:el('osObservacoes').value}); return;
+    }
+    const tamanho=(db.os||[]).length; const antes=anterior ? JSON.parse(JSON.stringify(anterior)) : null;
+    osSalvando=true;try{await salvarOSOriginal(e);}finally{osSalvando=false;}
+    const os=id?(db.os||[]).find(o=>o.id==id):(db.os||[])[tamanho];
+    if(!os || !el('modalOS').classList.contains('hidden')) return;
+    os.observacoes=el('osObservacoes').value.trim();
+    const agora=new Date().toISOString();
+    if(status==='Aprovada / Em andamento' || status==='Em andamento') os.dataAprovacao ||= agora;
+    if(status==='Concluída') os.dataConclusao ||= agora;
+    if(os.diagnosticoDevolvido) os.devolucaoTratada=true;
+    if(status==='Diagnóstico' && antes?.status!=='Diagnóstico') {os.diagnosticoDevolvido=false;os.devolucaoTratada=false;}
+    auditar('Salvar OS',os.id,antes,{numero:os.numero,status:os.status,total:os.total}); salvarDB(); renderizarOS();
+};
+const CHECKLIST = {
+'Motor':['Óleo','Vazamentos','Tampa de válvulas','Juntas / Retentores','Ruídos','Marcha lenta','Vela','Filtro de ar','Filtro de combustível','Válvulas','Injeção / TBI'],
+'Freios':['Pastilha dianteira','Lona / Pastilha traseira','Disco','Fluido de freio','Mangueiras','Acionamento','Desgaste / Vazamentos'],
+'Transmissão':['Corrente','Coroa','Pinhão','Tensão da corrente','Lubrificação','Desgaste da transmissão'],
+'Pneus / Rodas':['Pneu dianteiro','Pneu traseiro','Calibragem','Desgaste dos pneus','Rodas','Raios','Rolamentos das rodas'],
+'Suspensão / Direção':['Bengalas','Retentores das bengalas','Amortecedor','Caixa de direção','Rolamentos da direção','Folgas','Alinhamento'],
+'Elétrica':['Bateria','Carga','Farol','Lanterna','Luz de freio','Piscas','Buzina','Painel','Partida','Chicote'],
+'Comandos':['Embreagem','Acelerador','Manetes','Pedal de freio','Câmbio','Descansos'],
+'Estrutura / Segurança':['Fixações','Escapamento','Vazamentos gerais','Estrutura','Retrovisores','Placa','Itens gerais']
+};
+const CHECK_ITENS = Object.entries(CHECKLIST).flatMap(([grupo,itens])=>itens.map(nome=>({grupo,nome})));
+let checklistOSId=null;
+function abrirChecklist(id) {
+    const os=(db.os||[]).find(o=>o.id==id);
+    if(!ehMecanico() || !os || String(os.mecanicoId)!==String(usuarioLogadoAtual.id)) {alert('Esta OS não está atribuída a você.');return;}
+    checklistOSId=os.id;
+    el('checklistTitulo').textContent='OS '+numeroOS(os)+' · Revisão completa · '+os.motoInfo;
+    el('checklistCampos').innerHTML=Object.entries(CHECKLIST).map(([grupo,nomes])=>`<section class="border border-zinc-700 rounded-xl p-3"><h4 class="font-bold text-red-400 mb-3">${esc(grupo)}</h4>${nomes.map(nome=>{
+        const index=CHECK_ITENS.findIndex(i=>i.grupo===grupo && i.nome===nome); const item=os.checklist?.[index];
+        return `<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 border-t border-zinc-800 py-2 items-center"><label for="ck${index}">${esc(nome)}</label><select id="ck${index}" class="bg-zinc-950 rounded-lg p-2" ${os.diagnosticoDevolvido?'disabled':''}>${['','OK','ATENÇÃO','TROCAR','REPARAR','NÃO SE APLICA'].map(v=>`<option value="${v}" ${item?.estado===v?'selected':''}>${v || 'Não avaliado'}</option>`).join('')}</select><input id="ckObs${index}" aria-label="Observação ${esc(nome)}" placeholder="Observação (opcional)" value="${esc(item?.observacao || '')}" class="bg-zinc-950 rounded-lg p-2" ${os.diagnosticoDevolvido?'disabled':''}></div>`;
+    }).join('')}</section>`).join('');
+    el('checklistObservacoes').value=os.observacoesMecanico || ''; el('checklistObservacoes').disabled=!!os.diagnosticoDevolvido;
+    el('modalChecklist').classList.remove('hidden');
+}
+function salvarChecklist(devolver) {
+    const os=(db.os||[]).find(o=>o.id==checklistOSId);
+    if(!carregamentoFirebaseConcluido || !ehMecanico() || !os || String(os.mecanicoId)!==String(usuarioLogadoAtual.id) || os.status!=='Diagnóstico' || os.diagnosticoDevolvido) {alert('Esta OS não está em diagnóstico para você.');return;}
+    const checklist=CHECK_ITENS.map((item,i)=>({...item,estado:el('ck'+i).value,observacao:el('ckObs'+i).value.trim()}));
+    if(devolver && checklist.some(i=>!i.estado)) {alert('Avalie todos os itens; use Não se aplica quando necessário.');return;}
+    os.checklist=checklist;os.observacoesMecanico=el('checklistObservacoes').value.trim();
+    os.diagnosticoInterno=checklist.filter(i=>['ATENÇÃO','TROCAR','REPARAR'].includes(i.estado)).map(i=>i.nome+' — '+i.estado+(i.observacao?' — '+i.observacao:'')).join('\n')+(os.observacoesMecanico?'\n'+os.observacoesMecanico:'');
+    if(devolver) {os.diagnosticoDevolvido=true;os.devolucaoTratada=false;os.dataDevolucao=new Date().toISOString();os.status='Orçamento';el('modalChecklist').classList.add('hidden');}
+    auditar(devolver?'Devolver diagnóstico':'Salvar diagnóstico',os.id,null,{checklist:os.checklist,observacoes:os.observacoesMecanico});salvarDB();renderizarMinhasOS();
+}
+function renderizarMinhasOS() {
+    const lista=(db.os||[]).filter(o=>String(o.mecanicoId)===String(usuarioLogadoAtual?.id));
+    el('listaMinhasOS').innerHTML=lista.map(o=>`<div class="bg-zinc-900 border border-zinc-700 rounded-xl p-4 flex flex-wrap gap-3 justify-between"><div><b>OS ${numeroOS(o)}</b><p>${esc(o.motoInfo)}</p><p>${esc((db.clientes||[]).find(c=>c.id==o.clienteId)?.nome || 'Cliente')} · ${esc(o.status)}</p></div><button onclick="abrirChecklist(${o.id})" class="bg-red-600 rounded-xl px-4 py-2">${o.diagnosticoDevolvido?'Ver diagnóstico':'Abrir diagnóstico'}</button></div>`).join('') || '<p class="text-zinc-400">Nenhuma OS atribuída a você.</p>';
+}
+function renderizarDevolvidas() {
+    const lista=(db.os||[]).filter(o=>o.diagnosticoDevolvido && !o.devolucaoTratada);
+    el('osDevolvidas').innerHTML='<h3 class="text-amber-400 font-bold mb-2">OS devolvidas do mecânico</h3>'+ (lista.map(o=>`<button onclick="abrirModalOS(${o.id})" class="border border-zinc-700 rounded-xl p-3 mr-2 mb-2">OS ${numeroOS(o)} · ${esc(o.motoInfo)}</button>`).join('') || '<p class="text-zinc-400">Nenhum diagnóstico aguardando atendimento.</p>');
+}
+function renderizarApontamentos(os) {
+    const lista=(os?.checklist || []).map((i,index)=>({...i,index})).filter(i=>['ATENÇÃO','TROCAR','REPARAR'].includes(i.estado));
+    el('osApontamentos').classList.toggle('hidden',!lista.length);
+    el('osApontamentos').innerHTML='<h4 class="font-bold text-amber-400">Itens apontados pelo mecânico</h4><p class="text-sm text-zinc-400">Selecione apenas os itens que vão para o orçamento. É possível adicionar peça e mão de obra ao mesmo apontamento.</p>'+lista.map(i=>{
+        const incluidos=itensTempOS.filter(n=>n.apontamentoId===i.index);
+        return `<div class="border-t border-zinc-800 pt-3"><p>${esc(i.nome)} · ${esc(i.estado)}${i.observacao?' · '+esc(i.observacao):''}</p><p class="text-sm text-emerald-400">${incluidos.length?'Adicionado ao orçamento: '+incluidos.map(n=>n.tipo==='mao_de_obra'?'Mão de obra':'Peça').join(', '):''}</p><button type="button" onclick="prepararApontamento(${i.index})" class="text-amber-400 underline">Adicionar ao orçamento</button></div>`;
     }).join('');
 }
-
-function abrirDiagnosticoMecanico(id){
-    if(!efEhMecanico()) return abrirModalOS(id);
-    const os=(db.os||[]).find(o=>o.id===id);
-    if(!os || os.status!=='Diagnóstico' || String(os.mecanicoId||'')!==String(usuarioLogadoAtual.id)){
-        alert('Esta ordem não está mais disponível para diagnóstico.');
-        renderizarDiagnosticosMecanico();
-        return;
-    }
-    abrirModalOS(id);
-    document.getElementById('modalOSTitulo').innerHTML='<i class="fa-solid fa-stethoscope text-red-500 mr-2"></i>Diagnóstico da OS #'+id;
-    ['osClienteId','osMotoInfo','osStatus','osFormaPagamento','osParcelas','osItemEstoqueId','osItemValor'].forEach(k=>{
-        const e=document.getElementById(k); if(e) e.disabled=true;
-    });
-    document.getElementById('boxMecanicoOS')?.classList.add('hidden');
-    const tipo=document.getElementById('osItemTipo');
-    if(tipo){
-        tipo.innerHTML='<option value="mao_de_obra">Serviço / item encontrado no diagnóstico</option>';
-        tipo.value='mao_de_obra'; alternarTipoItemOS();
-    }
-    const valor=document.getElementById('osItemValor'); if(valor){valor.value='0'; valor.closest('div').classList.add('hidden');}
+function prepararApontamento(index) {
+    const os=(db.os||[]).find(o=>o.id==el('osIdEdit').value); const item=os?.checklist?.[index]; if(!item || os.faturado || !exigirAtendimento())return;
+    if(itensTempOS.filter(i=>i.apontamentoId===index).length>=2) {alert('Este apontamento já tem peça e mão de obra no orçamento.');return;}
+    apontamentoSelecionado=index;el('osItemTipo').value=itensTempOS.some(i=>i.apontamentoId===index && i.tipo==='peca')?'mao_de_obra':'peca_livre';alternarTipoItemOS();el('osItemDescricaoLivre').value=item.nome;el('osItemValor').value='';el('osItemDescricaoLivre').focus();
+}
+function aplicarPapel() {
+    for(const a of document.querySelectorAll('.nav-btn')) { const onclick=a.getAttribute('onclick') || ''; a.classList.toggle('hidden',ehMecanico() ? !onclick.includes("'minhas-os'") : onclick.includes("'minhas-os'") || (onclick.includes("'auditoria'") && !ehAdmin())); }
+}
+const renderizarTudoOriginal=renderizarTudo;
+renderizarTudo=function() { garantirNumeracaoOS(); aplicarPapel(); if(ehMecanico()) {renderizarMinhasOS();return;} renderizarTudoOriginal();renderizarDevolvidas();if(ehAdmin())renderizarAuditoria(); };
+const mudarModuloOriginal=mudarModulo;
+mudarModulo=function(id) { if(ehMecanico() && id!=='minhas-os')return; if(id==='auditoria' && !ehAdmin())return; mudarModuloOriginal(id); if(id==='minhas-os')el('pageTitle').textContent='Minhas Ordens de Serviço'; if(id==='auditoria')el('pageTitle').textContent='Solicitações e Auditoria'; };
+const loginOriginal=realizarLogin;
+realizarLogin=function(e) { loginOriginal(e); if(usuarioLogadoAtual) { aplicarPapel();mudarModulo(ehMecanico()?'minhas-os':'dashboard'); } };
+const renderizarOSOriginal=renderizarOS;
+renderizarOS=function() { if(ehMecanico())return;garantirNumeracaoOS();renderizarOSOriginal();renderizarDevolvidas(); };
+let vendaSalvando=false;
+const vendaOriginal=finalizarVendaPDV;
+finalizarVendaPDV=async function() { if(vendaSalvando)return; if(!exigirAtendimento() || !validarEstoque(itensTempPDV))return;const itens=JSON.parse(JSON.stringify(itensTempPDV));const antes=(db.caixa||[]).length;vendaSalvando=true;try{await vendaOriginal();}finally{vendaSalvando=false;}if((db.caixa||[]).length>antes) {auditar('Venda de balcão',db.caixa.at(-1).id,null,{clienteId:el('pdvClienteId').value,itens,total:itens.reduce((a,i)=>a+i.qtd*i.valor,0)});salvarDB();} };
+const excluirOSOriginal=excluirOS;
+excluirOS=function(id) {if(!exigirAtendimento())return;const os=(db.os||[]).find(o=>o.id==id);if(!os)return;if(ehAtendente())return solicitarAlteracao('Excluir OS',id,JSON.parse(JSON.stringify(os)),null);if(os.faturado){alert('Uma OS faturada não pode ser excluída. Preserve o histórico financeiro.');return;}excluirOSOriginal(id);if(!(db.os||[]).some(o=>o.id==id)){auditar('Excluir OS',id,os,null);salvarDB();} };
+function renderizarAuditoria() {
+    const pendentes=(db.solicitacoes||[]).filter(s=>s.status==='Pendente');
+    el('listaSolicitacoes').innerHTML=pendentes.map(s=>`<div class="bg-zinc-900 border border-zinc-700 p-4 rounded-xl"><b>${esc(s.tipo)} · ${esc(s.usuario)}</b><p>Registro: ${esc(s.referencia)}</p><pre class="text-sm whitespace-pre-wrap">Anterior: ${esc(JSON.stringify(s.anterior))}\nProposto: ${esc(JSON.stringify(s.novo))}</pre><button onclick="decidirSolicitacao('${s.id}',true)" class="bg-emerald-700 px-4 py-2 rounded-xl mr-2">Aprovar</button><button onclick="decidirSolicitacao('${s.id}',false)" class="bg-red-700 px-4 py-2 rounded-xl">Recusar</button></div>`).join('') || '<p class="text-zinc-400">Nenhuma solicitação pendente.</p>';
+    el('listaAuditoria').innerHTML=(db.auditoria||[]).slice().reverse().map(a=>`<div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl"><b>${esc(a.acao)}</b> · ${esc(a.usuario)} (${esc(a.cargo)})<p>${esc(new Date(a.dataHora).toLocaleString('pt-BR'))} · Registro ${esc(a.referencia)}</p><details><summary>Detalhes</summary><pre class="text-sm whitespace-pre-wrap">${esc(JSON.stringify({anterior:a.anterior,novo:a.novo,aprovacao:a.aprovacao},null,2))}</pre></details></div>`).join('') || '<p class="text-zinc-400">Nenhuma ação registrada.</p>';
+}
+function decidirSolicitacao(id,aprovada) {
+    if(!ehAdmin())return;const s=(db.solicitacoes||[]).find(s=>s.id===id);if(!s || s.status!=='Pendente')return;
+    const os=(db.os||[]).find(o=>o.id==s.referencia);
+    if(aprovada && s.tipo==='Editar OS') {
+        if(!os || os.faturado || JSON.stringify(os)!==JSON.stringify(s.anterior)) {alert('O registro mudou após a solicitação. Recuse e solicite uma nova revisão.');return;}
+        // Approval changes the draft only. Billing remains an explicit, validated step.
+        const novo={...s.novo,status:os.status};db.os=db.os.map(o=>o.id==s.referencia?novo:o);
+    } else if(aprovada && s.tipo==='Excluir OS') {if(os?.faturado){alert('OS faturada não pode ser excluída.');return;}db.os=(db.os||[]).filter(o=>o.id!=s.referencia);}
+    else if(aprovada && s.tipo==='Excluir lançamento') { db.caixa=(db.caixa||[]).filter(o=>o.id!=s.referencia); }
+    else if(aprovada && s.tipo==='Novo lançamento') {db.caixa ||= [];db.caixa.push({...s.novo,id:Date.now()});}
+    s.status=aprovada?'Aprovada':'Recusada';s.aprovador=usuarioLogadoAtual.nome;s.dataDecisao=new Date().toISOString();auditar('Decidir solicitação',s.referencia,s.anterior,s.novo,{status:s.status,solicitacaoId:s.id});salvarDB();renderizarTudo();
+}
+const caixaExcluirOriginal=excluirMovimentacaoCaixa;
+excluirMovimentacaoCaixa=function(id) {if(!exigirAtendimento())return;const m=(db.caixa||[]).find(m=>m.id==id);if(ehAtendente())return solicitarAlteracao('Excluir lançamento',id,m,null);if(m?.osId){alert('Lançamento vinculado à OS: preserve o histórico do faturamento.');return;}caixaExcluirOriginal(id);auditar('Excluir lançamento',id,m,null);salvarDB();};
+const caixaSalvarOriginal=salvarMovimentacaoCaixa;
+salvarMovimentacaoCaixa=function(e) {e.preventDefault();if(!exigirAtendimento())return;const novo={tipo:el('cxTipo').value,descricao:el('cxDescricao').value.trim(),valor:Number(el('cxValor').value),data:new Date().toLocaleDateString('pt-BR')};if(!novo.descricao || !Number.isFinite(novo.valor) || novo.valor<=0){alert('Confira a descrição e o valor.');return;}if(ehAtendente())return solicitarAlteracao('Novo lançamento','caixa',null,novo);caixaSalvarOriginal(e);auditar('Novo lançamento',db.caixa.at(-1).id,null,novo);salvarDB();};
+// Restrict administrative actions while leaving original modules and routines intact.
+for(const name of ['salvarUsuario','excluirUsuario','salvarConfiguracoes','salvarMetas','salvarProduto','excluirProduto','salvarContaPagar','excluirContaPagar','salvarContaReceber','excluirContaReceber']) {
+    const original=window[name];window[name]=function(...args){if(!ehAdmin()){args[0]?.preventDefault?.();alert('Esta ação requer administrador.');return;}const r=original.apply(this,args);auditar(name,'administração');salvarDB();return r;};
 }
 
-const efRealizarLoginOriginal=realizarLogin;
-realizarLogin=function(e){
-    efRealizarLoginOriginal(e);
-    if(usuarioLogadoAtual) setTimeout(efAplicarAcesso,0);
-};
+for(const name of ['salvarCliente','excluirCliente','salvarVeiculo','excluirVeiculo','excluirAgendamento','adicionarItemPDVEstoque','adicionarItemPDVLivre','removerItemPDV']) {
+    const original=window[name];window[name]=function(...args){if(!exigirAtendimento()){args[0]?.preventDefault?.();return;}return original.apply(this,args);};
+}
 
-const efMudarModuloOriginal=mudarModulo;
-mudarModulo=function(id){
-    if(efEhMecanico()){
-        document.querySelectorAll('[id^="mod-"]').forEach(el=>el.classList.add('hidden'));
-        document.getElementById('mod-diagnostico')?.classList.remove('hidden');
-        document.getElementById('pageTitle').innerText='Diagnóstico';
-        renderizarDiagnosticosMecanico();
-        return;
-    }
-    efMudarModuloOriginal(id);
+// Preserve Firebase, expose connection/save failures rather than silently losing a record.
+let carregamentoFirebaseConcluido=false;
+const carregarOriginal=carregarDadosFirebase;
+carregarDadosFirebase=function(callback) {
+    firestore.collection('ef_motos').doc('dados_gerais').get().then(doc=>{
+        if(doc.exists)db={...db,...doc.data()};
+        carregamentoFirebaseConcluido=true;garantirNumeracaoOS();el('statusSincronizacao').textContent='Dados conectados';if(callback)callback();
+    }).catch(err=>{console.error(err);if(!carregamentoFirebaseConcluido)el('statusSincronizacao').textContent='Conectando ao banco da oficina…';if(callback)callback();});
 };
-
-const efRenderizarTudoOriginal=renderizarTudo;
-renderizarTudo=function(){
-    if(efEhMecanico()){
-        renderizarDiagnosticosMecanico();
-        efAplicarAcesso();
-        return;
-    }
-    efRenderizarTudoOriginal();
-    efPopularMecanicos();
+const configVisuaisOriginal=aplicarConfiguracoesVisuais;
+aplicarConfiguracoesVisuais=function(){configVisuaisOriginal();el('cfgTelefone').value=db.config.telefone || '';el('cfgEndereco').value=db.config.endereco || '';};
+window.firebaseRealtimePronto=function() {carregamentoFirebaseConcluido=true;garantirNumeracaoOS();el('statusSincronizacao').textContent='Dados conectados';aplicarConfiguracoesVisuais();verificarLoginSalvoLocalStorage();};
+window.firebaseRealtimeFalhou=function() {if(!carregamentoFirebaseConcluido)el('statusSincronizacao').textContent='Não foi possível conectar aos dados. Recarregue para tentar novamente.';};
+const salvarOriginal=salvarDB;
+salvarDB=function() {
+    if(!carregamentoFirebaseConcluido) {el('statusSincronizacao').textContent='Não foi possível salvar: a conexão com o Firebase não está pronta.';return Promise.resolve(false);}
+    el('statusSincronizacao').textContent='Salvando…';
+    const promessas=[firestore.collection('ef_motos').doc('dados_gerais').set(db)];
+    if(typeof window.salvarDBRealtime==='function')promessas.push(window.salvarDBRealtime());
+    return Promise.allSettled(promessas).then(resultados=>{const sucesso=resultados.some(r=>r.status==='fulfilled');el('statusSincronizacao').textContent=sucesso?'Dados salvos':'Falha ao salvar. Mantenha esta tela aberta e tente novamente.';return sucesso;});
 };
-
-const efAbrirModalOSOriginal=abrirModalOS;
-abrirModalOS=function(id=null){
-    if(efEhMecanico()){
-        if(!id) return;
-        const os=(db.os||[]).find(o=>o.id===id);
-        if(!os || os.status!=='Diagnóstico' || String(os.mecanicoId||'')!==String(usuarioLogadoAtual.id)){
-            alert('Você só pode acessar ordens em Diagnóstico enviadas para você.');
-            return;
-        }
-    }
-    efAbrirModalOSOriginal(id);
-    efPopularMecanicos();
-    if(id){
-        const os=(db.os||[]).find(o=>o.id===id);
-        if(document.getElementById('osMecanicoId')) document.getElementById('osMecanicoId').value=os?.mecanicoId||'';
-    }
+// Complete, professional printable customer quote. Only customer-visible diagnosis is printed.
+const imprimirOrcamentoOriginal=imprimirOrcamentoOS;
+imprimirOrcamentoOS=function() {
+    if(!exigirAtendimento())return;const os=(db.os||[]).find(o=>o.id==el('osIdEdit').value);
+    if(!os){alert('Salve a OS antes de imprimir para manter seu número.');return;}
+    const c=(db.clientes||[]).find(c=>c.id==el('osClienteId').value);
+    const w=window.open('','_blank');if(!w){alert('Permita a abertura da janela de impressão.');return;}
+    const linhas=tipo=>itensTempOS.filter(i=>tipo==='peca'?i.tipo!=='mao_de_obra':i.tipo==='mao_de_obra').map(i=>`<tr><td>${esc(i.nome)}</td><td>${i.qtd}</td><td>${moeda(i.valor)}</td><td>${moeda(i.qtd*i.valor)}</td></tr>`).join('');
+    const tabela=(titulo,tipo)=>`<h3>${titulo}</h3><table><thead><tr><th>Descrição</th><th>Qtd.</th><th>Unitário</th><th>Subtotal</th></tr></thead><tbody>${linhas(tipo) || '<tr><td colspan="4">Nenhum item</td></tr>'}</tbody></table>`;
+    w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Orçamento OS ${numeroOS(os)}</title><style>body{font:14px Arial;color:#18181b;max-width:800px;margin:32px auto;padding:24px}header{display:flex;align-items:center;gap:20px;border-bottom:3px solid #dc2626;padding-bottom:20px}img{max-width:90px;max-height:80px}h1{margin:0}h2{color:#b91c1c}table{border-collapse:collapse;width:100%;margin-bottom:20px}th,td{border-bottom:1px solid #ddd;padding:10px;text-align:left}th{background:#f4f4f5}td:nth-child(n+2){text-align:right}.total{text-align:right;font-size:22px;font-weight:bold}.texto{white-space:pre-wrap}footer{border-top:1px solid #ddd;padding-top:16px;color:#555}@media print{body{margin:0;max-width:none}button{display:none}}</style></head><body><header>${db.config.logo?`<img src="${esc(db.config.logo)}" alt="Logo">`:''}<div><h1>${esc(db.config.nome || 'EF Motos')}</h1><p>${esc(db.config.telefone || '')} ${esc(db.config.endereco || '')}</p></div></header><h2>ORÇAMENTO · OS ${numeroOS(os)}</h2><p><b>Data:</b> ${esc(os.data)}<br><b>Cliente:</b> ${esc(c?.nome || 'Cliente')}<br><b>Veículo:</b> ${esc(el('osMotoInfo').value)}</p>${el('osDiagnosticoCliente').value?'<h3>Diagnóstico</h3><p class="texto">'+esc(el('osDiagnosticoCliente').value)+'</p>':''}${tabela('Peças','peca')}${tabela('Serviços / Mão de obra','mao_de_obra')}<p class="total">Total: ${moeda(itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0))}</p><h3>Observações</h3><p class="texto">${esc(el('osObservacoes').value)}</p><footer>Orçamento sujeito à aprovação do cliente.<p>Assinatura: _____________________________________</p></footer><button onclick="window.print()">Imprimir / Salvar PDF</button></body></html>`);w.document.close();
 };
+if(document.modelContext?.registerTool) {
+    const lifecycle=new AbortController();
+    const tool={name:'start_service_order',title:'Abrir ordem de serviço',description:'Abre uma nova OS e permite selecionar uma moto cadastrada. Não salva nem fatura.',inputSchema:{type:'object',properties:{vehicleId:{type:'string'}},additionalProperties:false},annotations:{readOnlyHint:false},execute(input){if(!exigirAtendimento())throw new Error('Acesso não permitido');if(input?.vehicleId && !(db.veiculos||[]).some(v=>String(v.id)===input.vehicleId))throw new Error('Moto não encontrada');abrirModalOS();if(input?.vehicleId){el('osVeiculoId').value=input.vehicleId;selecionarMotoOS();}return {opened:true,vehicleId:el('osVeiculoId').value || null};}};
+    Promise.resolve(document.modelContext.registerTool(tool,{signal:lifecycle.signal})).catch(console.error);window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});
+}
 
-const efAdicionarItemOSOriginal=adicionarItemOS;
-adicionarItemOS=function(){
-    if(efEhMecanico()){
-        const id=Number(document.getElementById('osIdEdit').value);
-        const os=(db.os||[]).find(o=>o.id===id);
-        if(!os || os.status!=='Diagnóstico'){ alert('A OS saiu de Diagnóstico e não pode mais ser alterada pelo mecânico.'); return; }
-        const desc=document.getElementById('osItemDescricaoLivre').value.trim();
-        const qtd=parseInt(document.getElementById('osItemQtd').value)||1;
-        if(!desc){alert('Digite o serviço ou item encontrado no diagnóstico.');return;}
-        itensTempOS.push({id:Date.now(),tipo:'mao_de_obra',nome:desc,qtd,valor:0,produtoId:null,diagnostico:true,mecanicoId:usuarioLogadoAtual.id});
-        document.getElementById('osItemDescricaoLivre').value='';
-        document.getElementById('osItemQtd').value='1';
-        atualizarTabelaItensOS();
-        return;
-    }
-    efAdicionarItemOSOriginal();
-};
-
-const efSalvarOSOriginal=salvarOS;
-salvarOS=function(e){
-    if(efEhMecanico()){
-        e.preventDefault();
-        const id=Number(document.getElementById('osIdEdit').value);
-        const os=(db.os||[]).find(o=>o.id===id);
-        if(!os || os.status!=='Diagnóstico' || String(os.mecanicoId||'')!==String(usuarioLogadoAtual.id)){
-            alert('A OS não está mais disponível para diagnóstico.');
-            fecharModalOS(); renderizarDiagnosticosMecanico(); return;
-        }
-        os.itens=itensTempOS.map(i=>({...i, valor:Number(i.valor)||0}));
-        os.atualizadoDiagnosticoEm=new Date().toLocaleString('pt-BR');
-        os.atualizadoDiagnosticoPor=usuarioLogadoAtual.nome;
-        salvarDB(); fecharModalOS(); renderizarDiagnosticosMecanico();
-        alert('Diagnóstico salvo. Os itens encontrados ficaram disponíveis para o atendimento colocar os valores.');
-        return;
-    }
-    const idEdit=document.getElementById('osIdEdit').value;
-    const mecanicoId=document.getElementById('osMecanicoId')?.value||'';
-    efSalvarOSOriginal(e);
-    const id=idEdit?Number(idEdit):(db.os||[]).slice(-1)[0]?.id;
-    const os=(db.os||[]).find(o=>o.id===id);
-    if(os){ os.mecanicoId=mecanicoId; salvarDB(); }
-};
-
-const efRemoverItemOSOriginal=removerItemOS;
-removerItemOS=function(id){
-    if(efEhMecanico()){
-        const osId=Number(document.getElementById('osIdEdit').value);
-        const os=(db.os||[]).find(o=>o.id===osId);
-        const item=itensTempOS.find(i=>i.id===id);
-        if(!os || os.status!=='Diagnóstico' || !item?.diagnostico || String(item.mecanicoId)!==String(usuarioLogadoAtual.id)){
-            alert('Você só pode remover itens que adicionou enquanto a OS está em Diagnóstico.');
-            return;
-        }
-    }
-    efRemoverItemOSOriginal(id);
-};
-
-const efAtualizarTabelaItensOSOriginal=atualizarTabelaItensOS;
-atualizarTabelaItensOS=function(){
-    efAtualizarTabelaItensOSOriginal();
-    if(efEhMecanico()){
-        document.querySelectorAll('#tabelaOsItens tr').forEach(tr=>{
-            const cells=tr.querySelectorAll('td');
-            if(cells.length>=5){
-                cells[3].innerHTML='<span class="text-zinc-500">A definir</span>';
-                cells[4].innerHTML='<span class="text-zinc-500">A definir</span>';
-            }
-        });
-        const total=document.getElementById('osTotalDisplay'); if(total) total.innerText='Valores definidos pelo atendimento';
-    }
-};
-
-setTimeout(()=>{ if(usuarioLogadoAtual) efAplicarAcesso(); },300);
 </script>
-
 </body>
 </html>
