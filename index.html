@@ -666,6 +666,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label for="osDataExibida" class="block text-sm text-zinc-400">Data da OS</label><input id="osDataExibida" readonly class="w-full bg-zinc-950 rounded-xl px-4 py-2"></div><div><label for="osObservacoes" class="block text-sm text-zinc-400">Observações</label><textarea id="osObservacoes" rows="2" class="w-full bg-zinc-950 rounded-xl px-4 py-2"></textarea></div></div>
+<div id="osChecklistRealizado"></div>
 <div id="osApontamentos" class="hidden bg-zinc-950 border border-amber-800 rounded-xl p-4 space-y-3"></div>
 <!-- Adicionar Itens à OS -->
                 <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
@@ -1022,6 +1023,7 @@
     <div id="statusSincronizacao" role="status" class="fixed bottom-3 right-3 z-50 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-sm">Conectando aos dados da oficina…</div>
 <div id="modalChecklist" class="hidden fixed inset-0 bg-black/70 z-50 p-4 overflow-y-auto"><div class="bg-zinc-900 border border-zinc-700 rounded-2xl max-w-3xl mx-auto p-5 my-4"><h3 id="checklistTitulo" class="text-xl font-bold mb-4">Diagnóstico · Revisão completa</h3><div id="checklistCampos" class="space-y-4"></div><label for="checklistObservacoes" class="block mt-4">Peças, serviços necessários e observações</label><textarea id="checklistObservacoes" rows="3" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-3 mt-2"></textarea><div class="flex flex-wrap gap-3 mt-4"><button onclick="salvarChecklist(false)" class="bg-blue-600 rounded-xl px-4 py-3">Salvar diagnóstico</button><button onclick="salvarChecklist(true)" class="bg-red-600 rounded-xl px-4 py-3">Finalizar / Devolver diagnóstico</button><button onclick="document.getElementById('modalChecklist').classList.add('hidden')" class="rounded-xl px-4 py-3 border border-zinc-700">Fechar</button></div></div></div>
 <!-- FIREBASE E SCRIPTS DO SISTEMA -->
+<div id="modalEditarItemOS" class="hidden fixed inset-0 bg-black/70 z-50 p-4 overflow-y-auto"><form onsubmit="salvarEdicaoItemOS(event)" class="bg-zinc-900 border border-zinc-700 rounded-2xl max-w-lg mx-auto p-5 my-8 space-y-4"><h3 class="text-xl font-bold">Editar item da OS / Orçamento</h3><label class="block">Descrição<input id="editarOSDescricao" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-3 mt-2"></label><label class="block">Quantidade<input id="editarOSQtd" type="number" min="1" step="1" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-3 mt-2"></label><label class="block"><span id="editarOSValorLabel">Valor unitário</span><input id="editarOSValor" type="number" min="0" step="0.01" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-3 mt-2"></label><div class="flex gap-3"><button type="submit" class="bg-red-600 rounded-xl px-4 py-3">Aplicar alteração</button><button type="button" onclick="document.getElementById('modalEditarItemOS').classList.add('hidden')" class="border border-zinc-700 rounded-xl px-4 py-3">Cancelar</button></div><p class="text-sm text-zinc-400">Salve a OS para gravar as alterações.</p></form></div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1415,7 +1417,7 @@
                     if(os.formaPagamento === 'Cartao_Credito') {
                         document.getElementById('osContainerParcelas').classList.remove('hidden');
                     }
-                    itensTempOS = [...(os.itens || [])];
+                    itensTempOS = (os.itens || []).map(item => ({...item}));
                     atualizarTabelaItensOS();
                 }
             }
@@ -1513,7 +1515,7 @@
                         <td class="p-3 text-center">${i.qtd}</td>
                         <td class="p-3 text-right font-mono">R$ ${i.valor.toFixed(2)}</td>
                         <td class="p-3 text-right font-mono text-emerald-400 font-bold">R$ ${subtotal.toFixed(2)}</td>
-                        <td class="p-3 text-right"><button type="button" onclick="removerItemOS(${i.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                        <td class="p-3 text-right">${ehAdmin() && !(db.os || []).find(o => o.id == document.getElementById('osIdEdit').value)?.faturado ? `<button type="button" onclick="editarItemOS(${i.id})" class="text-amber-400 hover:text-amber-300 mr-3">EDITAR</button>` : ''}<button type="button" onclick="removerItemOS(${i.id})" class="text-zinc-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `;
             }).join('');
@@ -2271,6 +2273,8 @@ abrirModalOS = function(id = null) {
     el('osDiagnosticoInterno').readOnly = true;
     apontamentoSelecionado=null;
     renderizarApontamentos(os);
+    el('osChecklistRealizado').innerHTML = os?.checklist?.length ? '<details class="border border-zinc-800 rounded-xl p-3"><summary class="font-semibold text-amber-400">Checklist realizado pelo mecânico</summary>'+os.checklist.map(i=>'<p class="text-sm mt-2">'+esc(i.grupo)+' · '+esc(i.nome)+' — '+esc(i.estado)+(i.observacao?' · '+esc(i.observacao):'')+'</p>').join('')+'<p class="text-sm whitespace-pre-wrap mt-3">Observações: '+esc(os.observacoesMecanico || '')+'</p></details>' : '';
+    atualizarTabelaItensOS();
     const bloquear = os?.faturado;
     for(const field of ['osClienteId','osVeiculoId','osMotoInfo','osFormaPagamento','osParcelas','osItemTipo','osItemEstoqueId','osItemDescricaoLivre','osItemQtd','osItemValor']) el(field).disabled=!!bloquear;
     el('osStatus').disabled=false;
@@ -2354,15 +2358,18 @@ function abrirChecklist(id) {
     el('checklistObservacoes').value=os.observacoesMecanico || ''; el('checklistObservacoes').disabled=!!os.diagnosticoDevolvido;
     el('modalChecklist').classList.remove('hidden');
 }
-function salvarChecklist(devolver) {
+async function salvarChecklist(devolver) {
     const os=(db.os||[]).find(o=>o.id==checklistOSId);
     if(!carregamentoFirebaseConcluido || !ehMecanico() || !os || String(os.mecanicoId)!==String(usuarioLogadoAtual.id) || os.status!=='Diagnóstico' || os.diagnosticoDevolvido) {alert('Esta OS não está em diagnóstico para você.');return;}
+    const anteriorDiagnostico=JSON.parse(JSON.stringify(os));
     const checklist=CHECK_ITENS.map((item,i)=>({...item,estado:el('ck'+i).value,observacao:el('ckObs'+i).value.trim()}));
     if(devolver && checklist.some(i=>!i.estado)) {alert('Avalie todos os itens; use Não se aplica quando necessário.');return;}
     os.checklist=checklist;os.observacoesMecanico=el('checklistObservacoes').value.trim();
     os.diagnosticoInterno=checklist.filter(i=>['ATENÇÃO','TROCAR','REPARAR'].includes(i.estado)).map(i=>i.nome+' — '+i.estado+(i.observacao?' — '+i.observacao:'')).join('\n')+(os.observacoesMecanico?'\n'+os.observacoesMecanico:'');
     if(devolver) {os.diagnosticoDevolvido=true;os.devolucaoTratada=false;os.dataDevolucao=new Date().toISOString();os.status='Orçamento';el('modalChecklist').classList.add('hidden');}
-    auditar(devolver?'Devolver diagnóstico':'Salvar diagnóstico',os.id,null,{checklist:os.checklist,observacoes:os.observacoesMecanico});salvarDB();renderizarMinhasOS();
+    auditar(devolver?'Devolver diagnóstico':'Salvar diagnóstico',os.id,null,{checklist:os.checklist,observacoes:os.observacoesMecanico});
+    if(!await salvarDB()) {Object.assign(os,anteriorDiagnostico);el('modalChecklist').classList.remove('hidden');alert('Não foi possível salvar o diagnóstico. Tente novamente.');return;}
+    renderizarMinhasOS();renderizarDevolvidas();
 }
 function renderizarMinhasOS() {
     const lista=(db.os||[]).filter(o=>String(o.mecanicoId)===String(usuarioLogadoAtual?.id));
@@ -2370,7 +2377,7 @@ function renderizarMinhasOS() {
 }
 function renderizarDevolvidas() {
     const lista=(db.os||[]).filter(o=>o.diagnosticoDevolvido && !o.devolucaoTratada);
-    el('osDevolvidas').innerHTML='<h3 class="text-amber-400 font-bold mb-2">OS devolvidas do mecânico</h3>'+ (lista.map(o=>`<button onclick="abrirModalOS(${o.id})" class="border border-zinc-700 rounded-xl p-3 mr-2 mb-2">OS ${numeroOS(o)} · ${esc(o.motoInfo)}</button>`).join('') || '<p class="text-zinc-400">Nenhum diagnóstico aguardando atendimento.</p>');
+    el('osDevolvidas').innerHTML='<h3 class="text-amber-400 font-bold mb-2">OS DEVOLVIDAS DO MECÂNICO ('+lista.length+')</h3>'+ (lista.map(o=>`<button onclick="abrirModalOS(${o.id})" class="border border-zinc-700 rounded-xl p-3 mr-2 mb-2">OS ${numeroOS(o)} · ${esc(o.motoInfo)}<br>${esc((db.clientes || []).find(c=>c.id==o.clienteId)?.nome || 'Cliente')} · ${esc((db.usuarios || []).find(u=>u.id==o.mecanicoId)?.nome || 'Mecânico')}<br>Diagnóstico devolvido · Aguardando orçamento</button>`).join('') || '<p class="text-zinc-400">Nenhum diagnóstico aguardando atendimento.</p>');
 }
 function renderizarApontamentos(os) {
     const lista=(os?.checklist || []).map((i,index)=>({...i,index})).filter(i=>['ATENÇÃO','TROCAR','REPARAR'].includes(i.estado));
@@ -2459,10 +2466,33 @@ imprimirOrcamentoOS=function() {
     if(!os){alert('Salve a OS antes de imprimir para manter seu número.');return;}
     const c=(db.clientes||[]).find(c=>c.id==el('osClienteId').value);
     const w=window.open('','_blank');if(!w){alert('Permita a abertura da janela de impressão.');return;}
-    const linhas=tipo=>itensTempOS.filter(i=>tipo==='peca'?i.tipo!=='mao_de_obra':i.tipo==='mao_de_obra').map(i=>`<tr><td>${esc(i.nome)}</td><td>${i.qtd}</td><td>${moeda(i.valor)}</td><td>${moeda(i.qtd*i.valor)}</td></tr>`).join('');
-    const tabela=(titulo,tipo)=>`<h3>${titulo}</h3><table><thead><tr><th>Descrição</th><th>Qtd.</th><th>Unitário</th><th>Subtotal</th></tr></thead><tbody>${linhas(tipo) || '<tr><td colspan="4">Nenhum item</td></tr>'}</tbody></table>`;
-    w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Orçamento OS ${numeroOS(os)}</title><style>body{font:14px Arial;color:#18181b;max-width:800px;margin:32px auto;padding:24px}header{display:flex;align-items:center;gap:20px;border-bottom:3px solid #dc2626;padding-bottom:20px}img{max-width:90px;max-height:80px}h1{margin:0}h2{color:#b91c1c}table{border-collapse:collapse;width:100%;margin-bottom:20px}th,td{border-bottom:1px solid #ddd;padding:10px;text-align:left}th{background:#f4f4f5}td:nth-child(n+2){text-align:right}.total{text-align:right;font-size:22px;font-weight:bold}.texto{white-space:pre-wrap}footer{border-top:1px solid #ddd;padding-top:16px;color:#555}@media print{body{margin:0;max-width:none}button{display:none}}</style></head><body><header>${db.config.logo?`<img src="${esc(db.config.logo)}" alt="Logo">`:''}<div><h1>${esc(db.config.nome || 'EF Motos')}</h1><p>${esc(db.config.telefone || '')} ${esc(db.config.endereco || '')}</p></div></header><h2>ORÇAMENTO · OS ${numeroOS(os)}</h2><p><b>Data:</b> ${esc(os.data)}<br><b>Cliente:</b> ${esc(c?.nome || 'Cliente')}<br><b>Veículo:</b> ${esc(el('osMotoInfo').value)}</p>${el('osDiagnosticoCliente').value?'<h3>Diagnóstico</h3><p class="texto">'+esc(el('osDiagnosticoCliente').value)+'</p>':''}${tabela('Peças','peca')}${tabela('Serviços / Mão de obra','mao_de_obra')}<p class="total">Total: ${moeda(itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0))}</p><h3>Observações</h3><p class="texto">${esc(el('osObservacoes').value)}</p><footer>Orçamento sujeito à aprovação do cliente.<p>Assinatura: _____________________________________</p></footer><button onclick="window.print()">Imprimir / Salvar PDF</button></body></html>`);w.document.close();
+    const linhas=()=>itensTempOS.map(i=>`<tr><td>${esc(i.nome)}</td><td>${i.qtd}</td><td>${moeda(i.valor)}</td><td>${moeda(i.qtd*i.valor)}</td></tr>`).join('');
+    const tabela=()=>`<table><thead><tr><th>Descrição</th><th>Qtd.</th><th>Unitário</th><th>Subtotal</th></tr></thead><tbody>${linhas() || '<tr><td colspan="4">Nenhum item</td></tr>'}</tbody></table>`;
+    w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Orçamento OS ${numeroOS(os)}</title><style>body{font:14px Arial;color:#18181b;max-width:800px;margin:32px auto;padding:24px}header{display:flex;align-items:center;gap:20px;border-bottom:3px solid #dc2626;padding-bottom:20px}img{max-width:90px;max-height:80px}h1{margin:0}h2{color:#b91c1c}table{border-collapse:collapse;width:100%;margin-bottom:20px}th,td{border-bottom:1px solid #ddd;padding:10px;text-align:left}th{background:#f4f4f5}td:nth-child(n+2){text-align:right}.total{text-align:right;font-size:22px;font-weight:bold}.texto{white-space:pre-wrap}footer{border-top:1px solid #ddd;padding-top:16px;color:#555}@media print{body{margin:0;max-width:none}button{display:none}}</style></head><body><header>${db.config.logo?`<img src="${esc(db.config.logo)}" alt="Logo">`:''}<div><h1>${esc(db.config.nome || 'EF Motos')}</h1><p>${esc(db.config.telefone || '')} ${esc(db.config.endereco || '')}</p></div></header><h2>ORÇAMENTO · OS ${numeroOS(os)}</h2><p><b>Data:</b> ${esc(os.data)}<br><b>Cliente:</b> ${esc(c?.nome || 'Cliente')}<br><b>Veículo:</b> ${esc(el('osMotoInfo').value)}</p>${el('osDiagnosticoCliente').value?'<h3>Diagnóstico</h3><p class="texto">'+esc(el('osDiagnosticoCliente').value)+'</p>':''}${tabela()}<p class="total">Total: ${moeda(itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0))}</p><h3>Observações</h3><p class="texto">${esc(el('osObservacoes').value)}</p><footer>Orçamento sujeito à aprovação do cliente.<p>Assinatura: _____________________________________</p></footer><button onclick="window.print()">Imprimir / Salvar PDF</button></body></html>`);w.document.close();
 };
+
+// Edição administrativa dos itens: preserva vínculo de estoque, tipo e apontamento.
+let itemOSEmEdicao=null;
+function editarItemOS(id) {
+    if(!ehAdmin() || !exigirAtendimento())return;
+    const os=(db.os || []).find(o=>o.id==el('osIdEdit').value);
+    if(os?.faturado){alert('A OS já foi faturada. Solicite uma alteração financeira.');return;}
+    const item=itensTempOS.find(i=>i.id===id);if(!item)return;
+    itemOSEmEdicao=id;
+    el('editarOSDescricao').value=item.nome;el('editarOSQtd').value=item.qtd;el('editarOSValor').value=item.valor;
+    el('editarOSValorLabel').textContent=item.tipo==='mao_de_obra'?'Valor unitário da mão de obra':'Valor unitário da peça';
+    el('modalEditarItemOS').classList.remove('hidden');
+}
+function salvarEdicaoItemOS(event) {
+    event.preventDefault();if(!ehAdmin() || !exigirAtendimento())return;
+    const os=(db.os || []).find(o=>o.id==el('osIdEdit').value);if(os?.faturado)return;
+    const item=itensTempOS.find(i=>i.id===itemOSEmEdicao);if(!item)return;
+    const nome=el('editarOSDescricao').value.trim(),qtd=Number(el('editarOSQtd').value),valor=Number(el('editarOSValor').value);
+    if(!nome || !Number.isInteger(qtd) || qtd<=0 || !el('editarOSValor').value.trim() || !Number.isFinite(valor) || valor<0){alert('Confira descrição, quantidade e valor unitário.');return;}
+    itensTempOS=itensTempOS.map(i=>i.id===itemOSEmEdicao?{...i,nome,qtd,valor}:i);
+    atualizarTabelaItensOS();renderizarApontamentos(os);el('modalEditarItemOS').classList.add('hidden');itemOSEmEdicao=null;
+}
+
 if(document.modelContext?.registerTool) {
     const lifecycle=new AbortController();
     const tool={name:'start_service_order',title:'Abrir ordem de serviço',description:'Abre uma nova OS e permite selecionar uma moto cadastrada. Não salva nem fatura.',inputSchema:{type:'object',properties:{vehicleId:{type:'string'}},additionalProperties:false},annotations:{readOnlyHint:false},execute(input){if(!exigirAtendimento())throw new Error('Acesso não permitido');if(input?.vehicleId && !(db.veiculos||[]).some(v=>String(v.id)===input.vehicleId))throw new Error('Moto não encontrada');abrirModalOS();if(input?.vehicleId){el('osVeiculoId').value=input.vehicleId;selecionarMotoOS();}return {opened:true,vehicleId:el('osVeiculoId').value || null};}};
