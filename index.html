@@ -193,7 +193,7 @@
                 
                 <!-- DASHBOARD -->
                 <div id="mod-dashboard" class="space-y-6">
-<div class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-3"><div class="flex flex-wrap justify-between gap-3"><h3 class="font-bold">Produtos mais vendidos</h3><div class="text-sm text-zinc-400">Valor de venda do estoque: <b id="valorEstoquePainel" class="text-emerald-400">R$ 0,00</b></div></div><p class="text-xs text-zinc-400">Top 10 por quantidade, em todo o histórico: peças nas OS faturadas e produtos nas vendas de balcão com itens registrados na auditoria. Mão de obra não entra no ranking. Vendas antigas sem detalhamento não podem ser contabilizadas.</p><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="text-zinc-400"><tr><th class="p-3 text-left">Produto</th><th class="p-3 text-right">Quantidade vendida</th><th class="p-3 text-right">Valor vendido</th></tr></thead><tbody id="rankingProdutosVendidos"></tbody></table></div></div>
+<div class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-3"><div class="flex flex-wrap justify-between gap-3"><h3 class="font-bold">Produtos mais vendidos</h3><div class="text-sm text-zinc-400">Valor de venda do estoque: <b id="valorEstoquePainel" class="text-emerald-400">R$ 0,00</b></div></div><p class="text-xs text-zinc-400">Top 10 por quantidade, no período selecionado: peças nas OS faturadas e produtos nas vendas de balcão com itens registrados na auditoria. Mão de obra não entra no ranking. Vendas antigas sem detalhamento não podem ser contabilizadas.</p><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="text-zinc-400"><tr><th class="p-3 text-left">Produto</th><th class="p-3 text-right">Quantidade vendida</th><th class="p-3 text-right">Valor vendido</th></tr></thead><tbody id="rankingProdutosVendidos"></tbody></table></div></div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-sm">
                             <p class="text-xs font-semibold text-zinc-400 uppercase">Saldo em Caixa</p>
@@ -1521,13 +1521,13 @@
             let totalGeral = 0;
             tbody.innerHTML = itensTempOS.map(i => {
                 const valorUnitario = Number(String(i.valor).replace(',', '.'));
-                const subtotal = Number(i.qtd) * valorUnitario;
-                totalGeral += subtotal;
+                const subtotal = i.aprovado===false?0:Number(i.qtd) * valorUnitario;
+                totalGeral += i.aprovado===false?0:subtotal;
                 let bolinhaHtml = i.tipo === 'peca' ? `<span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span> Peça` : `<span class="inline-block w-3 h-3 rounded-full bg-red-600 mr-2"></span> Mão de Obra`;
                 return `
                     <tr class="hover:bg-zinc-950/50">
                         <td class="p-3">${bolinhaHtml}</td>
-                        <td class="p-3 font-medium text-white">${i.nome}</td>
+                        <td class="p-3 font-medium text-white">${i.nome}${i.aprovado===false?' <span class="text-amber-400">(Não aprovado)</span>':''}</td>
                         <td class="p-3 text-center">${i.qtd}</td>
                         <td class="p-3 text-right font-mono">R$ ${valorUnitario.toFixed(2)}</td>
                         <td class="p-3 text-right font-mono text-emerald-400 font-bold">R$ ${subtotal.toFixed(2)}</td>
@@ -1579,8 +1579,8 @@
             const clienteId = document.getElementById('osClienteId').value;
             const cliente = (db.clientes || []).find(c => c.id == clienteId);
             const moto = document.getElementById('osMotoInfo').value || '';
-            const linhas = itensTempOS.map(i => `<tr><td>${i.nome}</td><td>${i.qtd}</td><td>R$ ${Number(i.valor).toFixed(2)}</td><td>R$ ${(i.qtd*i.valor).toFixed(2)}</td></tr>`).join('');
-            const total = itensTempOS.reduce((s,i)=>s+(i.qtd*i.valor),0);
+            const linhas = itensTempOS.map(i => `<tr><td>${i.nome}${i.aprovado===false?' <span class="text-amber-400">(Não aprovado)</span>':''}</td><td>${i.qtd}</td><td>R$ ${Number(i.valor).toFixed(2)}</td><td>R$ ${(i.qtd*i.valor).toFixed(2)}</td></tr>`).join('');
+            const total = itensTempOS.reduce((s,i)=>s+(i.aprovado===false?0:i.qtd*i.valor),0);
             const w = window.open('', '_blank');
             w.document.write(`<html><head><title>Orçamento</title></head><body style="font-family:Arial;padding:32px"><h2>ORÇAMENTO - ${db.config?.nomeOficina || 'EF Motos'}</h2><p><b>Cliente:</b> ${cliente?.nome || 'Cliente'}</p><p><b>Veículo:</b> ${moto}</p><table border="1" cellspacing="0" cellpadding="8" width="100%"><tr><th>Item/Serviço</th><th>Qtd</th><th>Unitário</th><th>Subtotal</th></tr>${linhas}</table><h3>Total: R$ ${total.toFixed(2)}</h3><script>window.print()<\/script></body></html>`);
             w.document.close();
@@ -1615,7 +1615,12 @@
 
             const estadoAntes = JSON.parse(JSON.stringify(db));
             const anterior = idEdit ? (db.os || []).find(o => o.id == idEdit) : null;
-            const totalOSBruto = itensTempOS.reduce((acc, item) => acc + (item.qtd * item.valor), 0);
+            const osIdUnico = anterior?.id || Date.now();
+            const entradaOS = Number(el('osEntradaNova').value)||0;
+            const recebidosAntes = (db.caixa||[]).filter(m=>m.osId==osIdUnico && m.tipo==='Entrada' && !m.cancelado).reduce((a,m)=>a+Number(m.valorBruto??m.valor??0),0);
+            const totalOSBruto = itensTempOS.reduce((acc, item) => acc + (item.aprovado===false?0:item.qtd * item.valor), 0);
+            if(entradaOS<0 || recebidosAntes+entradaOS>totalOSBruto+0.001){alert('A entrada excede o saldo da OS.');return;}
+            const saldoOS = Math.max(0,totalOSBruto-recebidosAntes-entradaOS);
             const calculoTaxa = calcularTaxaInfinitePay(totalOSBruto, formaPagamento, parcelas);
             const nomeClienteStr = clienteId === 'generico' ? 'Cliente' : ((db.clientes || []).find(c => c.id == clienteId)?.nome || 'Cliente');
             const agora = new Date();
@@ -1629,7 +1634,7 @@
             if (status === 'Faturada' && !faturado) {
                 if (!estoqueBaixado) {
                     itensTempOS.forEach(item => {
-                        if (item.produtoId) {
+                        if (item.produtoId && item.aprovado!==false) {
                             const prod = (db.produtos || []).find(p => p.id == item.produtoId);
                             if (prod) prod.qtd = Math.max(0, prod.qtd - item.qtd);
                         }
@@ -1637,12 +1642,13 @@
                     estoqueBaixado = true;
                 }
                 if (!db.caixa) db.caixa = [];
-                const osIdFinal = idEdit ? Number(idEdit) : Date.now();
+                const osIdFinal = osIdUnico;
                 db.caixa.push({
                     id: Date.now(),
                     tipo: 'Entrada',
                     descricao: `OS #${osIdFinal} - ${nomeClienteStr} (${formaPagamento}${formaPagamento === 'Cartao_Credito' ? ' em ' + parcelas + 'x' : ''})`,
-                    valor: calculoTaxa.valorLiquido,
+                    valor: calcularTaxaInfinitePay(saldoOS,formaPagamento,parcelas).valorLiquido,
+                    valorBruto: saldoOS, formaPagamento, parcelas, origem:'faturamentoOS',
                     data: dataHoje,
                     osId: osIdFinal
                 });
@@ -1652,7 +1658,8 @@
 
             const dadosOS = {
                 ...(anterior || {}),
-                id: idEdit ? Number(idEdit) : Date.now(),
+                id: osIdUnico,
+                km: el('osKm').value===''?(anterior?.km??null):Number(el('osKm').value),
                 numero: anterior?.numero || proximoNumeroOS(),
                 clienteId, motoInfo, veiculoId: document.getElementById('osVeiculoId').value || null, status, formaPagamento, parcelas,
                 itens: itensTempOS, total: totalOSBruto, valorLiquido: calculoTaxa.valorLiquido,
@@ -1664,9 +1671,13 @@
                 dataFaturamento
             };
 
+            if(entradaOS>0){db.caixa ||= [];const formaEntrada=el('osEntradaForma').value;db.caixa.push({id:novoIdEF(),osId:osIdUnico,tipo:'Entrada',origem:'entradaOS',descricao:'Entrada OS '+numeroOS(dadosOS),valor:calcularTaxaInfinitePay(entradaOS,formaEntrada,1).valorLiquido,valorBruto:entradaOS,formaPagamento:formaEntrada,parcelas:1,data:dataHoje});}
+            dadosOS.valorEntrada=(anterior?.valorEntrada||0)+entradaOS;
+            dadosOS.saldoReceber=status==='Faturada'?0:Math.max(0,totalOSBruto-recebidosAntes-entradaOS);
+            if(dadosOS.criadaPorTecnico && ehAdmin() && status!=='Aguardando aprovação'){dadosOS.aprovacaoAdminPendente=false;dadosOS.aprovadorId=usuarioLogadoAtual.id;dadosOS.dataAprovacaoAdmin ||= agora.toISOString();}
             dadosOS.observacoes = document.getElementById('osObservacoes').value.trim();
-            if (status === 'Aprovada / Em andamento' || status === 'Em andamento') dadosOS.dataAprovacao ||= agora.toISOString();
-            if (status === 'Concluída') dadosOS.dataConclusao ||= agora.toISOString();
+            if (status === 'Aprovada / Em andamento' || status === 'Em andamento' || status === 'Em serviço') dadosOS.dataAprovacao ||= agora.toISOString();
+            if (status === 'Concluída' || status === 'Finalizada') dadosOS.dataConclusao ||= agora.toISOString();
             if (dadosOS.diagnosticoDevolvido) dadosOS.devolucaoTratada = true;
             if (status === 'Diagnóstico' && anterior?.status !== 'Diagnóstico') { dadosOS.diagnosticoDevolvido = false; dadosOS.devolucaoTratada = false; }
             auditar('Salvar OS', dadosOS.id, anterior ? JSON.parse(JSON.stringify(anterior)) : null, {numero:dadosOS.numero,status:dadosOS.status,total:dadosOS.total});
@@ -1689,13 +1700,13 @@
             const tbody = document.getElementById('tabelaOS');
             if (!tbody) return;
             const filtro = (document.getElementById('filtroBuscaOS')?.value || '').toLowerCase();
-            const lista = (db.os || []).filter(o => 
-                numeroOS(o).includes(filtro) ||
+            const lista = (db.os || []).filter(o => (!el('osFiltroDataEF').value || diaISOEF(o.data)===el('osFiltroDataEF').value) && (!el('osFiltroSituacaoEF').value || situacaoEF(o.status)===el('osFiltroSituacaoEF').value) && (
+                normalizaPlacaEF((db.veiculos||[]).find(v=>v.id==o.veiculoId)?.placa).includes(normalizaPlacaEF(filtro)) && !!normalizaPlacaEF(filtro) || numeroOS(o).includes(filtro) ||
                 ((db.clientes || []).find(c => c.id == o.clienteId)?.nome || '').toLowerCase().includes(filtro) ||
                 String(o.id).includes(filtro) ||
                 (o.motoInfo && o.motoInfo.toLowerCase().includes(filtro)) ||
                 (o.status && o.status.toLowerCase().includes(filtro))
-            );
+            ));
 
             if (lista.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-zinc-500">Nenhuma Ordem de Serviço cadastrada.</td></tr>`;
@@ -1836,10 +1847,10 @@
             let totalGeral = 0;
             tbody.innerHTML = itensTempPDV.map(i => {
                 const subtotal = i.qtd * i.valor;
-                totalGeral += subtotal;
+                totalGeral += i.aprovado===false?0:subtotal;
                 return `
                     <tr class="hover:bg-zinc-950/50">
-                        <td class="p-3 font-medium text-white">${i.nome}</td>
+                        <td class="p-3 font-medium text-white">${i.nome}${i.aprovado===false?' <span class="text-amber-400">(Não aprovado)</span>':''}</td>
                         <td class="p-3 text-center">${i.qtd}</td>
                         <td class="p-3 text-right font-mono">R$ ${i.valor.toFixed(2)}</td>
                         <td class="p-3 text-right font-mono text-emerald-400 font-bold">R$ ${subtotal.toFixed(2)}</td>
@@ -1865,7 +1876,7 @@
             const clienteId = document.getElementById('pdvClienteId').value;
             const formaPagamento = document.getElementById('pdvFormaPagamento').value;
             const parcelas = parseInt(document.getElementById('pdvParcelas').value) || 1;
-            const totalVendaBruto = itensTempPDV.reduce((acc, item) => acc + (item.qtd * item.valor), 0);
+            const totalVendaBruto = itensTempPDV.reduce((acc, item) => acc + (item.aprovado===false?0:item.qtd * item.valor), 0);
             const calculo = calcularTaxaInfinitePay(totalVendaBruto, formaPagamento, parcelas);
 
             let nomeCliente = clienteId === 'generico' ? 'Cliente Balcão' : ((db.clientes || []).find(c => c.id == clienteId)?.nome || 'Cliente');
@@ -1881,6 +1892,10 @@
             db.caixa.push({
                 id: Date.now(),
                 tipo: 'Entrada',
+                clienteId, itens: JSON.parse(JSON.stringify(itensTempPDV)), formaPagamento, parcelas, valorBruto:totalVendaBruto, origem:'pdv',
+                mecanicoExecucaoId:el('pdvTecnicoEF').value || '',
+                vendaOficina:el('pdvOficinaEF').checked,
+                comissaoRegistrada:comissaoVendaEF(),
                 descricao: `Venda PDV - ${nomeCliente} (${formaPagamento}${formaPagamento === 'Cartao_Credito' ? ' ' + parcelas + 'x' : ''})`,
                 valor: calculo.valorLiquido,
                 data: new Date().toLocaleDateString('pt-BR')
@@ -1902,7 +1917,7 @@
             const tbody = document.getElementById('tabelaClientes');
             if (!tbody) return;
             const filtro = (document.getElementById('filtroBuscaCliente')?.value || '').toLowerCase();
-            const lista = (db.clientes || []).filter(c => c.nome.toLowerCase().includes(filtro) || c.telefone.includes(filtro));
+            const lista = (db.clientes || []).filter(c => String(c.nome||'').toLowerCase().includes(filtro) || String(c.telefone||'').includes(filtro) || String(c.doc||'').toLowerCase().includes(filtro) || (!!filtro.replace(/\D/g,'') && [c.doc,c.telefone].some(v=>String(v||'').replace(/\D/g,'').includes(filtro.replace(/\D/g,'')))));
             tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-zinc-500">Nenhum cliente cadastrado.</td></tr>` :
                 lista.map(c => `
                     <tr class="hover:bg-zinc-950/50">
@@ -1971,13 +1986,13 @@
         function renderizarVeiculos() {
             const tbody = document.getElementById('tabelaVeiculos');
             if (!tbody) return;
-            const lista = db.veiculos || [];
+            const lista = (db.veiculos || []).filter(v=>normalizaPlacaEF(v.placa).includes(normalizaPlacaEF(el('buscaVeiculoEF')?.value)));
             tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="6" class="p-4 text-center text-zinc-500">Nenhum veículo cadastrado.</td></tr>` :
                 lista.map(v => {
                     const cli = (db.clientes || []).find(c => c.id == v.clienteId)?.nome || 'Cliente';
                     return `
                         <tr class="hover:bg-zinc-950/50">
-                            <td class="p-4 font-bold text-white">${v.marca} ${v.modelo}</td>
+                            <td class="p-4 font-bold text-white">${v.marca} ${v.modelo} ${esc(v.ano||'')}</td>
                             <td class="p-4 text-amber-400 font-mono">${v.placa}</td>
                             <td class="p-4 text-zinc-300">${v.cor}</td>
                             <td class="p-4 text-zinc-300">${v.km} KM</td>
@@ -2006,7 +2021,7 @@
             const cor = document.getElementById('vCor').value.trim();
             const km = parseInt(document.getElementById('vKm').value) || 0;
             if (!db.veiculos) db.veiculos = [];
-            db.veiculos.push({ id: Date.now(), clienteId, marca, modelo, placa, cor, km });
+            db.veiculos.push({ id: Date.now(), clienteId, marca, modelo, placa, cor, km, ano:el('vAno').value });
             salvarDB();
             fecharModalVeiculo();
             renderizarVeiculos();
@@ -2058,7 +2073,7 @@
             const tbody = document.getElementById('tabelaEstoque');
             if (!tbody) return;
             const filtro = (document.getElementById('filtroBuscaProduto')?.value || '').toLowerCase();
-            const lista = (db.produtos || []).filter(p => p.nome.toLowerCase().includes(filtro) || p.tipo.toLowerCase().includes(filtro));
+            const lista = (db.produtos || []).filter(p => String(p.nome||'').toLowerCase().includes(filtro) || String(p.tipo||'').toLowerCase().includes(filtro));
             tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="5" class="p-4 text-center text-zinc-500">Nenhum produto cadastrado.</td></tr>` :
                 lista.map(p => `
                     <tr class="hover:bg-zinc-950/50">
@@ -2330,7 +2345,7 @@ removerItemOS = function(id) { if(!exigirAtendimento()) return; const os=(db.os|
 function validarEstoque(itens) {
     const consumo=new Map(); for(const item of itens) {
         if(!Number.isFinite(item.valor) || item.valor<0 || !Number.isInteger(item.qtd) || item.qtd<=0) {alert('Confira quantidade e preço dos itens.');return false;}
-        if(item.produtoId) consumo.set(String(item.produtoId), (consumo.get(String(item.produtoId)) || 0)+item.qtd);
+        if(item.produtoId && item.aprovado!==false) consumo.set(String(item.produtoId), (consumo.get(String(item.produtoId)) || 0)+item.qtd);
     }
     for(const [id,qtd] of consumo) { const p=(db.produtos||[]).find(p=>String(p.id)===id); if(!p || p.qtd < qtd) {alert('Estoque insuficiente: '+(p?.nome || 'produto removido'));return false;} }
     return true;
@@ -2348,12 +2363,12 @@ salvarOS = async function(e) {
     const id=el('osIdEdit').value; const anterior=(db.os||[]).find(o=>o.id==id);
     const status=el('osStatus').value;
     if(!el('osMotoInfo').value.trim()) {alert('Selecione ou informe a moto.'); return;}
-    if(anterior?.faturado && !['Faturada','Concluída'].includes(status)) {alert('Uma OS faturada precisa ser estornada antes de voltar ao orçamento.');return;}
+    if(anterior?.faturado && !['Faturada','Concluída','Finalizada'].includes(status)) {alert('Uma OS faturada precisa ser estornada antes de voltar ao orçamento.');return;}
     if(anterior?.faturado && (JSON.stringify(itensTempOS)!==JSON.stringify(anterior.itens) || el('osFormaPagamento').value!==anterior.formaPagamento || Number(el('osParcelas').value || 1)!==Number(anterior.parcelas || 1))) {alert('Os valores e o pagamento de uma OS faturada ficam protegidos.');return;}
     if(status==='Concluída' && !anterior?.faturado) {alert('Fat ure a OS antes de concluir.'.replace('Fat ure','Fature'));return;}
-    if(status==='Faturada' && !anterior?.faturado && !validarEstoque(itensTempOS)) return;
-    if(ehAtendente() && anterior && (anterior.total>itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0) || anterior.itens?.some(i=> !itensTempOS.some(n=>n.id===i.id) || itensTempOS.find(n=>n.id===i.id)?.valor!==i.valor))) {
-        solicitarAlteracao('Editar OS',anterior.id,JSON.parse(JSON.stringify(anterior)),{...anterior,...dadosComissaoOS(anterior,status),itens:JSON.parse(JSON.stringify(itensTempOS)),total:itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0),status,formaPagamento:el('osFormaPagamento').value,parcelas:Number(el('osParcelas').value),motoInfo:el('osMotoInfo').value,clienteId:el('osClienteId').value,veiculoId:el('osVeiculoId').value,observacoes:el('osObservacoes').value}); return;
+    if(status==='Faturada' && !anterior?.faturado && !validarEstoque(itensAprovadosEF(itensTempOS))) return;
+    if(ehAtendente() && anterior && (anterior.total>itensTempOS.reduce((a,i)=>a+(i.aprovado===false?0:i.qtd*i.valor),0) || anterior.itens?.some(i=> !itensTempOS.some(n=>n.id===i.id) || itensTempOS.find(n=>n.id===i.id)?.valor!==i.valor))) {
+        solicitarAlteracao('Editar OS',anterior.id,JSON.parse(JSON.stringify(anterior)),{...anterior,...dadosComissaoOS(anterior,status),itens:JSON.parse(JSON.stringify(itensTempOS)),total:itensTempOS.reduce((a,i)=>a+(i.aprovado===false?0:i.qtd*i.valor),0),status,formaPagamento:el('osFormaPagamento').value,parcelas:Number(el('osParcelas').value),motoInfo:el('osMotoInfo').value,clienteId:el('osClienteId').value,veiculoId:el('osVeiculoId').value,observacoes:el('osObservacoes').value}); return;
     }
     const tamanho=(db.os||[]).length; const antes=anterior ? JSON.parse(JSON.stringify(anterior)) : null;
     osSalvando=true;try{await salvarOSOriginal(e);}finally{osSalvando=false;}
@@ -2361,23 +2376,25 @@ salvarOS = async function(e) {
 };
 const CHECKLIST = {
 'Motor':['Óleo','Vazamentos','Tampa de válvulas','Juntas / Retentores','Ruídos','Marcha lenta','Vela','Filtro de ar','Filtro de combustível','Válvulas','Injeção / TBI'],
-'Freios':['Pastilha dianteira','Lona / Pastilha traseira','Disco','Fluido de freio','Mangueiras','Acionamento','Desgaste / Vazamentos'],
-'Transmissão':['Corrente','Coroa','Pinhão','Tensão da corrente','Lubrificação','Desgaste da transmissão'],
-'Pneus / Rodas':['Pneu dianteiro','Pneu traseiro','Calibragem','Desgaste dos pneus','Rodas','Raios','Rolamentos das rodas'],
-'Suspensão / Direção':['Bengalas','Retentores das bengalas','Amortecedor','Caixa de direção','Rolamentos da direção','Folgas','Alinhamento'],
-'Elétrica':['Bateria','Carga','Farol','Lanterna','Luz de freio','Piscas','Buzina','Painel','Partida','Chicote'],
+'Freios':['Pastilha dianteira','Lona / Pastilha traseira','Disco','Fluido de freio','Mangueiras','Cabo de freio','Acionamento','Desgaste / Vazamentos'],
+'Transmissão':['Transmissão','Esticar e lubrificar'],
+'Pneus / Rodas':['Pneu dianteiro','Pneu traseiro','Calibragem','Rodas','Raios','Rolamento da roda dianteira','Rolamento da roda traseira','Rolamento da flange'],
+'Suspensão / Direção':['Bengalas','Retentores das bengalas','Amortecedor','Caixa de direção','Folgas','Alinhamento'],
+'Elétrica':['Bateria','Carga','Farol','Lanterna','Lâmpada de placa','Luz de freio','Piscas','Buzina','Painel','Partida','Chicote'],
 'Comandos':['Embreagem','Acelerador','Manetes','Pedal de freio','Câmbio','Descansos'],
-'Estrutura / Segurança':['Fixações','Escapamento','Vazamentos gerais','Estrutura','Retrovisores','Placa','Itens gerais']
+'Estrutura / Segurança':['Fixações','Escapamento','Vazamentos gerais','Estrutura','Carenagem geral','Retrovisores','Placa','Itens gerais']
 };
 const CHECK_ITENS = Object.entries(CHECKLIST).flatMap(([grupo,itens])=>itens.map(nome=>({grupo,nome})));
-let checklistOSId=null;
+let checklistOSId=null; let checkItensAtivos=CHECK_ITENS;
 function abrirChecklist(id) {
     const os=(db.os||[]).find(o=>o.id==id);
     if(!ehMecanico() || !os || String(os.mecanicoId)!==String(usuarioLogadoAtual.id)) {alert('Esta OS não está atribuída a você.');return;}
     checklistOSId=os.id;
     el('checklistTitulo').textContent='OS '+numeroOS(os)+' · Revisão completa · '+os.motoInfo;
-    el('checklistCampos').innerHTML=Object.entries(CHECKLIST).map(([grupo,nomes])=>`<section class="border border-zinc-700 rounded-xl p-3"><h4 class="font-bold text-red-400 mb-3">${esc(grupo)}</h4>${nomes.map(nome=>{
-        const index=CHECK_ITENS.findIndex(i=>i.grupo===grupo && i.nome===nome); const item=os.checklist?.[index];
+    checkItensAtivos=os.checklist?.length?os.checklist.map(i=>({grupo:i.grupo,nome:i.nome})):CHECK_ITENS;
+    const gruposAtivos={};for(const i of checkItensAtivos)(gruposAtivos[i.grupo] ||= []).push(i.nome);
+    el('checklistCampos').innerHTML=Object.entries(gruposAtivos).map(([grupo,nomes])=>`<section class="border border-zinc-700 rounded-xl p-3"><h4 class="font-bold text-red-400 mb-3">${esc(grupo)}</h4>${nomes.map(nome=>{
+        const index=checkItensAtivos.findIndex(i=>i.grupo===grupo && i.nome===nome); const item=os.checklist?.find(i=>i.grupo===grupo && i.nome===nome);
         return `<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 border-t border-zinc-800 py-2 items-center"><label for="ck${index}">${esc(nome)}</label><select id="ck${index}" class="bg-zinc-950 rounded-lg p-2" ${os.diagnosticoDevolvido?'disabled':''}>${['','OK','ATENÇÃO','TROCAR','REPARAR','NÃO SE APLICA'].map(v=>`<option value="${v}" ${item?.estado===v?'selected':''}>${v || 'Não avaliado'}</option>`).join('')}</select><input id="ckObs${index}" aria-label="Observação ${esc(nome)}" placeholder="Observação (opcional)" value="${esc(item?.observacao || '')}" class="bg-zinc-950 rounded-lg p-2" ${os.diagnosticoDevolvido?'disabled':''}></div>`;
     }).join('')}</section>`).join('');
     el('checklistObservacoes').value=os.observacoesMecanico || ''; el('checklistObservacoes').disabled=!!os.diagnosticoDevolvido;
@@ -2387,7 +2404,7 @@ async function salvarChecklist(devolver) {
     const os=(db.os||[]).find(o=>o.id==checklistOSId);
     if(!carregamentoFirebaseConcluido || !ehMecanico() || !os || String(os.mecanicoId)!==String(usuarioLogadoAtual.id) || os.status!=='Diagnóstico' || os.diagnosticoDevolvido) {alert('Esta OS não está em diagnóstico para você.');return;}
     const anteriorDiagnostico=JSON.parse(JSON.stringify(os));
-    const checklist=CHECK_ITENS.map((item,i)=>({...item,estado:el('ck'+i).value,observacao:el('ckObs'+i).value.trim()}));
+    const checklist=checkItensAtivos.map((item,i)=>({...os.checklist?.find(x=>x.grupo===item.grupo && x.nome===item.nome),...item,estado:el('ck'+i).value,observacao:el('ckObs'+i).value.trim()}));
     if(devolver && checklist.some(i=>!i.estado)) {alert('Avalie todos os itens; use Não se aplica quando necessário.');return;}
     os.checklist=checklist;os.observacoesMecanico=el('checklistObservacoes').value.trim();
     os.diagnosticoInterno=checklist.filter(i=>['ATENÇÃO','TROCAR','REPARAR'].includes(i.estado)).map(i=>i.nome+' — '+i.estado+(i.observacao?' — '+i.observacao:'')).join('\n')+(os.observacoesMecanico?'\n'+os.observacoesMecanico:'');
@@ -2491,9 +2508,9 @@ imprimirOrcamentoOS=function() {
     if(!os){alert('Salve a OS antes de imprimir para manter seu número.');return;}
     const c=(db.clientes||[]).find(c=>c.id==el('osClienteId').value);
     const w=window.open('','_blank');if(!w){alert('Permita a abertura da janela de impressão.');return;}
-    const linhas=()=>itensTempOS.map(i=>`<tr><td>${esc(i.nome)}</td><td>${i.qtd}</td><td>${moeda(i.valor)}</td><td>${moeda(i.qtd*i.valor)}</td></tr>`).join('');
+    const linhas=()=>itensTempOS.map(i=>`<tr><td>${esc(i.nome)}${i.aprovado===false?' (Não aprovado)':''}</td><td>${i.qtd}</td><td>${moeda(i.valor)}</td><td>${moeda(i.aprovado===false?0:i.qtd*i.valor)}</td></tr>`).join('');
     const tabela=()=>`<table><thead><tr><th>Descrição</th><th>Qtd.</th><th>Unitário</th><th>Subtotal</th></tr></thead><tbody>${linhas() || '<tr><td colspan="4">Nenhum item</td></tr>'}</tbody></table>`;
-    w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Orçamento OS ${numeroOS(os)}</title><style>body{font:14px Arial;color:#18181b;max-width:800px;margin:32px auto;padding:24px}header{display:flex;align-items:center;gap:20px;border-bottom:3px solid #dc2626;padding-bottom:20px}img{max-width:90px;max-height:80px}h1{margin:0}h2{color:#b91c1c}table{border-collapse:collapse;width:100%;margin-bottom:20px}th,td{border-bottom:1px solid #ddd;padding:10px;text-align:left}th{background:#f4f4f5}td:nth-child(n+2){text-align:right}.total{text-align:right;font-size:22px;font-weight:bold}.texto{white-space:pre-wrap}footer{border-top:1px solid #ddd;padding-top:16px;color:#555}@media print{body{margin:0;max-width:none}button{display:none}}</style></head><body><header>${db.config.logo?`<img src="${esc(db.config.logo)}" alt="Logo">`:''}<div><h1>${esc(db.config.nome || 'EF Motos')}</h1><p>${esc(db.config.telefone || '')} ${esc(db.config.endereco || '')}</p></div></header><h2>ORÇAMENTO · OS ${numeroOS(os)}</h2><p><b>Data:</b> ${esc(os.data)}<br><b>Cliente:</b> ${esc(c?.nome || 'Cliente')}<br><b>Veículo:</b> ${esc(el('osMotoInfo').value)}</p>${el('osDiagnosticoCliente').value?'<h3>Diagnóstico</h3><p class="texto">'+esc(el('osDiagnosticoCliente').value)+'</p>':''}${tabela()}<p class="total">Total: ${moeda(itensTempOS.reduce((a,i)=>a+i.qtd*i.valor,0))}</p><h3>Observações</h3><p class="texto">${esc(el('osObservacoes').value)}</p><footer>Orçamento sujeito à aprovação do cliente.<p>Assinatura: _____________________________________</p></footer><button onclick="window.print()">Imprimir / Salvar PDF</button></body></html>`);w.document.close();
+    w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Orçamento OS ${numeroOS(os)}</title><style>body{font:14px Arial;color:#18181b;max-width:800px;margin:32px auto;padding:24px}header{display:flex;align-items:center;gap:20px;border-bottom:3px solid #dc2626;padding-bottom:20px}img{max-width:90px;max-height:80px}h1{margin:0}h2{color:#b91c1c}table{border-collapse:collapse;width:100%;margin-bottom:20px}th,td{border-bottom:1px solid #ddd;padding:10px;text-align:left}th{background:#f4f4f5}td:nth-child(n+2){text-align:right}.total{text-align:right;font-size:22px;font-weight:bold}.texto{white-space:pre-wrap}footer{border-top:1px solid #ddd;padding-top:16px;color:#555}@media print{body{margin:0;max-width:none}button{display:none}}</style></head><body><header>${db.config.logo?`<img src="${esc(db.config.logo)}" alt="Logo">`:''}<div><h1>${esc(db.config.nome || 'EF Motos')}</h1><p>${esc(db.config.telefone || '')} ${esc(db.config.endereco || '')}</p></div></header><h2>ORÇAMENTO · OS ${numeroOS(os)}</h2><p><b>Data:</b> ${esc(os.data)}<br><b>Cliente:</b> ${esc(c?.nome || 'Cliente')}<br><b>Veículo:</b> ${esc(el('osMotoInfo').value)}</p>${el('osDiagnosticoCliente').value?'<h3>Diagnóstico</h3><p class="texto">'+esc(el('osDiagnosticoCliente').value)+'</p>':''}${tabela()}<p class="total">Total: ${moeda(itensTempOS.reduce((a,i)=>a+(i.aprovado===false?0:i.qtd*i.valor),0))}</p><h3>Observações</h3><p class="texto">${esc(el('osObservacoes').value)}</p><footer>Orçamento sujeito à aprovação do cliente.<p>Assinatura: _____________________________________</p></footer><button onclick="window.print()">Imprimir / Salvar PDF</button></body></html>`);w.document.close();
 };
 
 // Edição administrativa dos itens: preserva vínculo de estoque, tipo e apontamento.
@@ -2654,7 +2671,7 @@ function dataMovimentoMeta(valor) {
     return iso ? new Date(Number(iso[1]),Number(iso[2])-1,Number(iso[3])) : null;
 }
 function faturamentoPeriodoMeta(inicio,fim) {
-    return (db.caixa || []).filter(m => {const d=dataMovimentoMeta(m.data);return m.tipo==='Entrada' && d && d>=inicio && d<=fim;}).reduce((s,m)=>s+Number(m.valor || 0),0);
+    return (db.caixa || []).filter(m => {const d=dataMovimentoMeta(m.data);return m.tipo==='Entrada' && ativoEF(m) && d && d>=inicio && d<=fim;}).reduce((s,m)=>s+Number(m.valor || 0),0);
 }
 const calcularMetasManualOriginal = calcularMetasAutomaticas;
 calcularMetasAutomaticas = function() {
@@ -2708,19 +2725,7 @@ atualizarDashboard=function(){dashboardMetasOriginal();atualizarProgressoMetas()
 function resumoEstoqueAtual() {
  return (db.produtos||[]).reduce((r,p)=>{const qtd=Math.max(0,Number(p.qtd)||0);r.quantidade+=qtd;r.valor+=qtd*Math.max(0,Number(p.preco)||0);return r;},{quantidade:0,valor:0});
 }
-function produtosMaisVendidos() {
- const grupos=new Map();
- function adicionar(itens){for(const i of itens||[]){if(!i.produtoId && !['peca','peca_livre','estoque'].includes(i.tipo))continue;
- const qtd=Number(i.qtd),valor=Number(i.valor);if(!Number.isFinite(qtd)||qtd<=0||!Number.isFinite(valor))continue;
- const key=i.produtoId?'produto:'+i.produtoId:'nome:'+String(i.nome||'').trim().toLocaleLowerCase('pt-BR');
- const p=(db.produtos||[]).find(p=>String(p.id)===String(i.produtoId));
- const r=grupos.get(key)||{nome:p?.nome||i.nome||'Produto',quantidade:0,valor:0};r.quantidade+=qtd;r.valor+=qtd*valor;grupos.set(key,r);
- }}
- for(const os of db.os||[])if(os.faturado===true || os.status==='Faturada')adicionar(os.itens);
- const vistos=new Set(),caixa=new Set((db.caixa||[]).map(m=>String(m.id)));
- for(const a of db.auditoria||[]){if(a.acao!=='Venda de balcão'||!caixa.has(String(a.referencia))||vistos.has(String(a.referencia)))continue;vistos.add(String(a.referencia));adicionar(a.novo?.itens);}
- return [...grupos.values()].sort((a,b)=>b.quantidade-a.quantidade||b.valor-a.valor||a.nome.localeCompare(b.nome)).slice(0,10);
-}
+function produtosMaisVendidos() { return rankingEF(); }
 function renderizarResumoProdutos(){
  if(ehMecanico())return;
  const r=resumoEstoqueAtual();for(const id of ['valorEstoquePainel','valorEstoqueCadastro'])el(id).textContent=moeda(r.valor);
@@ -2803,7 +2808,7 @@ function dadosComissaoOS(anterior,status){
 const salvarOSExecucaoOriginal=salvarOS;
 salvarOS=async function(event){
  event.preventDefault();const os=(db.os||[]).find(o=>o.id==el('osIdEdit').value),status=el('osStatus').value,id=el('osMecanicoExecucaoId').value;
- if(['Faturada','Em andamento','Aprovada / Em andamento'].includes(status)&&!os?.faturado&&!id){alert('Selecione o mecânico responsável pela execução do serviço.');return;}
+ if(['Faturada','Em andamento','Aprovada / Em andamento','Em serviço'].includes(status)&&!os?.faturado&&!id){alert('Selecione o mecânico responsável pela execução do serviço.');return;}
  if(os?.faturado&&os.mecanicoExecucaoId&&String(os.mecanicoExecucaoId)!==id){alert('O responsável de uma OS faturada fica preservado.');return;}
  if(os?.faturado&&!os.mecanicoExecucaoId&&id&&!ehAdmin()){alert('Somente o administrador pode atribuir o responsável de uma OS já faturada.');return;}
  await salvarOSExecucaoOriginal(event);renderizarComissoes();
@@ -2811,11 +2816,11 @@ salvarOS=async function(event){
 function resumoComissoes(mes=''){
  const mapa=new Map((db.usuarios||[]).filter(u=>/mec[aâ]nico|t[eé]cnico/i.test(u.cargo||'')).map(u=>[String(u.id),{nome:u.nome,pecas:0,servicos:0,comissaoPecas:0,comissaoServicos:0}]));
  let semResponsavel=0;
- for(const os of db.os||[]){if(!os.faturado&&os.status!=='Faturada')continue;
+ for(const os of db.os||[]){if(os.cancelada || os.status==='Cancelada' || (!os.faturado&&os.status!=='Faturada'))continue;
  const data=String(os.dataFaturamento||'').slice(0,10);const d=dataMovimentoMeta(data||os.data);
  if(mes&&(!d||`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`!==mes))continue;
  const r=mapa.get(String(os.mecanicoExecucaoId));if(!r){semResponsavel++;continue;}
- for(const i of os.itens||[]){const valor=(Number(i.qtd)||0)*(Number(i.valor)||0);if(i.tipo==='mao_de_obra'){r.servicos+=valor;r.comissaoServicos+=valor*(Number(os.comissaoRegistrada?.servicos)||0)/100;}else{r.pecas+=valor;r.comissaoPecas+=valor*(Number(os.comissaoRegistrada?.pecas)||0)/100;}}
+ for(const i of os.itens||[]){if(i.aprovado===false)continue;const valor=(Number(i.qtd)||0)*(Number(i.valor)||0);if(i.tipo==='mao_de_obra'){r.servicos+=valor;r.comissaoServicos+=valor*(Number(os.comissaoRegistrada?.servicos)||0)/100;}else{r.pecas+=valor;r.comissaoPecas+=valor*(Number(os.comissaoRegistrada?.pecas)||0)/100;}}
  }return {mecanicos:[...mapa.values()],semResponsavel};
 }
 function renderizarComissoes(){if(!ehAdmin())return;const r=resumoComissoes(el('comissaoFiltroMes').value);
@@ -2877,13 +2882,13 @@ function periodoFiltroComissao(mes){
 }
 function linhasComissaoFiltradas(){
  const periodo=periodoFiltroComissao(el('comissaoFiltroMes').value),mecanico=el('comissaoFiltroMecanico').value,tipo=el('comissaoFiltroTipo').value,linhas=[];
- for(const os of db.os||[]){if(!os.faturado&&os.status!=='Faturada')continue;
+ for(const os of db.os||[]){if(os.cancelada || os.status==='Cancelada' || (!os.faturado&&os.status!=='Faturada'))continue;
  const d=os.dataFaturamento?new Date(os.dataFaturamento):dataMovimentoMeta(os.data);
  if(periodo&&(!d||!Number.isFinite(+d)||d<periodo.inicio||d>=periodo.fim))continue;
  if(mecanico&&String(os.mecanicoExecucaoId)!==mecanico)continue;
  const u=(db.usuarios||[]).find(u=>String(u.id)===String(os.mecanicoExecucaoId));if(!u)continue;
  const form=[...el('camposPercentuaisMecanicos').querySelectorAll('form[data-mecanico]')].find(f=>f.dataset.mecanico===String(u.id));
- for(const i of os.itens||[]){const servico=i.tipo==='mao_de_obra';if(tipo==='pecas'&&servico||tipo==='servicos'&&!servico)continue;
+ for(const i of os.itens||[]){if(i.aprovado===false)continue;const servico=i.tipo==='mao_de_obra';if(tipo==='pecas'&&servico||tipo==='servicos'&&!servico)continue;
  const pct=Number(form?.elements.namedItem(servico?'servicos':'pecas')?.value??(servico?u.comissaoServicos:u.comissaoPecas))||0;
  const valor=(Number(i.qtd)||0)*(Number(i.valor)||0);
  linhas.push({mecanicoId:String(u.id),mecanico:u.nome,os:numeroOS(os),nome:i.nome||'Item',tipo:servico?'Mão de obra':'Peça',valor,percentual:pct,comissao:valor*pct/100});
@@ -2918,6 +2923,169 @@ salvarOS = async function(event) {
     try { await salvarOSConfirmacaoOriginal(event); }
     finally { window.osGravacaoEmCurso = false; }
 };
+</script>
+<script>
+// Alterações solicitadas em 01/10/2026. Sem migração ou limpeza dos dados existentes.
+const categoriasEF=['Lubrificantes','Filtros','Freios','Transmissão','Motor','Suspensão','Direção','Elétrica','Pneus e rodas','Cabos e comandos','Carenagem e acessórios','Outros'];
+const classeEF='bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm';
+let ultimoIdEF=0;
+function novoIdEF(){let id=Math.max(Date.now()*1000+Math.floor(Math.random()*1000),ultimoIdEF+1);const usados=new Set(['os','caixa','contasReceber','contasPagar'].flatMap(k=>(db[k]||[]).map(x=>String(x.id))));while(usados.has(String(id)))id++;ultimoIdEF=id;return id;}
+function normalizaPlacaEF(v){return String(v||'').replace(/[^a-z0-9]/gi,'').toUpperCase();}
+function diaISOEF(v){const d=dataMovimentoMeta(v);return d&&Number.isFinite(+d)?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`:'';}
+function situacaoEF(s){return ['Em andamento','Aprovada / Em andamento'].includes(s)?'Em serviço':s==='Concluída'?'Finalizada':s;}
+function ativoEF(m){const o=m.osId?(db.os||[]).find(o=>o.id==m.osId):null;return !m.cancelado && !m.estornoDe && !o?.cancelada && o?.status!=='Cancelada';}
+function itensAprovadosEF(itens){return (itens||[]).filter(i=>i.aprovado!==false);}
+function totalItensEF(itens){return itensAprovadosEF(itens).reduce((a,i)=>a+Number(i.qtd)*Number(i.valor),0);}
+function saldoDinheiroEF(){return (db.caixa||[]).filter(m=>ativoEF(m)&&formaAtualCaixa(m)==='Dinheiro').reduce((a,m)=>a+(m.tipo==='Entrada'?1:-1)*Number(m.valor||0),0);}
+let mutacaoEF=false;
+async function transacaoEF(acao){
+ if(mutacaoEF||window.osGravacaoEmCurso||!carregamentoFirebaseConcluido)return false;
+ mutacaoEF=true;window.osGravacaoEmCurso=true;const antes=JSON.parse(JSON.stringify(db));
+ try{await acao();if(!await salvarDB())throw new Error('Falha ao salvar');return true;}
+ catch(e){db=antes;alert(e.message||'Não foi possível salvar. Tente novamente.');return false;}
+ finally{mutacaoEF=false;window.osGravacaoEmCurso=false;}
+}
+function inserirEF(ancora,html,pos='beforebegin'){el(ancora).insertAdjacentHTML(pos,html);}
+function campoEF(id,label,type='text',extra=''){return `<label class="block text-sm">${label}<input id="${id}" type="${type}" ${extra} class="${classeEF} w-full"></label>`;}
+function seletorFormaEF(id){return `<select id="${id}" class="${classeEF}">${formasCaixaPermitidas.map(f=>`<option value="${f}">${f.replace('Cartao_','Cartão de ')}</option>`).join('')}</select>`;}
+function clientesOptionsEF(){return '<option value="generico">Cliente balcão</option>'+(db.clientes||[]).map(c=>`<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join('');}
+function tecnicosOptionsEF(){return '<option value="">Selecione o técnico</option>'+(db.usuarios||[]).filter(u=>/mec[aâ]nico|t[eé]cnico/i.test(u.cargo||'')).map(u=>`<option value="${esc(u.id)}">${esc(u.nome)}</option>`).join('');}
+function atualizarCategoriasEF(){const atual=el('pTipo').value;el('pTipo').innerHTML='<option value="">Selecione a categoria</option>'+[...new Set([...categoriasEF,...(db.produtos||[]).map(p=>p.tipo).filter(Boolean),atual].filter(Boolean))].map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');if(atual)el('pTipo').value=atual;}
+const produtoAbrirEF=abrirModalProduto;
+abrirModalProduto=function(id=null){atualizarCategoriasEF();produtoAbrirEF(id);};
+const selectsEF=atualizarSelectsClientesEProdutos;
+atualizarSelectsClientesEProdutos=function(){selectsEF();const v=el('pdvTecnicoEF').value;el('pdvTecnicoEF').innerHTML=tecnicosOptionsEF();el('pdvTecnicoEF').value=v;};
+function comissaoVendaEF(){const u=(db.usuarios||[]).find(u=>u.id==el('pdvTecnicoEF').value);return el('pdvOficinaEF').checked&&u?{pecas:Number(u.comissaoPecas)||0,servicos:Number(u.comissaoServicos)||0}:null;}
+const vendaFinalEF=finalizarVendaPDV;
+finalizarVendaPDV=async function(){if(el('pdvOficinaEF').checked&&!el('pdvTecnicoEF').value){alert('Selecione o técnico da venda na oficina.');return;}await vendaFinalEF();renderizarComissoes();};
+function procurarProdutoEF(input,select){const termo=el(input).value.toLocaleLowerCase('pt-BR');const atual=el(select).value;el(select).innerHTML='<option value="">Selecione o produto...</option>'+(db.produtos||[]).filter(p=>String(p.nome||'').toLocaleLowerCase('pt-BR').includes(termo)||String(p.tipo||'').toLocaleLowerCase('pt-BR').includes(termo)).map(p=>`<option value="${esc(p.id)}">${esc(p.nome)} · ${moeda(p.preco)} · Estoque ${Number(p.qtd)||0}</option>`).join('');el(select).value=atual;}
+function procurarClienteOSEF(){const termo=el('osBuscaClienteEF').value.toLocaleLowerCase('pt-BR');const atual=el('osClienteId').value;el('osClienteId').innerHTML='<option value="generico">Cliente</option>'+(db.clientes||[]).filter(c=>String(c.nome||'').toLocaleLowerCase('pt-BR').includes(termo)).map(c=>`<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join('');el('osClienteId').value=atual||'generico';}
+function procurarPlacaOSEF(){const termo=normalizaPlacaEF(el('osBuscaPlacaEF').value);el('osPlacasResultadoEF').innerHTML='<option value="">Selecione um veículo encontrado...</option>'+(termo?(db.veiculos||[]).filter(v=>normalizaPlacaEF(v.placa).includes(termo)).map(v=>`<option value="${esc(v.id)}">${esc(textoMoto(v))} · ${esc((db.clientes||[]).find(c=>c.id==v.clienteId)?.nome||'Cliente')}</option>`).join(''):'');}
+function escolherPlacaOSEF(){const v=(db.veiculos||[]).find(v=>v.id==el('osPlacasResultadoEF').value);if(!v)return;el('osBuscaClienteEF').value='';procurarClienteOSEF();el('osClienteId').value=v.clienteId||'generico';preencherMotos('os',v.id);el('osVeiculoId').value=v.id;selecionarMotoOS();el('osKm').value=v.km??'';}
+const motoSelecionarEF=selecionarMotoOS;
+selecionarMotoOS=function(){motoSelecionarEF();const v=(db.veiculos||[]).find(v=>v.id==el('osVeiculoId').value);if(v)el('osKm').value=v.km??'';};
+const abrirOSEF=abrirModalOS;
+abrirModalOS=function(id=null){if(ehMecanico()){abrirOSEF(id);return;}el('osBuscaClienteEF').value='';el('osBuscaPlacaEF').value='';el('osPlacasResultadoEF').innerHTML='';atualizarSelectsClientesEProdutos();abrirOSEF(id);const o=(db.os||[]).find(o=>o.id==id);el('osKm').value=o?.km??'';el('osEntradaNova').value='';el('osEntradaForma').value='Dinheiro';for(const id of ['osKm','osEntradaNova','osEntradaForma','osBuscaClienteEF','osBuscaPlacaEF','osPlacasResultadoEF'])el(id).disabled=!!(o?.faturado||o?.cancelada);el('osSaldoEF').textContent=o?`Já recebido: ${moeda(recebidoOSEF(o.id))} · Saldo: ${moeda(Math.max(0,Number(o.total||0)-recebidoOSEF(o.id)))}`:'';};
+function recebidoOSEF(id){return (db.caixa||[]).filter(m=>m.osId==id&&m.tipo==='Entrada'&&ativoEF(m)).reduce((a,m)=>a+Number(m.valorBruto??m.valor??0),0);}
+function aprovarItemEF(id,valor){if(!exigirAtendimento())return;const o=(db.os||[]).find(o=>o.id==el('osIdEdit').value);if(o?.faturado||o?.cancelada)return;const i=itensTempOS.find(i=>i.id==id);if(i){i.aprovado=valor;atualizarTabelaItensOS();}}
+const tabelaItensEF=atualizarTabelaItensOS;
+atualizarTabelaItensOS=function(){tabelaItensEF();const o=(db.os||[]).find(o=>o.id==el('osIdEdit').value);for(const [n,i] of itensTempOS.entries()){const cel=el('tabelaOsItens').rows[n]?.cells[1];if(cel)cel.insertAdjacentHTML('beforeend',`<label class="block text-xs mt-2"><input type="checkbox" ${i.aprovado===false?'':'checked'} ${o?.faturado||o?.cancelada?'disabled':''} onchange="aprovarItemEF(${i.id},this.checked)"> Autorizado pelo cliente</label>`);}el('osTotalDisplay').textContent=moeda(totalItensEF(itensTempOS));};
+const salvarOSEF=salvarOS;
+salvarOS=async function(e){e.preventDefault();const o=(db.os||[]).find(o=>o.id==el('osIdEdit').value);if(o?.cancelada||o?.status==='Cancelada'){alert('Esta OS está cancelada; seu histórico está preservado.');return;}if(o?.aprovacaoAdminPendente&&!ehAdmin()){alert('A OS rápida aguarda aprovação do administrador.');return;}if(el('osStatus').value==='Cancelada'){if(o)await cancelarOSEF(o.id);else alert('Salve a OS antes de cancelar.');return;}if(el('osStatus').value==='Faturada'&&!o?.faturado&&!ehAdmin()){alert('O administrador deve confirmar o faturamento.');return;}if(el('osKm').value!==''&&(!Number.isFinite(Number(el('osKm').value))||Number(el('osKm').value)<0)){alert('Confira a quilometragem.');return;}if(el('osStatus').value==='Faturada'&&totalItensEF(itensTempOS)<=0){alert('Autorize pelo menos um item para faturar.');return;}await salvarOSEF(e);};
+const osRenderEF=renderizarOS;
+renderizarOS=function(){osRenderEF();for(const row of el('tabelaOS')?.rows||[]){const btn=row.querySelector('button[onclick^="abrirModalOS"]');if(!btn)continue;const id=btn.getAttribute('onclick').match(/\((\d+)\)/)?.[1];const o=(db.os||[]).find(o=>o.id==id);if(!o)continue;row.cells[2].textContent=situacaoEF(o.status);if(ehAdmin()&&!o.cancelada)row.cells[4].insertAdjacentHTML('beforeend',`<button onclick="cancelarOSEF(${o.id})" class="text-red-400 ml-2">Cancelar OS</button>`);}};
+async function cancelarOSEF(id){if(!ehAdmin()||!exigirAtendimento())return;const o=(db.os||[]).find(o=>o.id==id);if(!o||o.cancelada||o.status==='Cancelada')return;if(!confirm('Cancelar esta OS, estornar os recebimentos e devolver ao estoque os itens baixados? O histórico será mantido.'))return;
+ if(await transacaoEF(()=>{const antes=JSON.parse(JSON.stringify(o));if(o.estoqueBaixado&&!o.estoqueEstornado){for(const i of itensAprovadosEF(o.itens)){const p=(db.produtos||[]).find(p=>p.id==i.produtoId);if(p)p.qtd=Number(p.qtd||0)+Number(i.qtd||0);}o.estoqueEstornado=true;}
+ for(const m of (db.caixa||[]).filter(m=>m.osId==id&&m.tipo==='Entrada'&&ativoEF(m)))estornarMovimentoEF(m,'Cancelamento OS '+numeroOS(o));
+ o.cancelada=true;o.status='Cancelada';o.statusAntesCancelamento=antes.status;o.dataCancelamento=new Date().toISOString();o.saldoReceber=0;auditar('Cancelar OS',id,antes,JSON.parse(JSON.stringify(o)));})){fecharModalOS();renderizarTudo();}}
+function estornarMovimentoEF(m,motivo){if(m.cancelado||(db.caixa||[]).some(x=>x.estornoDe==m.id))return;db.caixa.push({id:novoIdEF(),tipo:m.tipo==='Entrada'?'Saída':'Entrada',descricao:motivo,valor:Number(m.valor||0),valorBruto:Number(m.valorBruto??m.valor??0),data:new Date().toLocaleDateString('pt-BR'),formaPagamento:formaAtualCaixa(m),estornoDe:m.id,osId:m.osId??null,contaReceberId:m.contaReceberId??null});m.cancelado=true;}
+function itensVendaEF(m){return m.itens || (db.auditoria||[]).find(a=>a.acao==='Venda de balcão'&&a.referencia==m.id)?.novo?.itens || [];}
+async function cancelarVendaEF(id){if(!ehAdmin()||!exigirAtendimento())return;const m=(db.caixa||[]).find(m=>m.id==id);if(!m||!ativoEF(m)||m.osId||m.contaReceberId)return;if(!confirm('Cancelar a venda e estornar o caixa e o estoque?'))return;if(await transacaoEF(()=>{const antes=JSON.parse(JSON.stringify(m));for(const i of itensVendaEF(m)){const p=(db.produtos||[]).find(p=>p.id==i.produtoId);if(p)p.qtd=Number(p.qtd||0)+Number(i.qtd||0);}estornarMovimentoEF(m,'Cancelamento venda '+m.id);auditar('Cancelar venda',id,antes,JSON.parse(JSON.stringify(m)));})){renderizarTudo();}}
+// Manual accounts use their original array and ids; a received account cannot be received twice.
+let contaEditarEF=null,contaItensEF=[];
+abrirModalContaReceber=function(id=null){if(!ehAdmin()||!exigirAtendimento())return;contaEditarEF=id;const c=(db.contasReceber||[]).find(c=>c.id==id);if(c?.status==='Recebido'){alert('Conta já recebida; o histórico financeiro fica preservado.');return;}contaItensEF=JSON.parse(JSON.stringify(c?.itens||[]));el('crDescricao').value=c?.descricao||'';el('crValor').value=c?.valor||'';el('crClienteEF').innerHTML=clientesOptionsEF();el('crClienteEF').value=c?.clienteId||'generico';el('crVencimentoEF').value=diaISOEF(c?.vencimento)||'';renderContaItensEF();el('modalContaReceber').classList.remove('hidden');};
+function adicionarContaItemEF(){const nome=el('crItemNomeEF').value.trim(),qtd=Number(el('crItemQtdEF').value),valor=Number(el('crItemValorEF').value);if(!nome||!Number.isInteger(qtd)||qtd<=0||!Number.isFinite(valor)||valor<0){alert('Confira descrição, quantidade e preço.');return;}contaItensEF.push({id:novoIdEF(),tipo:el('crItemTipoEF').value,nome,qtd,valor});renderContaItensEF();}
+function renderContaItensEF(){el('crItensEF').innerHTML=contaItensEF.map((i,n)=>`<p>${esc(i.nome)} · ${i.tipo==='mao_de_obra'?'Mão de obra':'Peça'} · ${moeda(i.qtd*i.valor)} <button type="button" onclick="contaItensEF.splice(${n},1);renderContaItensEF()">Remover</button></p>`).join('');if(contaItensEF.length)el('crValor').value=totalItensEF(contaItensEF).toFixed(2);el('crValor').readOnly=!!contaItensEF.length;}
+salvarContaReceber=async function(e){e.preventDefault();if(!ehAdmin()||!exigirAtendimento())return;const c=(db.contasReceber||[]).find(c=>c.id==contaEditarEF);if(c?.status==='Recebido')return;const valor=Number(el('crValor').value);if(!Number.isFinite(valor)||valor<=0)return alert('Informe o valor da conta.');if(await transacaoEF(()=>{const novo={...(c||{}),id:c?.id||novoIdEF(),descricao:el('crDescricao').value.trim(),valor,clienteId:el('crClienteEF').value,itens:JSON.parse(JSON.stringify(contaItensEF)),vencimento:el('crVencimentoEF').value,status:'Pendente'};db.contasReceber ||= [];if(c)Object.assign(c,novo);else db.contasReceber.push(novo);auditar('Salvar conta a receber',novo.id,c,novo);})){fecharModalContaReceber();renderizarContasReceber();}};
+function abrirRecebimentoEF(tipo,id){if(!ehAdmin()||!exigirAtendimento())return;el('receberTipoEF').value=tipo;el('receberIdEF').value=id;const c=tipo==='os'?(db.os||[]).find(c=>c.id==id):(db.contasReceber||[]).find(c=>c.id==id);if(!c)return;el('receberInfoEF').textContent=tipo==='os'?'Saldo da OS '+numeroOS(c):c.descricao;el('receberValorEF').value=tipo==='os'?Math.max(0,c.total-recebidoOSEF(id)):c.valor;el('receberFormaEF').value='Dinheiro';el('modalReceberEF').classList.remove('hidden');}
+async function confirmarRecebimentoEF(e){e.preventDefault();if(!ehAdmin()||!exigirAtendimento())return;const tipo=el('receberTipoEF').value,id=el('receberIdEF').value,forma=el('receberFormaEF').value,valor=Number(el('receberValorEF').value);if(!formasCaixaPermitidas.includes(forma)||!Number.isFinite(valor)||valor<=0)return;const c=tipo==='os'?(db.os||[]).find(c=>c.id==id):(db.contasReceber||[]).find(c=>c.id==id);if(!c||c.cancelada||c.status==='Recebido')return;const saldo=tipo==='os'?Math.max(0,c.total-recebidoOSEF(id)):Number(c.valor);if(valor>saldo+0.001)return alert('O valor excede o saldo.');if(tipo!=='os'&&Math.abs(valor-saldo)>0.001)return alert('Receba o valor integral desta conta.');
+ if(await transacaoEF(()=>{if(tipo!=='os'&&(db.caixa||[]).some(m=>m.contaReceberId==id&&ativoEF(m)))throw new Error('Conta já recebida.');db.caixa ||= [];const m={id:novoIdEF(),tipo:'Entrada',descricao:tipo==='os'?'Recebimento OS '+numeroOS(c):'Recebimento · '+c.descricao,valor:calcularTaxaInfinitePay(valor,forma,Number(el('receberParcelasEF').value)||1).valorLiquido,valorBruto:valor,formaPagamento:forma,parcelas:Number(el('receberParcelasEF').value)||1,data:new Date().toLocaleDateString('pt-BR'),origem:'recebimento'};if(tipo==='os')m.osId=c.id;else m.contaReceberId=c.id;db.caixa.push(m);if(tipo==='os')c.saldoReceber=Math.max(0,saldo-valor);else {c.status='Recebido';c.recebimentoId=m.id;c.dataRecebimento=new Date().toISOString();c.formaPagamento=forma;}auditar('Receber conta',c.id,null,m);})){el('modalReceberEF').classList.add('hidden');renderizarTudo();}}
+renderizarContasReceber=function(){const contas=db.contasReceber||[],os=(db.os||[]).filter(o=>!o.cancelada&&!o.faturado&&Number(o.total)>recebidoOSEF(o.id));el('finTotalReceberPendente').textContent=moeda(contas.filter(c=>c.status!=='Recebido').reduce((a,c)=>a+Number(c.valor||0),0)+os.reduce((a,o)=>a+Math.max(0,o.total-recebidoOSEF(o.id)),0));el('tabelaContasReceber').innerHTML=contas.map(c=>`<tr><td class="p-4">${esc(c.descricao)}</td><td>${esc((db.clientes||[]).find(x=>x.id==c.clienteId)?.nome||'Cliente balcão')}</td><td>${moeda(c.valor)}</td><td>${esc(c.vencimento||'-')}</td><td>${esc(c.status||'Pendente')}</td><td>${ehAdmin()&&c.status!=='Recebido'?`<button onclick="abrirModalContaReceber(${c.id})">Editar</button> · <button onclick="abrirRecebimentoEF('conta',${c.id})">Receber</button> · <button onclick="excluirContaReceber(${c.id})">Excluir</button>`:''}</td></tr>`).join('')+os.map(o=>`<tr><td class="p-4">OS ${numeroOS(o)} · ${esc(o.motoInfo)}</td><td>${esc((db.clientes||[]).find(c=>c.id==o.clienteId)?.nome||'Cliente')}</td><td>${moeda(o.total-recebidoOSEF(o.id))}</td><td>${esc(o.data)}</td><td>Saldo OS</td><td>${ehAdmin()?`<button onclick="abrirRecebimentoEF('os',${o.id})">Receber</button>`:''}</td></tr>`).join('')||'<tr><td colspan="6" class="p-4">Nenhuma conta a receber.</td></tr>';};
+excluirContaReceber=async function(id){if(!ehAdmin()||!exigirAtendimento())return;const c=(db.contasReceber||[]).find(c=>c.id==id);if(!c)return;if(c.status==='Recebido'||(db.caixa||[]).some(m=>m.contaReceberId==id))return alert('O recebimento registrado precisa permanecer no histórico.');if(confirm('Excluir esta conta pendente?')&&await transacaoEF(()=>{db.contasReceber=db.contasReceber.filter(c=>c.id!=id);auditar('Excluir conta pendente',id,c,null);})){renderizarContasReceber();}};
+function caixaFiltradoEF(){const termo=el('caixaBuscaEF').value.toLocaleLowerCase('pt-BR'),de=el('caixaDeEF').value,ate=el('caixaAteEF').value;return (db.caixa||[]).filter(m=>{const dia=diaISOEF(m.data);return ativoEF(m)&&(!de||dia>=de)&&(!ate||dia<=ate)&&String(m.descricao||'').toLocaleLowerCase('pt-BR').includes(termo);});}
+renderizarCaixa=function(){const lista=caixaFiltradoEF(),entradas=lista.filter(m=>m.tipo==='Entrada').reduce((a,m)=>a+Number(m.valor||0),0),saidas=lista.filter(m=>m.tipo==='Saída').reduce((a,m)=>a+Number(m.valor||0),0);el('finTotalEntradas').textContent=moeda(entradas);el('finTotalSaidas').textContent=moeda(saidas);el('finSaldoLiquido').textContent=moeda(entradas-saidas);el('caixaDinheiroEF').textContent='Dinheiro físico acumulado: '+moeda(saldoDinheiroEF());const desconhecidas=(db.caixa||[]).filter(m=>!formaAtualCaixa(m));el('caixaAvisoEF').textContent=desconhecidas.length?`${desconhecidas.length} lançamento(s) antigo(s) sem forma de pagamento. Classifique-os em Editar pagamento para incluí-los corretamente no saldo físico.`:'';const dias=new Map();for(const m of lista){const k=m.data,r=dias.get(k)||{e:0,s:0};r[m.tipo==='Entrada'?'e':'s']+=Number(m.valor||0);dias.set(k,r);}el('caixaDiasEF').innerHTML=[...dias].map(([dia,r])=>`<p>${esc(dia)} · Entradas ${moeda(r.e)} · Saídas ${moeda(r.s)} · Saldo ${moeda(r.e-r.s)}</p>`).join('');el('tabelaCaixa').innerHTML=lista.map(m=>`<tr class="hover:bg-zinc-950/50"><td class="p-4">${esc(m.data)}</td><td class="p-4">${esc(m.tipo)}</td><td class="p-4">${esc(m.descricao)} ${m.cancelado?'· Cancelado':''}<br><span class="text-xs text-zinc-500">${esc(formaAtualCaixa(m)||'Forma não informada')}</span></td><td class="p-4">${moeda(m.valor)}</td><td class="p-4">${ehAdmin()&&ativoEF(m)?`<button onclick="abrirEdicaoPagamentoCaixa(${m.id})">Editar pagamento</button> ${itensVendaEF(m).length||m.osId?`<button class="text-amber-400 ml-2" onclick="abrirPrecosVendaEF(${m.id})">Editar valores</button>`:''} ${m.osId?`<button class="text-red-400 ml-2" onclick="cancelarOSEF(${m.osId})">Cancelar OS</button>`:m.origem==='pdv'||itensVendaEF(m).length?`<button class="text-red-400 ml-2" onclick="cancelarVendaEF(${m.id})">Cancelar venda</button>`:''}`:''} ${!m.osId&&!m.contaReceberId&&!m.estornoDe&&!m.cancelado&&m.origem!=='pdv'&&!itensVendaEF(m).length?`<button class="text-red-400 ml-2" onclick="cancelarLancamentoEF(${m.id})">Cancelar lançamento</button>`:''}</td></tr>`).join('')||'<tr><td colspan="5" class="p-4">Nenhuma movimentação encontrada.</td></tr>';el('fechamentosEF').innerHTML=(db.fechamentosCaixa||[]).slice().reverse().map(f=>`<p>${esc(f.data)} · ${esc(f.usuario)} · Esperado ${moeda(f.saldoDinheiro)} · Contado ${moeda(f.contado)} · Diferença ${moeda(f.diferenca)}</p>`).join('');};
+const excluirCaixaEF=excluirMovimentacaoCaixa;
+excluirMovimentacaoCaixa=function(id){const m=(db.caixa||[]).find(m=>m.id==id);if(m&&(m.origem==='pdv'||m.contaReceberId||m.estornoDe||m.cancelado||itensVendaEF(m).length)){alert('Use o cancelamento para preservar o histórico financeiro.');return;}return excluirCaixaEF(id);};
+// Preserve the original payment choices and fee table.
+salvarMovimentacaoCaixa=async function(e){e.preventDefault();if(!exigirAtendimento())return;const novo={tipo:el('cxTipo').value,descricao:el('cxDescricao').value.trim(),valor:Number(el('cxValor').value),formaPagamento:el('cxFormaEF').value,data:new Date().toLocaleDateString('pt-BR')};if(!novo.descricao||!Number.isFinite(novo.valor)||novo.valor<=0)return alert('Confira descrição e valor.');if(ehAtendente())return solicitarAlteracao('Novo lançamento','caixa',null,novo);if(await transacaoEF(()=>{db.caixa ||= [];novo.id=novoIdEF();db.caixa.push(novo);auditar('Novo lançamento',novo.id,null,novo);})){fecharModalCaixa();renderizarTudo();}};
+function abrirSangriaEF(){if(!ehAdmin()||!exigirAtendimento())return;el('sangriaValorEF').value='';el('sangriaDescricaoEF').value='';el('modalSangriaEF').classList.remove('hidden');}
+async function salvarSangriaEF(e){e.preventDefault();if(!ehAdmin()||!exigirAtendimento())return;const valor=Number(el('sangriaValorEF').value);if(!Number.isFinite(valor)||valor<=0||valor>saldoDinheiroEF()+0.001)return alert('A sangria deve ser positiva e não pode exceder o saldo físico.');if(await transacaoEF(()=>{db.caixa ||= [];const m={id:novoIdEF(),tipo:'Saída',origem:'sangria',descricao:'Sangria · '+el('sangriaDescricaoEF').value.trim(),valor,formaPagamento:'Dinheiro',data:new Date().toLocaleDateString('pt-BR')};db.caixa.push(m);auditar('Sangria',m.id,null,m);})){el('modalSangriaEF').classList.add('hidden');renderizarTudo();}}
+function abrirFechamentoEF(){if(!ehAdmin()||!exigirAtendimento())return;el('fecharEsperadoEF').textContent='Dinheiro esperado: '+moeda(saldoDinheiroEF());el('fecharContadoEF').value='';el('modalFechamentoEF').classList.remove('hidden');}
+async function salvarFechamentoEF(e){e.preventDefault();if(!ehAdmin()||!exigirAtendimento())return;const contado=Number(el('fecharContadoEF').value);if(!Number.isFinite(contado)||contado<0)return;const dia=new Date().toLocaleDateString('pt-BR');if((db.fechamentosCaixa||[]).some(f=>f.data===dia))return alert('O fechamento de hoje já foi registrado.');if(await transacaoEF(()=>{db.fechamentosCaixa ||= [];const lista=(db.caixa||[]).filter(m=>m.data===dia&&ativoEF(m)),saldo=saldoDinheiroEF();const f={id:novoIdEF(),data:dia,dataHora:new Date().toISOString(),usuario:usuarioLogadoAtual.nome,usuarioId:usuarioLogadoAtual.id,saldoDinheiro:saldo,contado,diferenca:contado-saldo,entradas:lista.filter(m=>m.tipo==='Entrada').reduce((a,m)=>a+Number(m.valor||0),0),saidas:lista.filter(m=>m.tipo==='Saída').reduce((a,m)=>a+Number(m.valor||0),0),lancamentos:lista.map(m=>m.id)};db.fechamentosCaixa.push(f);auditar('Fechar caixa',f.id,null,f);})){el('modalFechamentoEF').classList.add('hidden');renderizarCaixa();}}
+let precosVendaEF=null;
+function abrirPrecosVendaEF(id){if(!ehAdmin()||!exigirAtendimento())return;const m=(db.caixa||[]).find(m=>m.id==id);if(!m||!ativoEF(m))return;const os=(db.os||[]).find(o=>o.id==m.osId);if(os?.cancelada)return;const itens=JSON.parse(JSON.stringify(os?.itens||itensVendaEF(m)));if(!itens.length)return alert('Esta venda antiga não tem os itens registrados para editar valores.');precosVendaEF={id,osId:os?.id,itens,anterior:JSON.stringify(os||m)};el('precosItensEF').innerHTML=itens.map((i,n)=>`<label class="block mt-2">${esc(i.nome)} · ${Number(i.qtd)} un. ${i.aprovado===false?'(Não aprovado)':''}<input class="${classeEF} w-full" id="precoVendaEF${n}" type="number" min="0" step="0.01" required value="${Number(i.valor)||0}"></label>`).join('');el('modalPrecosEF').classList.remove('hidden');}
+async function salvarPrecosVendaEF(e){e.preventDefault();if(!ehAdmin()||!exigirAtendimento()||!precosVendaEF)return;const ed=precosVendaEF,m=(db.caixa||[]).find(m=>m.id==ed.id),o=(db.os||[]).find(o=>o.id==ed.osId);if(!m||!ativoEF(m)||JSON.stringify(o||m)!==ed.anterior)return alert('O registro mudou. Abra novamente a edição.');const itens=ed.itens.map((i,n)=>({...i,valor:Number(el('precoVendaEF'+n).value)}));if(itens.some(i=>!Number.isFinite(i.valor)||i.valor<0))return;const total=totalItensEF(itens);if(await transacaoEF(()=>{const antes=JSON.parse(JSON.stringify(o||m));if(o){const pagamentos=(db.caixa||[]).filter(x=>x.osId==o.id&&x.tipo==='Entrada'&&ativoEF(x));const faturamento=pagamentos.find(x=>x.origem==='faturamentoOS')||(pagamentos.length===1?pagamentos[0]:null);if(!faturamento)throw new Error('Esta OS tem pagamentos antigos sem vínculo de faturamento identificável. Confira os recebimentos antes da edição.');const outros=pagamentos.filter(x=>x!==faturamento).reduce((a,x)=>a+Number(x.valorBruto??x.valor??0),0);if(total<outros-0.001)throw new Error('O novo valor não pode ser menor que as entradas já recebidas.');o.itens=itens;o.total=total;o.valorLiquido=calcularTaxaInfinitePay(total,o.formaPagamento,o.parcelas||1).valorLiquido;faturamento.valorBruto=Math.max(0,total-outros);faturamento.valor=calcularTaxaInfinitePay(faturamento.valorBruto,formaAtualCaixa(faturamento),faturamento.parcelas||o.parcelas||1).valorLiquido;auditar('Editar valores OS faturada',o.id,antes,JSON.parse(JSON.stringify(o)));}else{m.itens=itens;m.valorBruto=total;m.valor=calcularTaxaInfinitePay(total,formaAtualCaixa(m),m.parcelas||1).valorLiquido;auditar('Editar valores venda',m.id,antes,JSON.parse(JSON.stringify(m)));}})){el('modalPrecosEF').classList.add('hidden');renderizarTudo();}}
+// Technician creates a draft only. Billing stays an administrator action.
+let itensRapidosEF=[];
+function abrirRapidaEF(){if(!ehMecanico()||!carregamentoFirebaseConcluido)return;itensRapidosEF=[];el('rapidaClienteEF').innerHTML=clientesOptionsEF();el('rapidaVeiculoEF').innerHTML='<option value="">Selecione o veículo cadastrado</option>'+(db.veiculos||[]).map(v=>`<option value="${esc(v.id)}">${esc(textoMoto(v))}</option>`).join('');el('rapidaMotoEF').value='';el('rapidaKmEF').value='';el('rapidaItensEF').innerHTML='';el('modalRapidaEF').classList.remove('hidden');}
+function veiculoRapidaEF(){const v=(db.veiculos||[]).find(v=>v.id==el('rapidaVeiculoEF').value);if(v){el('rapidaClienteEF').value=v.clienteId||'generico';el('rapidaMotoEF').value=textoMoto(v);el('rapidaKmEF').value=v.km??'';}}
+function adicionarRapidaEF(){const nome=el('rapidaNomeEF').value.trim(),qtd=Number(el('rapidaQtdEF').value),valor=Number(el('rapidaValorEF').value);if(!nome||!Number.isInteger(qtd)||qtd<=0||!Number.isFinite(valor)||valor<0)return alert('Confira os dados do item.');itensRapidosEF.push({id:novoIdEF(),tipo:el('rapidaTipoEF').value,nome,qtd,valor,produtoId:null});renderRapidaEF();}
+function renderRapidaEF(){el('rapidaItensEF').innerHTML=itensRapidosEF.map((i,n)=>`<p>${esc(i.nome)} · ${i.tipo==='mao_de_obra'?'Mão de obra':'Peça'} · ${moeda(i.qtd*i.valor)} <button type="button" onclick="itensRapidosEF.splice(${n},1);renderRapidaEF()">Remover</button></p>`).join('')+'<p>Total: '+moeda(totalItensEF(itensRapidosEF))+'</p>';}
+async function salvarRapidaEF(e){e.preventDefault();if(!ehMecanico()||!carregamentoFirebaseConcluido)return;if(!itensRapidosEF.length||!el('rapidaMotoEF').value.trim())return alert('Informe o veículo e os itens.');const v=(db.veiculos||[]).find(v=>v.id==el('rapidaVeiculoEF').value);if(v&&String(v.clienteId)!==el('rapidaClienteEF').value)return alert('O cliente deve corresponder ao veículo selecionado.');if(await transacaoEF(()=>{const o={id:novoIdEF(),numero:proximoNumeroOS(),clienteId:el('rapidaClienteEF').value,veiculoId:v?.id||null,motoInfo:el('rapidaMotoEF').value.trim(),km:el('rapidaKmEF').value===''?null:Number(el('rapidaKmEF').value),itens:JSON.parse(JSON.stringify(itensRapidosEF)),total:totalItensEF(itensRapidosEF),status:'Aguardando aprovação',formaPagamento:el('rapidaFormaEF').value,parcelas:Number(el('rapidaParcelasEF').value)||1,mecanicoId:usuarioLogadoAtual.id,mecanicoExecucaoId:usuarioLogadoAtual.id,criadaPorTecnico:true,aprovacaoAdminPendente:true,faturado:false,estoqueBaixado:false,data:new Date().toLocaleDateString('pt-BR'),dataCriacao:new Date().toISOString()};db.os ||= [];db.os.push(o);auditar('OS rápida enviada para aprovação',o.id,null,o);})){el('modalRapidaEF').classList.add('hidden');renderizarMinhasOS();alert('OS encaminhada ao administrador. Nenhum valor lançado no caixa.');}}
+// Commission reports include real workshop sales using the existing percentage rules.
+const linhasComissaoEF=linhasComissaoFiltradas;
+linhasComissaoFiltradas=function(){const linhas=linhasComissaoEF(),periodo=periodoFiltroComissao(el('comissaoFiltroMes').value),mecanico=el('comissaoFiltroMecanico').value,tipo=el('comissaoFiltroTipo').value;for(const m of db.caixa||[]){if(!m.vendaOficina||!ativoEF(m)||m.tipo!=='Entrada')continue;const d=dataMovimentoMeta(m.data);if(periodo&&(!d||d<periodo.inicio||d>=periodo.fim))continue;if(mecanico&&String(m.mecanicoExecucaoId)!==mecanico)continue;const u=(db.usuarios||[]).find(u=>u.id==m.mecanicoExecucaoId);if(!u)continue;const form=[...el('camposPercentuaisMecanicos').querySelectorAll('form[data-mecanico]')].find(f=>f.dataset.mecanico===String(u.id));for(const i of itensAprovadosEF(m.itens)){const servico=i.tipo==='mao_de_obra';if(tipo==='pecas'&&servico||tipo==='servicos'&&!servico)continue;const pct=Number(form?.elements.namedItem(servico?'servicos':'pecas')?.value??(servico?u.comissaoServicos:u.comissaoPecas))||0,valor=Number(i.qtd)*Number(i.valor);linhas.push({mecanicoId:String(u.id),mecanico:u.nome,os:'Venda '+m.id,nome:i.nome,tipo:servico?'Mão de obra':'Peça',valor,percentual:pct,comissao:valor*pct/100});}}return linhas;};
+const resumoComissaoEF=resumoComissoes;
+resumoComissoes=function(mes=''){const r=resumoComissaoEF(mes);for(const m of db.caixa||[]){if(!m.vendaOficina||!ativoEF(m)||m.tipo!=='Entrada'||(mes&&!diaISOEF(m.data).startsWith(mes)))continue;const u=(db.usuarios||[]).find(u=>u.id==m.mecanicoExecucaoId),linha=r.mecanicos.find(x=>x.nome===u?.nome);if(!linha)continue;for(const i of itensAprovadosEF(m.itens)){const valor=Number(i.qtd)*Number(i.valor),servico=i.tipo==='mao_de_obra';linha[servico?'servicos':'pecas']+=valor;linha[servico?'comissaoServicos':'comissaoPecas']+=valor*Number(m.comissaoRegistrada?.[servico?'servicos':'pecas']||0)/100;}}return r;};
+function rankingEF(){const mes=el('rankingMesEF')?.value,semana=el('rankingSemanaEF')?.value,grupos=new Map();function noPeriodo(data){const dia=diaISOEF(data);if(mes&&!dia.startsWith(mes))return false;if(semana){const [ano,w]=semana.split('-W').map(Number);const jan4=new Date(ano,0,4),segunda=new Date(jan4);segunda.setDate(jan4.getDate()-(jan4.getDay()+6)%7+(w-1)*7);const fim=new Date(segunda);fim.setDate(fim.getDate()+7);const d=dataMovimentoMeta(data);if(!d||d<segunda||d>=fim)return false;}return true;}function adicionar(itens){for(const i of itensAprovadosEF(itens)){if(i.tipo==='mao_de_obra'||!i.produtoId&&!['peca','peca_livre','estoque'].includes(i.tipo))continue;const key=i.produtoId?'id:'+i.produtoId:'nome:'+String(i.nome).toLocaleLowerCase('pt-BR'),r=grupos.get(key)||{nome:(db.produtos||[]).find(p=>p.id==i.produtoId)?.nome||i.nome,quantidade:0,valor:0};r.quantidade+=Number(i.qtd)||0;r.valor+=(Number(i.qtd)||0)*(Number(i.valor)||0);grupos.set(key,r);}}
+ for(const o of db.os||[])if(!o.cancelada&&o.status!=='Cancelada'&&(o.faturado||o.status==='Faturada')&&noPeriodo(o.dataFaturamento||o.data))adicionar(o.itens);
+ for(const m of db.caixa||[])if(m.tipo==='Entrada'&&!m.osId&&ativoEF(m)&&noPeriodo(m.data))adicionar(itensVendaEF(m));return [...grupos.values()].sort((a,b)=>b.quantidade-a.quantidade||b.valor-a.valor).slice(0,10);}
+const clientesRenderEF=renderizarClientes;
+renderizarClientes=function(){clientesRenderEF();const agora=new Date();const mes=[],dia=[];for(const c of db.clientes||[]){const d=dataMovimentoMeta(c.aniversario);if(!d||!Number.isFinite(+d)||d.getMonth()!==agora.getMonth())continue;mes.push(c);if(d.getDate()===agora.getDate())dia.push(c);}el('aniversariantesEF').innerHTML='<p>Aniversariantes de hoje: '+(dia.map(c=>esc(c.nome)).join(', ')||'Nenhum')+'</p><p>Aniversariantes do mês: '+(mes.map(c=>esc(c.nome)).join(', ')||'Nenhum')+'</p>';};
+const veiculoAbrirEF=abrirModalVeiculo;
+abrirModalVeiculo=function(){veiculoAbrirEF();el('vAno').value='';};
+function modalEF(id,titulo,acao,conteudo){return `<div id="${id}" class="hidden fixed inset-0 bg-black/70 z-50 p-4 overflow-y-auto"><form onsubmit="${acao}(event)" class="bg-zinc-900 border border-zinc-700 rounded-2xl max-w-2xl mx-auto p-5 my-8 space-y-3"><h3 class="text-xl font-bold">${titulo}</h3>${conteudo}<div class="flex gap-3"><button type="submit" class="bg-red-600 rounded-xl px-4 py-2">Confirmar</button><button type="button" class="border border-zinc-700 rounded-xl px-4 py-2" onclick="el('${id}').classList.add('hidden')">Fechar</button></div></form></div>`;}
+function montarCamposEF(){
+ const antigo=el('pTipo');const select=document.createElement('select');select.id='pTipo';select.className=antigo.className;select.required=true;antigo.replaceWith(select);atualizarCategoriasEF();
+ inserirEF('vModelo',campoEF('vAno','Ano','number','min="1900" max="2100"'), 'afterend');
+ el('tabelaVeiculos').closest('table').parentElement.insertAdjacentHTML('beforebegin',`<input id="buscaVeiculoEF" placeholder="Buscar veículo pela placa" oninput="renderizarVeiculos()" class="${classeEF} w-full mb-3">`);
+ inserirEF('filtroBuscaCliente','<div id="aniversariantesEF" class="text-sm text-amber-400 mb-3"></div>','afterend');
+ inserirEF('filtroBuscaOS',`<div class="flex gap-2 mt-2"><input type="date" id="osFiltroDataEF" onchange="renderizarOS()" class="${classeEF}" aria-label="Data da OS"><select id="osFiltroSituacaoEF" onchange="renderizarOS()" class="${classeEF}"><option value="">Todas as situações</option>${['Orçamento','Diagnóstico','Aguardando peça','Aguardando aprovação','Em serviço','Finalizada','Faturada','Cancelada','Orçamento aguardando peça'].map(v=>`<option>${v}</option>`).join('')}</select></div>`,'afterend');
+ for(const s of ['Em serviço','Finalizada','Cancelada'])el('osStatus').insertAdjacentHTML('beforeend',`<option value="${s}">${s}</option>`);
+ inserirEF('osClienteId',`<input id="osBuscaClienteEF" oninput="procurarClienteOSEF()" placeholder="Pesquisar cliente pelo nome" class="${classeEF} w-full mb-2">`);
+ inserirEF('osVeiculoId',`<div class="space-y-2 mb-2"><input id="osBuscaPlacaEF" oninput="procurarPlacaOSEF()" placeholder="Pesquisar veículo pela placa" class="${classeEF} w-full"><select id="osPlacasResultadoEF" onchange="escolherPlacaOSEF()" class="${classeEF} w-full"></select></div>`);
+ inserirEF('osMotoInfo',campoEF('osKm','Quilometragem nesta OS','number','min="0" step="1"'),'afterend');
+ inserirEF('osFormaPagamento',`<div class="space-y-2 my-3">${campoEF('osEntradaNova','Novo valor de entrada / recebimento','number','min="0" step="0.01"')}<label class="block text-sm">Forma de pagamento da entrada ${seletorFormaEF('osEntradaForma')}</label><p id="osSaldoEF" class="text-sm text-amber-400"></p></div>`,'afterend');
+ inserirEF('osItemEstoqueId',`<input id="osBuscaProdutoEF" oninput="procurarProdutoEF('osBuscaProdutoEF','osItemEstoqueId')" placeholder="Pesquisar produto" class="${classeEF} w-full mb-2">`);
+ inserirEF('pdvProdutoSelect',`<input id="pdvBuscaProdutoEF" oninput="procurarProdutoEF('pdvBuscaProdutoEF','pdvProdutoSelect')" placeholder="Pesquisar produto" class="${classeEF} w-full mb-2">`);
+ inserirEF('pdvClienteId',`<div class="space-y-2 my-3"><label class="text-sm"><input id="pdvOficinaEF" type="checkbox" onchange="el('pdvTecnicoEF').disabled=!this.checked; if(!this.checked)el('pdvTecnicoEF').value=''"> Venda na oficina</label><select id="pdvTecnicoEF" disabled class="${classeEF} w-full">${tecnicosOptionsEF()}</select></div>`,'afterend');
+ inserirEF('crDescricao',`<div class="space-y-2 mt-2"><label class="block">Cliente<select id="crClienteEF" class="${classeEF} w-full"></select></label>${campoEF('crVencimentoEF','Vencimento','date')}<div class="border border-zinc-700 rounded-xl p-3 space-y-2"><h4>Peças e mão de obra</h4><select id="crItemTipoEF" class="${classeEF}"><option value="peca">Peça</option><option value="mao_de_obra">Mão de obra</option></select>${campoEF('crItemNomeEF','Descrição do item')}${campoEF('crItemQtdEF','Quantidade','number','min="1" step="1" value="1"')}${campoEF('crItemValorEF','Preço unitário','number','min="0" step="0.01"')}<button type="button" onclick="adicionarContaItemEF()" class="${classeEF}">Adicionar item</button><div id="crItensEF"></div></div></div>`,'afterend');
+ inserirEF('cxValor',`<label class="block mt-2">Forma de pagamento ${seletorFormaEF('cxFormaEF')}</label>`,'afterend');
+ el('tabelaCaixa').closest('table').parentElement.insertAdjacentHTML('beforebegin',`<div class="space-y-3 p-3"><div class="flex flex-wrap gap-2"><input id="caixaBuscaEF" placeholder="Pesquisar no caixa" oninput="renderizarCaixa()" class="${classeEF}"><label>De <input id="caixaDeEF" type="date" onchange="renderizarCaixa()" class="${classeEF}"></label><label>Até <input id="caixaAteEF" type="date" onchange="renderizarCaixa()" class="${classeEF}"></label><button onclick="abrirSangriaEF()" class="${classeEF}">Sangria</button><button onclick="abrirFechamentoEF()" class="${classeEF}">Fechar caixa</button></div><p id="caixaDinheiroEF" class="text-emerald-400 font-bold"></p><p id="caixaAvisoEF" class="text-amber-400 text-sm"></p><details><summary>Valores por dia</summary><div id="caixaDiasEF" class="text-sm space-y-2"></div></details><details><summary>Fechamentos registrados</summary><div id="fechamentosEF" class="text-sm space-y-2"></div></details></div>`);
+ el('rankingProdutosVendidos').closest('table').parentElement.insertAdjacentHTML('beforebegin',`<div class="flex flex-wrap gap-2 my-3"><label>Semana <input type="week" id="rankingSemanaEF" onchange="el('rankingMesEF').value='';renderizarResumoProdutos()" class="${classeEF}"></label><label>Mês <input type="month" id="rankingMesEF" onchange="el('rankingSemanaEF').value='';renderizarResumoProdutos()" class="${classeEF}"></label><button class="${classeEF}" onclick="el('rankingSemanaEF').value='';el('rankingMesEF').value='';renderizarResumoProdutos()">Todo o histórico</button></div>`);
+ el('listaMinhasOS').insertAdjacentHTML('beforebegin',`<button onclick="abrirRapidaEF()" class="bg-red-600 rounded-xl px-4 py-2 mb-3">Criar OS rápida</button>`);
+ document.body.insertAdjacentHTML('beforeend',
+ modalEF('modalReceberEF','Confirmar recebimento','confirmarRecebimentoEF',`<input type="hidden" id="receberTipoEF"><input type="hidden" id="receberIdEF"><p id="receberInfoEF"></p>${campoEF('receberValorEF','Valor recebido','number','min="0.01" step="0.01" required')}${seletorFormaEF('receberFormaEF')}${campoEF('receberParcelasEF','Parcelas no crédito','number','min="1" max="12" step="1" value="1" required')}`)+
+ modalEF('modalSangriaEF','Retirar dinheiro do caixa','salvarSangriaEF',campoEF('sangriaDescricaoEF','Motivo','text','required')+campoEF('sangriaValorEF','Valor','number','min="0.01" step="0.01" required'))+
+ modalEF('modalFechamentoEF','Fechamento de caixa','salvarFechamentoEF',`<p id="fecharEsperadoEF"></p>${campoEF('fecharContadoEF','Dinheiro contado','number','min="0" step="0.01" required')}<p class="text-xs text-zinc-400">O fechamento registra a conferência. Para retirar dinheiro, use Sangria.</p>`)+
+ modalEF('modalPrecosEF','Alterar valores da venda','salvarPrecosVendaEF','<div id="precosItensEF"></div><p class="text-sm text-zinc-400">Atualiza o lançamento vinculado usando as taxas de pagamento existentes.</p>')+
+ modalEF('modalRapidaEF','OS rápida · Enviar ao administrador','salvarRapidaEF',`<label class="block">Cliente<select id="rapidaClienteEF" required class="${classeEF} w-full"></select></label><label class="block">Veículo<select id="rapidaVeiculoEF" onchange="veiculoRapidaEF()" class="${classeEF} w-full"></select></label>${campoEF('rapidaMotoEF','Veículo / placa','text','required')}${campoEF('rapidaKmEF','Quilometragem','number','min="0" step="1"')}<div class="border border-zinc-700 p-3 rounded-xl space-y-2"><select id="rapidaTipoEF" class="${classeEF}"><option value="peca">Peça</option><option value="mao_de_obra">Mão de obra</option></select>${campoEF('rapidaNomeEF','Descrição do item')}${campoEF('rapidaQtdEF','Quantidade','number','min="1" value="1" step="1"')}${campoEF('rapidaValorEF','Preço unitário','number','min="0" step="0.01"')}<button type="button" onclick="adicionarRapidaEF()" class="${classeEF}">Adicionar item</button><div id="rapidaItensEF"></div></div><label>Forma de pagamento indicada ${seletorFormaEF('rapidaFormaEF')}</label>${campoEF('rapidaParcelasEF','Parcelas no crédito','number','min="1" max="12" value="1" step="1"')}<p class="text-sm text-amber-400">Somente o administrador confirma o faturamento. Este envio não movimenta o caixa.</p>`));
+}
+montarCamposEF();
+el('modalContaReceber').classList.add('overflow-y-auto');el('modalContaReceber').classList.remove('items-center');el('modalContaReceber').classList.add('items-start');el('modalContaReceber').firstElementChild.classList.add('my-4');
+let diaCaixaAtualEF=diaISOEF(new Date().toLocaleDateString('pt-BR'));
+function caixaHojeEF(){el('caixaDeEF').value=diaCaixaAtualEF;el('caixaAteEF').value=diaCaixaAtualEF;el('caixaBuscaEF').value='';renderizarCaixa();}
+el('tabBtnCaixa').insertAdjacentHTML('afterend','<button onclick="alternarAbaFinanceiro(\'dinheiro\')" id="tabBtnDinheiroEF" class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-zinc-400 hover:text-white">Dinheiro físico</button>');
+el('secCaixa').insertAdjacentHTML('afterend',`<div id="secDinheiroEF" class="hidden space-y-4 bg-zinc-900 border border-zinc-800 rounded-2xl p-4"><h3 class="font-bold">Dinheiro físico no caixa</h3><p id="dinheiroSaldoSeparadoEF" class="text-2xl font-bold text-emerald-400"></p><p class="text-sm text-zinc-400">Saldo acumulado em dinheiro, descontando saídas, sangrias e estornos. Pix e cartões ficam no fluxo geral.</p><p id="dinheiroAvisoSeparadoEF" class="text-amber-400 text-sm"></p><button onclick="abrirSangriaEF()" class="${classeEF}">Sangria</button><button onclick="abrirFechamentoEF()" class="${classeEF}">Fechar caixa</button><div id="dinheiroMovimentosEF" class="text-sm space-y-2"></div></div>`);
+const abasFinanceiroEF=alternarAbaFinanceiro;
+alternarAbaFinanceiro=function(aba){abasFinanceiroEF(aba);el('secDinheiroEF').classList.toggle('hidden',aba!=='dinheiro');if(aba==='dinheiro')renderizarCaixa();};
+const caixaRenderDiarioEF=renderizarCaixa;
+renderizarCaixa=function(){const hoje=diaISOEF(new Date().toLocaleDateString('pt-BR'));if(hoje!==diaCaixaAtualEF){diaCaixaAtualEF=hoje;el('caixaDeEF').value=hoje;el('caixaAteEF').value=hoje;}caixaRenderDiarioEF();el('dinheiroSaldoSeparadoEF').textContent=moeda(saldoDinheiroEF());el('dinheiroAvisoSeparadoEF').textContent=el('caixaAvisoEF').textContent;el('dinheiroMovimentosEF').innerHTML=(db.caixa||[]).filter(m=>ativoEF(m)&&formaAtualCaixa(m)==='Dinheiro').slice().reverse().map(m=>`<p>${esc(m.data)} · ${esc(m.tipo)} · ${esc(m.descricao)} · ${moeda(m.valor)}</p>`).join('');};
+el('caixaDinheiroEF').classList.add('hidden');el('caixaAvisoEF').classList.add('hidden');
+el('caixaBuscaEF').insertAdjacentHTML('afterend',`<button onclick="caixaHojeEF()" class="${classeEF}">Hoje</button><button onclick="el('caixaDeEF').value='';el('caixaAteEF').value='';renderizarCaixa()" class="${classeEF}">Todo o histórico</button>`);
+el('caixaDeEF').value=diaCaixaAtualEF;el('caixaAteEF').value=diaCaixaAtualEF;
+// Detect day changes while the system stays open; no record is deleted.
+setInterval(()=>{if(diaISOEF(new Date().toLocaleDateString('pt-BR'))!==diaCaixaAtualEF)renderizarCaixa();},30000);
+async function cancelarLancamentoEF(id){if(!exigirAtendimento())return;const m=(db.caixa||[]).find(m=>m.id==id);if(!m||!ativoEF(m))return;if(m.osId)return cancelarOSEF(m.osId);if(m.origem==='pdv'||itensVendaEF(m).length)return cancelarVendaEF(m.id);if(ehAtendente())return solicitarAlteracao('Cancelar lançamento',id,JSON.parse(JSON.stringify(m)),null);if(!ehAdmin())return;if(m.contaReceberId)return alert('Este lançamento está vinculado a uma conta recebida. Preserve o histórico do recebimento.');if(!confirm('Cancelar este lançamento? Ele deixará de contar no fluxo e ficará apenas no histórico.'))return;if(await transacaoEF(()=>{const antes=JSON.parse(JSON.stringify(m));estornarMovimentoEF(m,'Cancelamento lançamento '+m.id);auditar('Cancelar lançamento',id,antes,JSON.parse(JSON.stringify(m)));})){renderizarTudo();}}
+const decidirSolicitacaoEF=decidirSolicitacao;
+decidirSolicitacao=async function(id,aprovada){const s=(db.solicitacoes||[]).find(s=>s.id===id);if(s?.tipo!=='Cancelar lançamento')return decidirSolicitacaoEF(id,aprovada);if(!ehAdmin()||!exigirAtendimento()||s.status!=='Pendente')return;const m=(db.caixa||[]).find(m=>m.id==s.referencia);if(aprovada&&(!m||!ativoEF(m)||JSON.stringify(m)!==JSON.stringify(s.anterior)))return alert('O lançamento mudou. Recuse e solicite nova revisão.');if(await transacaoEF(()=>{if(aprovada)estornarMovimentoEF(m,'Cancelamento lançamento '+m.id);s.status=aprovada?'Aprovada':'Recusada';s.aprovador=usuarioLogadoAtual.nome;s.dataDecisao=new Date().toISOString();auditar('Decidir cancelamento lançamento',s.referencia,s.anterior,m,{status:s.status,solicitacaoId:s.id});})){renderizarTudo();}};
+// Contas a pagar: acréscimo autorizado durante a revisão, mantendo o mesmo array e ids.
+let contaPagarEditarEF=null;
+inserirEF('cpValor',campoEF('cpVencimentoEF','Vencimento do boleto','date'),'afterend');
+abrirModalContaPagar=function(id=null){if(!ehAdmin()||!exigirAtendimento())return;const c=(db.contasPagar||[]).find(c=>c.id==id);if(c?.status==='Cancelada'||c?.status==='Pago'||c?.status==='Paga')return alert('Esta conta já está encerrada; o histórico será preservado.');contaPagarEditarEF=id;el('cpDescricao').value=c?.descricao||'';el('cpValor').value=c?.valor||'';el('cpVencimentoEF').value=diaISOEF(c?.vencimento)||'';el('modalContaPagar').querySelector('h3').textContent=c?'Editar Conta a Pagar':'Nova Conta a Pagar';el('modalContaPagar').classList.remove('hidden');};
+salvarContaPagar=async function(e){e.preventDefault();if(!ehAdmin()||!exigirAtendimento())return;const c=(db.contasPagar||[]).find(c=>c.id==contaPagarEditarEF);if(c&&c.status&&c.status!=='Pendente')return;const descricao=el('cpDescricao').value.trim(),valor=Number(el('cpValor').value);if(!descricao||!Number.isFinite(valor)||valor<=0)return alert('Confira a descrição e o valor da conta.');if(await transacaoEF(()=>{const anterior=c?JSON.parse(JSON.stringify(c)):null,novo={...(c||{}),id:c?.id||novoIdEF(),descricao,valor,status:'Pendente',vencimento:el('cpVencimentoEF').value||new Date().toLocaleDateString('pt-BR')};db.contasPagar ||= [];if(c)Object.assign(c,novo);else db.contasPagar.push(novo);auditar(c?'Editar conta a pagar':'Adicionar conta a pagar',novo.id,anterior,novo);})){fecharModalContaPagar();renderizarContasPagar();}};
+async function cancelarContaPagarEF(id){if(!ehAdmin()||!exigirAtendimento())return;const c=(db.contasPagar||[]).find(c=>c.id==id);if(!c||c.status==='Cancelada')return;if(['Pago','Paga'].includes(c.status))return alert('Esta conta já foi paga; preserve o registro do pagamento.');if(!confirm('Cancelar este boleto? Ele sai do total pendente e permanece no histórico.'))return;if(await transacaoEF(()=>{const antes=JSON.parse(JSON.stringify(c));c.status='Cancelada';c.dataCancelamento=new Date().toISOString();c.canceladoPor=usuarioLogadoAtual.id;auditar('Cancelar conta a pagar',id,antes,JSON.parse(JSON.stringify(c)));})){renderizarContasPagar();}}
+excluirContaPagar=cancelarContaPagarEF;
+renderizarContasPagar=function(){const lista=db.contasPagar||[];el('finTotalPagarPendente').textContent=moeda(lista.filter(c=>!c.status||c.status==='Pendente').reduce((a,c)=>a+Number(c.valor||0),0));el('tabelaContasPagar').innerHTML=lista.map(c=>`<tr class="hover:bg-zinc-950/50"><td class="p-4">#${esc(c.id)}</td><td class="p-4">${esc(c.descricao)}</td><td class="p-4">${moeda(c.valor)}</td><td class="p-4">${esc(c.fornecedor||'-')}</td><td class="p-4">${esc(c.vencimento||'-')}</td><td class="p-4">${esc(c.status||'Pendente')}</td><td class="p-4">${ehAdmin()&&(!c.status||c.status==='Pendente')?`<button class="text-amber-400 mr-3" onclick="abrirModalContaPagar(${c.id})">Editar</button><button class="text-red-400" onclick="cancelarContaPagarEF(${c.id})">Cancelar boleto</button>`:''}</td></tr>`).join('')||'<tr><td colspan="7" class="p-4">Nenhuma conta a pagar.</td></tr>';};
+inserirEF('crItemNomeEF',`<div class="space-y-2 my-2"><label class="block">Produto do estoque (opcional)<input id="crBuscaProdutoEF" placeholder="Pesquisar produto" oninput="procurarProdutoEF('crBuscaProdutoEF','crProdutoEF')" class="${classeEF} w-full"><select id="crProdutoEF" onchange="selecionarProdutoContaEF()" class="${classeEF} w-full"></select></label><p class="text-xs text-zinc-400">Você também pode digitar a descrição de uma peça genérica ou da mão de obra abaixo.</p></div>`);
+function selecionarProdutoContaEF(){const p=(db.produtos||[]).find(p=>p.id==el('crProdutoEF').value);if(p){el('crItemTipoEF').value='peca';el('crItemNomeEF').value=p.nome;el('crItemValorEF').value=Number(p.preco)||0;}}
+const abrirContaProdutosEF=abrirModalContaReceber;
+abrirModalContaReceber=function(id=null){abrirContaProdutosEF(id);el('crBuscaProdutoEF').value='';procurarProdutoEF('crBuscaProdutoEF','crProdutoEF');el('crProdutoEF').value='';el('crItemNomeEF').value='';el('crItemQtdEF').value='1';el('crItemValorEF').value='';el('crItemTipoEF').value='peca';};
+const adicionarContaProdutoEF=adicionarContaItemEF;
+adicionarContaItemEF=function(){const antes=contaItensEF.length;adicionarContaProdutoEF();if(contaItensEF.length>antes){const i=contaItensEF.at(-1),p=(db.produtos||[]).find(p=>p.id==el('crProdutoEF').value);if(i.tipo==='peca'&&p&&i.nome===p.nome)i.produtoId=p.id;el('crProdutoEF').value='';el('crItemNomeEF').value='';el('crItemValorEF').value='';renderContaItensEF();}};
+const contasDetalheEF=renderizarContasReceber;
+renderizarContasReceber=function(){contasDetalheEF();for(const [n,c] of (db.contasReceber||[]).entries()){const celula=el('tabelaContasReceber').rows[n]?.cells[0];if(celula&&c.itens?.length)celula.insertAdjacentHTML('beforeend',`<details class="text-sm mt-2"><summary>Produtos e mão de obra</summary>${c.itens.map(i=>`<p>${esc(i.nome)} · ${i.tipo==='mao_de_obra'?'Mão de obra':'Peça'} · ${Number(i.qtd)||0} × ${moeda(i.valor)} = ${moeda(Number(i.qtd)*Number(i.valor))}</p>`).join('')}</details>`);}};
+
 </script>
 </body>
 </html>
